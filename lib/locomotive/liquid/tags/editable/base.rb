@@ -63,7 +63,12 @@ module Locomotive
           end
 
           def render_default_content(context)
-            render_all(@nodelist, context).join(' ')
+            puts '====== RENDER ALL ======'
+            ret = render_all(@nodelist, context).join(' ')
+            puts "GOT: #{ret}"
+            puts "ENCODING: #{ret.encoding}"
+            puts '====== END RENDER ALL ======'
+            ret
           end
         end
 

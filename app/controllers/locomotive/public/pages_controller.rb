@@ -21,6 +21,13 @@ module Locomotive
       end
 
       def show
+        puts '-----------------------------------------------------------------'
+        Dir.glob(File.join('/', 'home', 'alex', 'colibri', 'locomotive_engine',
+                           'lib', 'locomotive', 'liquid', '**', '*.rb')) do |f|
+          puts "Loading file: #{f}"
+          load f
+        end
+
         render_locomotive_page
       end
 

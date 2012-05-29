@@ -42,7 +42,16 @@ module Locomotive
         end
 
         def before_method(meth)
-          self._source.editable_elements.where(:slug => meth).try(:first).try(:content)
+          puts '~=~=~=~=~=~=~=~=~=~=~=~=~=~=~=~=~=~=~=~=~=~=~=~=~=~=~=~=~=~=~=~'
+          puts "DOING PAGE METHOD: #{meth}"
+          ret = self._source.editable_elements.where(:slug => meth).try(:first).try(:content)
+          puts "GOT ELEMENT: #{self._source.editable_elements.where(:slug => meth).try(:first)}"
+          puts "GOT VALUE: #{ret}"
+          puts "ENCODING: #{ret.encoding if ret}"
+          puts "RETURNING STRING: #{ret.to_s.inspect}"
+          puts "WITH ENCODING: #{ret.to_s.encoding}"
+          puts '~=~=~=~=~=~=~=~=~=~=~=~=~=~=~=~=~=~=~=~=~=~=~=~=~=~=~=~=~=~=~=~'
+          ret #|| ''
         end
 
       end
