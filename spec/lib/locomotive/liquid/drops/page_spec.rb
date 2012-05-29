@@ -86,12 +86,21 @@ describe Locomotive::Liquid::Drops::Page do
     before(:each) do
       @site = FactoryGirl.create(:site)
       @home = @site.pages.root.first
-      @home.update_attributes :raw_template => "{% block body %}{% editable_short_text 'body' %}Lorem ipsum{% endeditable_short_text %}{% endblock %}"
+      @home.update_attributes :raw_template => <<-EOF
+        {% block body %}
+        {% editable_short_text 'body' %}Lorem ipsum{% endeditable_short_text %}
+        {% editable_short_text 'other' %}Default Content{% endeditable_short_text %}
+        {% endblock %}"
+      EOF
       @home.editable_elements.first.content = 'Lorem ipsum'
     end
 
     it 'renders the text of the editable field' do
       render_template('{{ home.body }}').should == 'Lorem ipsum'
+    end
+
+    it 'renders the default text of the editable field' do
+      render_template('{{ home.other }}').should == 'Default Content'
     end
 
   end
