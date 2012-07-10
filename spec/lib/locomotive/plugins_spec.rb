@@ -6,8 +6,17 @@ module Locomotive
     context 'before_filters' do
 
       before(:each) do
+        LocomotivePlugins.register_plugin(MyEnabledPlugin)
+        LocomotivePlugins.register_plugin(MyDisabledPlugin)
+        @enabled_plugin = LocomotivePlugins.registered_plugins['my_enabled_plugin']
+        @disabled_plugin = LocomotivePlugins.registered_plugins['my_disabled_plugin']
+
+        @site = FactoryGirl.build(:site)
+        @site.stubs(:enabled_plugins).returns(['my_enabled_plugin'])
+
         Locomotive::TestController.send(:include, Locomotive::PluginProcessor)
         @controller = Locomotive::TestController.new
+        @controller.stubs(:current_site).returns(@site)
       end
 
       it 'should run all before_filters for enabled plugins' do
