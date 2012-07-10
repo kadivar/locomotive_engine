@@ -17,6 +17,7 @@ require 'locomotive/rails'
 require 'locomotive/routing'
 require 'locomotive/regexps'
 require 'locomotive/render'
+require 'locomotive/plugins'
 require 'locomotive/middlewares'
 require 'locomotive/session_store'
 
