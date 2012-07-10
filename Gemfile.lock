@@ -25,6 +25,7 @@ PATH
       locomotive-mongoid-tree (~> 0.6.2)
       locomotive-tinymce-rails (~> 3.4.7.2)
       locomotive_liquid (= 2.2.2)
+      locomotive_plugins (~> 0.0.1)
       mimetype-fu (~> 0.1.2)
       mongo (~> 1.5.2)
       mongoid (~> 2.4.9)
@@ -37,6 +38,11 @@ PATH
       rmagick (~> 2.12.2)
       sanitize (~> 2.0.3)
       unidecoder (~> 1.1.1)
+
+PATH
+  remote: ../locomotive_plugins
+  specs:
+    locomotive_plugins (0.0.1)
 
 GEM
   remote: http://rubygems.org/
@@ -332,6 +338,7 @@ DEPENDENCIES
   json_spec
   launchy
   locomotive_cms!
+  locomotive_plugins!
   mocha (= 0.9.12)
   pickle
   poltergeist
