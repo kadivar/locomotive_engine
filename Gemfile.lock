@@ -43,6 +43,7 @@ PATH
   remote: ../locomotive_plugins
   specs:
     locomotive_plugins (0.0.1)
+      locomotive_liquid (~> 2.2.2)
 
 GEM
   remote: http://rubygems.org/

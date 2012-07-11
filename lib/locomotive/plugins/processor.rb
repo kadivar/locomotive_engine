@@ -15,7 +15,7 @@ module Locomotive
         DropContainer.new({}.tap do |drops|
           enabled_plugins_hash.each do |id, plugin|
             drop = plugin.to_liquid
-            arr[id] = drop if drop
+            drops[id] = drop if drop
           end
         end)
       end
