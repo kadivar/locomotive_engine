@@ -5,6 +5,7 @@ module Locomotive
       include Locomotive::Routing::SiteDispatcher
       include Locomotive::Render
       include Locomotive::ActionController::LocaleHelpers
+      include Locomotive::PluginProcessor
 
       before_filter :require_site
 
@@ -15,6 +16,8 @@ module Locomotive
       before_filter :set_toolbar_locale, :only => :show_toolbar
 
       before_filter :set_locale, :only => [:show, :edit]
+
+      before_filter :run_plugin_before_filters, :only => [:show, :edit]
 
       def show_toolbar
         render :layout => false
