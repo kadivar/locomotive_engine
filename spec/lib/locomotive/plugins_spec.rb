@@ -34,15 +34,28 @@ module Locomotive
 
       context 'liquid' do
 
+        before(:each) do
+          LocomotivePlugins.register_plugin(AnotherEnabledPlugin)
+          @another_enabled_plugin = \
+            LocomotivePlugins.registered_plugins['another_enabled_plugin']
+        end
+
         it 'should build a container for the plugin liquid drops' do
           container = @controller.plugin_drops
           container_liquid = container.to_liquid
           container_liquid.kind_of?(::Liquid::Drop).should be_true
         end
 
-        it 'should retrieve the liquid drops for enabled plugins'
+        it 'should retrieve the liquid drops for enabled plugins with drops' do
+          container = @controller.plugin_drops
+          container.before_method('my_enabled_plugin').should == @enabled_plugin.to_liquid
+          container.before_method('another_enabled_plugin').should be_nil
+        end
 
-        it 'should not retrieve the liquid drops for disabled plugins'
+        it 'should not retrieve the liquid drops for disabled plugins' do
+          container = @controller.plugin_drops
+          container.before_method('my_disabled_plugin').should be_nil
+        end
 
       end
 
@@ -55,12 +68,16 @@ module Locomotive
         before_filter :my_method
 
         def to_liquid
-          MyEnabledDrop.new
+          @my_drop ||= MyEnabledDrop.new
         end
 
         def my_method
         end
 
+      end
+
+      class AnotherEnabledPlugin
+        include Locomotive::Plugin
       end
 
       class MyDisabledPlugin
@@ -73,7 +90,7 @@ module Locomotive
         end
 
         def to_liquid
-          MyDisabledDrop.new
+          @my_drop ||= MyDisabledDrop.new
         end
 
       end
