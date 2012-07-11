@@ -5,7 +5,7 @@ module Locomotive
       include Locomotive::Routing::SiteDispatcher
       include Locomotive::Render
       include Locomotive::ActionController::LocaleHelpers
-      include Locomotive::PluginProcessor
+      include Locomotive::Plugins::Processor
 
       before_filter :require_site
 
