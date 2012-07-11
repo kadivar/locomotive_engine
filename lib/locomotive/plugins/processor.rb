@@ -11,7 +11,7 @@ module Locomotive
         end
       end
 
-      def plugin_drops
+      def plugin_drops_container
         DropContainer.new({}.tap do |drops|
           enabled_plugins_hash.each do |id, plugin|
             drop = plugin.to_liquid

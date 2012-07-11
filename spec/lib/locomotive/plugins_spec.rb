@@ -41,19 +41,19 @@ module Locomotive
         end
 
         it 'should build a container for the plugin liquid drops' do
-          container = @controller.plugin_drops
+          container = @controller.plugin_drops_container
           container_liquid = container.to_liquid
           container_liquid.kind_of?(::Liquid::Drop).should be_true
         end
 
         it 'should retrieve the liquid drops for enabled plugins with drops' do
-          container = @controller.plugin_drops
+          container = @controller.plugin_drops_container
           container.before_method('my_enabled_plugin').should == @enabled_plugin.to_liquid
           container.before_method('another_enabled_plugin').should be_nil
         end
 
         it 'should not retrieve the liquid drops for disabled plugins' do
-          container = @controller.plugin_drops
+          container = @controller.plugin_drops_container
           container.before_method('my_disabled_plugin').should be_nil
         end
 
