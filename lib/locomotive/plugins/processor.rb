@@ -22,18 +22,16 @@ module Locomotive
 
       protected
 
-      def enabled_plugins
-        current_site.enabled_plugins.collect do |plugin_name|
-          LocomotivePlugins.registered_plugins[plugin_name]
-        end
-      end
-
       def enabled_plugins_hash
         {}.tap do |h|
           current_site.enabled_plugins.collect do |plugin_name|
             h[plugin_name] = LocomotivePlugins.registered_plugins[plugin_name]
           end
         end
+      end
+
+      def enabled_plugins
+        enabled_plugins_hash.values
       end
 
     end
