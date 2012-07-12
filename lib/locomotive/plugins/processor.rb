@@ -8,9 +8,14 @@ module Locomotive
       def process_plugins
         self.plugin_drops_container = DropContainer.new({}.tap do |container|
           enabled_plugins do |plugin_id, plugin|
+            plugin.controller = self
+
+            # Call all before_filters
             plugin.before_filters.each do |meth|
               plugin.send(meth)
             end
+
+            # Add the drop to the container
             drop = plugin.to_liquid
             container[plugin_id] = drop if drop
           end

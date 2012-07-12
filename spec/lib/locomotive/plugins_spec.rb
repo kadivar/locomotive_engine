@@ -30,6 +30,11 @@ module Locomotive
           @controller.process_plugins
         end
 
+        it 'should be able to access the controller from the before_filter' do
+          @controller.expects(:params)
+          @controller.process_plugins
+        end
+
       end
 
       context 'liquid' do
@@ -73,6 +78,8 @@ module Locomotive
         end
 
         def my_method
+          # Access params
+          self.controller.params
         end
 
       end
