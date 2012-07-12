@@ -22,12 +22,12 @@ module Locomotive
 
         it 'should run all before_filters for enabled plugins' do
           @enabled_plugin.expects(:my_method)
-          @controller.run_plugin_before_filters
+          @controller.process_plugins
         end
 
         it 'should not run any before_filters for disabled plugins' do
           @disabled_plugin.expects(:another_method).never
-          @controller.run_plugin_before_filters
+          @controller.process_plugins
         end
 
       end
@@ -38,6 +38,7 @@ module Locomotive
           LocomotivePlugins.register_plugin(AnotherEnabledPlugin)
           @another_enabled_plugin = \
             LocomotivePlugins.registered_plugins['another_enabled_plugin']
+          @controller.process_plugins
         end
 
         it 'should build a container for the plugin liquid drops' do
@@ -48,13 +49,13 @@ module Locomotive
 
         it 'should retrieve the liquid drops for enabled plugins with drops' do
           container = @controller.plugin_drops_container
-          container.before_method('my_enabled_plugin').should == @enabled_plugin.to_liquid
-          container.before_method('another_enabled_plugin').should be_nil
+          container['my_enabled_plugin'].should == @enabled_plugin.to_liquid
+          container['another_enabled_plugin'].should be_nil
         end
 
         it 'should not retrieve the liquid drops for disabled plugins' do
           container = @controller.plugin_drops_container
-          container.before_method('my_disabled_plugin').should be_nil
+          container['my_disabled_plugin'].should be_nil
         end
 
       end
