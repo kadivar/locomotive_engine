@@ -8,7 +8,8 @@
 
 - content_for :buttons do
   = local_action_button :show_entries, content_entries_url(@content_type.slug_was), :class => 'show'
-  = local_action_button :new_entry, new_content_entry_url(@content_type.slug_was), :class => 'new'
+  - if @content_type.allow_add_entry?
+    = local_action_button :new_entry, new_content_entry_url(@content_type.slug_was), :class => 'new'
 
 %p!= t('.help')
 

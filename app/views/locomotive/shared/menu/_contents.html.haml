@@ -26,15 +26,17 @@
     = submenu_entry truncate(content_type.name, :length => 15), content_entries_url(content_type.slug), :i18n => false, :css => "#{'on' if is_content_type_selected(content_type)}" do
       .wrapper
         .header
-          %p= link_to t('locomotive.content_entries.index.new'), new_content_entry_url(content_type.slug)
+          - if content_type.allow_add_entry?
+            %p= link_to t('locomotive.content_entries.index.new'), new_content_entry_url(content_type.slug)
 
           - if can? :manage, content_type
             %p.edit= link_to t('locomotive.content_types.index.edit'), edit_content_type_url(content_type)
 
         .inner
-          %h2!= t('locomotive.content_entries.index.latest_entries')
-          %ul
-            - content_type.entries.latest_updated.each do |entry|
-              %li
-                = link_to truncate(entry._label(content_type), :length => 20), edit_content_entry_url(content_type.slug, entry)
-                %span= time_ago_in_words(entry.updated_at)
+          -if content_type.allow_list_entries?
+            %h2!= t('locomotive.content_entries.index.latest_entries')
+            %ul
+              - content_type.entries.latest_updated.each do |entry|
+                %li
+                  = link_to truncate(entry._label(content_type), :length => 20), edit_content_entry_url(content_type.slug, entry)
+                  %span= time_ago_in_words(entry.updated_at)

@@ -15,7 +15,7 @@ form.quick-upload {
 
 /* ___ list ___ */
 
-p.no-items {
+p.no-items, p.remote-source {
   background: #fffbe6;
   border: 5px solid #eee3a8;
   @include border-radius(25px);

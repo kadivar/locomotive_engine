@@ -7,7 +7,7 @@ module Locomotive
 
         included do
           before_save :set_order_by
-          before_save :set_label_field
+          before_save :set_label_field, :unless => :from_remote_source
           before_save :set_default_order_by_for_has_many_fields
         end
 

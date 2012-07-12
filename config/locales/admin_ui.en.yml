@@ -249,6 +249,7 @@ en:
         order_direction:
           asc: Ascending
           desc: Descending
+        
 
     content_entries:
       index:
@@ -262,6 +263,7 @@ en:
         updated_at: "Updated at"
       list:
         no_items: "There are no entries for now. Just click <a href=\"%{url}\">here</a> to create the first one."
+        remote_source: "This model's entries come from a remote source: <a href=\"%{source_url}\">%{source_url}</a>"
       new:
         title: '%{type} &mdash; new entry'
       edit:

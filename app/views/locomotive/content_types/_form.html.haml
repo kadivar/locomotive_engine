@@ -13,8 +13,14 @@
   = f.input :slug
 
   = f.input :description
+  
+  = f.input :from_remote_source, :as => :'Locomotive::Toggle'
 
-= f.inputs :name => :custom_fields, :class => "inputs foldable" do
+  = f.input :remote_source_url, :wrapper_html => { :style => "#{'display: none' if !@content_type.from_remote_source}" }
+
+  = f.input :remote_source_expiry, :as => :select, :collection => options_for_remote_source_expiry, :include_blank => false, :style => "#{'display: none' if !@content_type.from_remote_source}"
+
+= f.inputs :name => :custom_fields, :id=> :custom_fields_fieldset, :class => "inputs foldable",  :style => "#{'display: none' if @content_type.from_remote_source}"  do
 
   = f.input :entries_custom_fields, :as => :'Locomotive::Empty', :label => false, :wrapper_html => { :id => 'custom_fields_input' }
 

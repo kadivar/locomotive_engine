@@ -10,7 +10,8 @@
   - if can?(:manage, Locomotive::ContentType)
     = local_action_button t('locomotive.content_entries.index.edit'), edit_content_type_url(@content_type), :class => 'edit'
 
-  = local_action_button t('locomotive.content_entries.index.new'), new_content_entry_url(@content_type.slug), :class => 'new'
+  - if @content_type.allow_add_entry?
+    = local_action_button t('locomotive.content_entries.index.new'), new_content_entry_url(@content_type.slug), :class => 'new'
 
 %p= @content_type.description
 

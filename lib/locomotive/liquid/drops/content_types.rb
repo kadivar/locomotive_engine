@@ -5,7 +5,21 @@ module Locomotive
 
         def before_method(meth)
           type = @context.registers[:site].content_types.where(:slug => meth.to_s).first
-          ContentTypeProxyCollection.new(type)
+          if(type.from_remote_source)
+            cache_key = Digest::SHA1.hexdigest(type.remote_source_url)
+            
+            if type.remote_source_expiry == 'none'
+              expires_in = 10
+            else
+              expires_in = type.remote_source_expiry.to_i rescue 1.minute 
+            end
+            
+            Rails.cache.fetch(cache_key, :expires_in => expires_in) do
+              Locomotive::Httparty::Webservice.consume(type.remote_source_url)
+            end
+          else
+            ContentTypeProxyCollection.new(type)
+          end
         end
 
       end

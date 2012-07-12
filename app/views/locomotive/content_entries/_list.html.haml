@@ -1,5 +1,7 @@
-- if entries.empty?
+- if entries.empty? and !content_type.from_remote_source
   %p.no-items!= t('.no_items', :url => new_content_entry_url(content_type.slug))
+- elsif content_type.from_remote_source
+  %p.remote-source!= t('.remote_source', :source_url => content_type.remote_source_url)
 - else
   %ul{ :id => 'entries-list', :class => "#{'list' unless content_type.groupable?} #{'sortable' if content_type.order_manually?}", :'data-url' => sort_content_entries_url(content_type.slug, :json) }
     - entries.each do |entry|
