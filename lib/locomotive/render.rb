@@ -57,7 +57,7 @@ module Locomotive
         'default_locale'    => current_site.default_locale.to_s,
         'locales'           => current_site.locales,
         'current_user'      => Locomotive::Liquid::Drops::CurrentUser.new(current_locomotive_account),
-        'plugins'           => plugin_drops_container   # TODO: do some kind of dependency injection here
+        'plugins'           => self.respond_to?(:plugin_drops_container) ? self.plugin_drop_container : nil
       }
 
       assigns.merge!(Locomotive.config.context_assign_extensions)
