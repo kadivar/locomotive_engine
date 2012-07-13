@@ -5,13 +5,11 @@ module Locomotive
     describe Processor do
 
       before(:each) do
-        LocomotivePlugins.register_plugin(MyEnabledPlugin)
-        LocomotivePlugins.register_plugin(MyDisabledPlugin)
-        @enabled_plugin = LocomotivePlugins.registered_plugins['my_enabled_plugin']
-        @disabled_plugin = LocomotivePlugins.registered_plugins['my_disabled_plugin']
+        @enabled_plugin = register_and_enable_plugin(MyEnabledPlugin)
+        @disabled_plugin = register_plugin(MyDisabledPlugin)
 
         @site = FactoryGirl.build(:site)
-        @site.stubs(:enabled_plugins).returns(['my_enabled_plugin'])
+        @site.stubs(:enabled_plugins).returns(@enabled_plugins)
 
         Locomotive::TestController.send(:include, Locomotive::Plugins::Processor)
         @controller = Locomotive::TestController.new
@@ -40,9 +38,7 @@ module Locomotive
       context 'liquid' do
 
         before(:each) do
-          LocomotivePlugins.register_plugin(AnotherEnabledPlugin)
-          @another_enabled_plugin = \
-            LocomotivePlugins.registered_plugins['another_enabled_plugin']
+          @another_enabled_plugin = register_and_enable_plugin(AnotherEnabledPlugin)
           @controller.process_plugins
         end
 
@@ -65,7 +61,62 @@ module Locomotive
 
       end
 
+      context 'content entry scoping' do
+
+        before(:each) do
+          @controller.process_plugins
+        end
+
+        it 'should add a scope for enabled plugins' do
+          scopes = @controller.plugin_scope_hash
+          scopes['$and'].count.should == 1
+          scopes['$and'].should include(@enabled_plugin.content_entry_scope)
+        end
+
+        it 'should not add a scope for disabled plugins' do
+          scopes = @controller.plugin_scope_hash
+          scopes['$and'].should_not include(@disabled_plugin.content_entry_scope)
+        end
+
+        it 'should not add a scope for an enabled plugin which does not specify one' do
+          @another_enabled_plugin = register_and_enable_plugin(AnotherEnabledPlugin)
+          @controller.process_plugins
+          scopes = @controller.plugin_scope_hash
+          scopes['$and'].count.should == 1
+          scopes['$and'].should include(@enabled_plugin.content_entry_scope)
+        end
+
+        it 'should add all scopes for multiple enabled plugins' do
+          @plugin_with_scope = register_and_enable_plugin(PluginWithScope)
+          @controller.process_plugins
+          scopes = @controller.plugin_scope_hash
+          scopes['$and'].count.should == 2
+          scopes['$and'].should include(@enabled_plugin.content_entry_scope)
+          scopes['$and'].should include(@plugin_with_scope.content_entry_scope)
+        end
+
+      end
+
       protected
+
+      def register_plugin(plugin_class)
+        LocomotivePlugins.register_plugin(plugin_class)
+        plugin_id = LocomotivePlugins.default_id(plugin_class)
+        LocomotivePlugins.registered_plugins[plugin_id]
+      end
+
+      def enable_plugin(plugin_id)
+        @enabled_plugins ||= []
+        @enabled_plugins << plugin_id
+      end
+
+      def register_and_enable_plugin(plugin_class)
+        plugin_id = LocomotivePlugins.default_id(plugin_class)
+        enable_plugin(plugin_id)
+        register_plugin(plugin_class)
+      end
+
+      ## Classes ##
 
       class MyEnabledPlugin
 
@@ -75,6 +126,10 @@ module Locomotive
 
         def to_liquid
           @my_drop ||= MyEnabledDrop.new
+        end
+
+        def content_entry_scope
+          { :my_field.gte => 5 }
         end
 
         def my_method
@@ -88,6 +143,14 @@ module Locomotive
         include Locomotive::Plugin
       end
 
+      class PluginWithScope
+        include Locomotive::Plugin
+
+        def content_entry_scope
+          { :my_field => :my_value }
+        end
+      end
+
       class MyDisabledPlugin
 
         include Locomotive::Plugin
@@ -99,6 +162,10 @@ module Locomotive
 
         def to_liquid
           @my_drop ||= MyDisabledDrop.new
+        end
+
+        def content_entry_scope
+          { :awesomeness => 100 }
         end
 
       end
