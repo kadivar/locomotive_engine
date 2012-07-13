@@ -8,13 +8,20 @@ module Locomotive
           if(type.from_remote_source)
             cache_key = Digest::SHA1.hexdigest(type.remote_source_url)
             
+            minimum_cache_time = 10
             if type.remote_source_expiry == 'none'
-              expires_in = 10
+              expires_in = minimum_cache_time
             else
               expires_in = type.remote_source_expiry.to_i rescue 1.minute 
             end
             
-            Rails.cache.fetch(cache_key, :expires_in => expires_in) do
+            force = true
+            if(Rails.cache.exist?(cache_key+"_expiry"))
+               force = Rails.cache.read(cache_key+"_expiry") != expires_in
+            end
+            Rails.cache.fetch(cache_key, :expires_in => expires_in, :force => force) do
+              Locomotive.log  "[Liquid template] Loading Remote URL: #{type.remote_source_url}"
+              Rails.cache.write(cache_key+"_expiry", expires_in)
               Locomotive::Httparty::Webservice.consume(type.remote_source_url)
             end
           else
