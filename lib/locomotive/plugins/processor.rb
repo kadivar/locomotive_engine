@@ -28,6 +28,7 @@ module Locomotive
         end
 
         self.plugin_drops_container = DropContainer.new(plugin_drops_container_hash)
+        self.plugin_scope_hash = nil if self.plugin_scope_hash['$and'].blank?
       end
 
       protected

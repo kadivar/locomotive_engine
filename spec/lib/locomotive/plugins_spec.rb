@@ -95,6 +95,13 @@ module Locomotive
           scopes['$and'].should include(@plugin_with_scope.content_entry_scope)
         end
 
+        it 'should return nil if there are no scopes to be added' do
+          @enabled_plugins.clear
+          @plugin_without_scope = register_and_enable_plugin(AnotherEnabledPlugin)
+          @controller.process_plugins
+          @controller.plugin_scope_hash.should be_nil
+        end
+
       end
 
       protected
