@@ -39,7 +39,13 @@ module Locomotive
         protected
 
         def collection
-          @collection ||= @content_type.ordered_entries(@context['with_scope'])
+          conditions = [ @context['with_scope'], @context['plugin_scope'] ].compact
+          if conditions.blank?
+            h = {}
+          else
+            h = { '$and' => conditions }
+          end
+          @collection ||= @content_type.ordered_entries(h)
         end
       end
 
