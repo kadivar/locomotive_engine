@@ -39,9 +39,12 @@ module Locomotive
         protected
 
         def current_scope
-          conditions = @context.registers['plugins'].collect do |plugin|
+          conditions = [ @context.registers['with_scope'] ]
+          conditions += @context.registers['plugins'].collect do |plugin|
             plugin.content_type_scope(@content_type)
-          end.compact
+          end
+
+          conditions.compact!
 
           if conditions.blank?
             nil

@@ -8,7 +8,8 @@ module Locomotive
         before(:each) do
           @proxy_collection = ContentTypeProxyCollection.new(special_content_type)
 
-          context_stub = stub(:registers => { 'plugins' => plugins })
+          @registers = { 'plugins' => plugins }
+          context_stub = stub(:registers => @registers)
           @proxy_collection.instance_variable_set(:@context, context_stub)
         end
 
@@ -37,7 +38,16 @@ module Locomotive
             current_scope['$and'].should_not include({ :field4 => :value4 })
           end
 
-          it 'should also apply the scope supplied by "with_scope"'
+          it 'should also apply the scope supplied by "with_scope"' do
+            @registers['with_scope'] = { 'special_field' => 'special_value' }
+            current_scope.should == { 'special_field' => 'special_value' }
+
+            set_plugins(Plugins::Plugin1, Plugins::Plugin2)
+            current_scope['$and'].count.should == 3
+            current_scope['$and'].should include({ 'special_field' => 'special_value' })
+            current_scope['$and'].should include({ :field1 => :value1 })
+            current_scope['$and'].should include({ :field3 => :value3 })
+          end
 
         end
 
