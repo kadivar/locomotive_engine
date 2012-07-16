@@ -42,7 +42,9 @@ module Locomotive
           @controller.process_plugins
         end
 
-        it 'should add a register which holds all enabled plugins'
+        it 'should supply the enabled plugins' do
+          @controller.enabled_plugins.should == [ @enabled_plugin, @another_enabled_plugin ]
+        end
 
         it 'should build a container for the plugin liquid drops' do
           container = @controller.plugin_drops_container
@@ -59,49 +61,6 @@ module Locomotive
         it 'should not retrieve the liquid drops for disabled plugins' do
           container = @controller.plugin_drops_container
           container['my_disabled_plugin'].should be_nil
-        end
-
-      end
-
-      context 'content entry scoping' do
-
-        before(:each) do
-          @controller.process_plugins
-        end
-
-        it 'should add a scope for enabled plugins' do
-          scopes = @controller.plugin_scope_hash
-          scopes['$and'].count.should == 1
-          scopes['$and'].should include(@enabled_plugin.content_type_scope)
-        end
-
-        it 'should not add a scope for disabled plugins' do
-          scopes = @controller.plugin_scope_hash
-          scopes['$and'].should_not include(@disabled_plugin.content_type_scope)
-        end
-
-        it 'should not add a scope for an enabled plugin which does not specify one' do
-          @another_enabled_plugin = register_and_enable_plugin(AnotherEnabledPlugin)
-          @controller.process_plugins
-          scopes = @controller.plugin_scope_hash
-          scopes['$and'].count.should == 1
-          scopes['$and'].should include(@enabled_plugin.content_entry_scope)
-        end
-
-        it 'should add all scopes for multiple enabled plugins' do
-          @plugin_with_scope = register_and_enable_plugin(PluginWithScope)
-          @controller.process_plugins
-          scopes = @controller.plugin_scope_hash
-          scopes['$and'].count.should == 2
-          scopes['$and'].should include(@enabled_plugin.content_entry_scope)
-          scopes['$and'].should include(@plugin_with_scope.content_entry_scope)
-        end
-
-        it 'should return nil if there are no scopes to be added' do
-          @enabled_plugins.clear
-          @plugin_without_scope = register_and_enable_plugin(AnotherEnabledPlugin)
-          @controller.process_plugins
-          @controller.plugin_scope_hash.should be_nil
         end
 
       end

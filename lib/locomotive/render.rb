@@ -57,8 +57,7 @@ module Locomotive
         'default_locale'    => current_site.default_locale.to_s,
         'locales'           => current_site.locales,
         'current_user'      => Locomotive::Liquid::Drops::CurrentUser.new(current_locomotive_account),
-        'plugins'           => self.respond_to?(:plugin_drops_container) ? self.plugin_drops_container : nil,
-        'plugin_scope'      => self.respond_to?(:plugin_scope_hash) ? self.plugin_scope_hash : nil
+        'plugins'           => self.respond_to?(:plugin_drops_container) ? self.plugin_drops_container : nil
       }
 
       assigns.merge!(Locomotive.config.context_assign_extensions)
@@ -74,6 +73,7 @@ module Locomotive
         :controller     => self,
         :site           => current_site,
         :page           => @page,
+        :plugins        => self.respond_to?(:enabled_plugins) ? self.enabled_plugins : nil,
         :inline_editor  => self.editing_page?,
         :current_locomotive_account => current_locomotive_account
       }
