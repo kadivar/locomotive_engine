@@ -9,7 +9,10 @@ module Locomotive
           @proxy_collection = ContentTypeProxyCollection.new(special_content_type)
 
           @registers = { :plugins => plugins }
-          context_stub = stub(:registers => @registers)
+          @assigns = {}
+          context_stub = Stubs::Context.new
+          context_stub.registers = @registers
+          context_stub.assigns = @assigns
           @proxy_collection.instance_variable_set(:@context, context_stub)
         end
 
@@ -39,7 +42,7 @@ module Locomotive
           end
 
           it 'should also apply the scope supplied by "with_scope"' do
-            @registers['with_scope'] = { 'special_field' => 'special_value' }
+            @assigns['with_scope'] = { 'special_field' => 'special_value' }
             current_scope.should == { 'special_field' => 'special_value' }
 
             set_plugins(Plugins::Plugin1, Plugins::Plugin2)
@@ -118,6 +121,20 @@ module Locomotive
 
             def special_content_type
               ::Locomotive::Liquid::Drops::Plugins.special_content_type
+            end
+
+          end
+
+        end
+
+        module Stubs
+
+          class Context
+
+            attr_accessor :registers, :assigns
+
+            def [](key)
+              self.assigns[key]
             end
 
           end

@@ -39,7 +39,7 @@ module Locomotive
         protected
 
         def current_scope
-          conditions = [ @context.registers['with_scope'] ]
+          conditions = [ @context['with_scope'] ]
           conditions += @context.registers[:plugins].collect do |plugin|
             plugin.content_type_scope(@content_type)
           end
