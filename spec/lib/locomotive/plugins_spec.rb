@@ -42,6 +42,8 @@ module Locomotive
           @controller.process_plugins
         end
 
+        it 'should add a register which holds all enabled plugins'
+
         it 'should build a container for the plugin liquid drops' do
           container = @controller.plugin_drops_container
           container_liquid = container.to_liquid
@@ -70,12 +72,12 @@ module Locomotive
         it 'should add a scope for enabled plugins' do
           scopes = @controller.plugin_scope_hash
           scopes['$and'].count.should == 1
-          scopes['$and'].should include(@enabled_plugin.content_entry_scope)
+          scopes['$and'].should include(@enabled_plugin.content_type_scope)
         end
 
         it 'should not add a scope for disabled plugins' do
           scopes = @controller.plugin_scope_hash
-          scopes['$and'].should_not include(@disabled_plugin.content_entry_scope)
+          scopes['$and'].should_not include(@disabled_plugin.content_type_scope)
         end
 
         it 'should not add a scope for an enabled plugin which does not specify one' do
@@ -135,8 +137,12 @@ module Locomotive
           @my_drop ||= MyEnabledDrop.new
         end
 
-        def content_entry_scope
-          { :my_field.gte => 5 }
+        def content_type_scope(content_type = nil)
+          if content_type
+            { :content_entry_field => 'hello' }
+          else
+            { :my_field.gte => 5 }
+          end
         end
 
         def my_method
