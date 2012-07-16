@@ -14,7 +14,9 @@ module Locomotive
 
         context 'plugins' do
 
-          it 'should apply a nil scope if there are no plugins'
+          it 'should apply a nil scope if there are no plugins' do
+            current_scope.should be_nil
+          end
 
           it 'should apply the scope for this content type' do
             set_plugins(Plugins::Plugin1)
@@ -29,7 +31,11 @@ module Locomotive
             current_scope['$and'].should include({ :field3 => :value3 })
           end
 
-          it 'should not apply the scope for other content types'
+          it 'should not apply the scope for other content types' do
+            set_plugins(Plugins::Plugin1, Plugins::Plugin2)
+            current_scope['$and'].should_not include({ :field2 => :value2 })
+            current_scope['$and'].should_not include({ :field4 => :value4 })
+          end
 
           it 'should also apply the scope supplied by "with_scope"'
 
