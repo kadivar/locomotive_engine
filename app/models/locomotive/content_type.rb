@@ -23,7 +23,7 @@ module Locomotive
     field :from_remote_source,          :type => Boolean, :default => false
     field :remote_source_url
     field :remote_source_expiry,        :default => 'none'
-    
+    field :public_readonly_api_enabled, :type => Boolean, :default => false
 
     ## associations ##
     belongs_to  :site,      :class_name => 'Locomotive::Site'

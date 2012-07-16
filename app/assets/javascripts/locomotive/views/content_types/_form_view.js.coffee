@@ -28,6 +28,8 @@ class Locomotive.Views.ContentTypes.FormView extends Locomotive.Views.Shared.For
     @enable_order_by_toggler()
     
     @enable_from_remote_source_checkbox()
+    
+    @enable_public_readonly_api_checkbox()
 
     return @
 
@@ -67,15 +69,19 @@ class Locomotive.Views.ContentTypes.FormView extends Locomotive.Views.Shared.For
     @_enable_checkbox 'from_remote_source',
       on_callback: =>
         @$('#custom_fields_fieldset').hide()
+        @$('#presentation_fieldset').hide()
+        @$('#options_fieldset').hide()
         @$('#content_type_remote_source_url_input').show()
         @$('#content_type_remote_source_expiry_input').show()
       off_callback: =>
         @$('#custom_fields_fieldset').show()
+        @$('#presentation_fieldset').show()
+        @$('#options_fieldset').show()
         @$('#content_type_remote_source_url_input').hide()
         @$('#content_type_remote_source_expiry_input').hide()
         
-
-
+  enable_public_readonly_api_checkbox: ->
+    @_enable_checkbox 'public_readonly_api_enabled'
 
   show_error: (attribute, message, html) ->
     if attribute != 'entries_custom_fields'

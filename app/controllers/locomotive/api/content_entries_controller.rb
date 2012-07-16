@@ -3,13 +3,17 @@ module Locomotive
     class ContentEntriesController < BaseController
 
       before_filter :set_content_type
+      before_filter :require_account, :except => [:index, :show]
+
 
       def index
+        require_account unless @content_type.public_readonly_api_enabled
         @content_entries = @content_type.ordered_entries
         respond_with @content_entries
       end
 
       def show
+        require_account unless @content_type.public_readonly_api_enabled
         @content_entry = @content_type.entries.any_of({ :_id => params[:id] }, { :_slug => params[:id] }).first
         respond_with @content_entry, :status => @content_entry ? :ok : :not_found
       end
