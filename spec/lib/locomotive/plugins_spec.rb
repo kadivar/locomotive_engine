@@ -44,6 +44,9 @@ module Locomotive
 
         it 'should supply the enabled plugins' do
           @controller.enabled_plugins.should == [ @enabled_plugin, @another_enabled_plugin ]
+          @enabled_plugins.clear
+          @controller.process_plugins
+          @controller.enabled_plugins.should == []
         end
 
         it 'should build a container for the plugin liquid drops' do
@@ -96,14 +99,6 @@ module Locomotive
           @my_drop ||= MyEnabledDrop.new
         end
 
-        def content_type_scope(content_type = nil)
-          if content_type
-            { :content_entry_field => 'hello' }
-          else
-            { :my_field.gte => 5 }
-          end
-        end
-
         def my_method
           # Access params
           self.controller.params
@@ -117,10 +112,6 @@ module Locomotive
 
       class PluginWithScope
         include Locomotive::Plugin
-
-        def content_entry_scope
-          { :my_field => :my_value }
-        end
       end
 
       class MyDisabledPlugin
@@ -134,10 +125,6 @@ module Locomotive
 
         def to_liquid
           @my_drop ||= MyDisabledDrop.new
-        end
-
-        def content_entry_scope
-          { :awesomeness => 100 }
         end
 
       end

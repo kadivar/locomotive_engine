@@ -8,7 +8,7 @@ module Locomotive
         before(:each) do
           @proxy_collection = ContentTypeProxyCollection.new(special_content_type)
 
-          @registers = { 'plugins' => plugins }
+          @registers = { :plugins => plugins }
           context_stub = stub(:registers => @registers)
           @proxy_collection.instance_variable_set(:@context, context_stub)
         end
@@ -86,7 +86,7 @@ module Locomotive
 
             include Locomotive::Plugin
 
-            def content_type_scope(content_type = nil)
+            def content_type_scope(content_type)
               if content_type == special_content_type
                 { :field1 => :value1 }
               else
@@ -106,7 +106,7 @@ module Locomotive
 
             include Locomotive::Plugin
 
-            def content_type_scope(content_type = nil)
+            def content_type_scope(content_type)
               if content_type == special_content_type
                 { :field3 => :value3 }
               else
