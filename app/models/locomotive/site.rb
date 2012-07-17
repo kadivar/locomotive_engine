@@ -8,11 +8,11 @@ module Locomotive
     extend  Extensions::Site::FirstInstallation
     include Extensions::Shared::Seo
     include Extensions::Site::Locales
+    include Extensions::Site::Plugins
 
     ## fields ##
     field :name
     field :robots_txt
-    field :enabled_plugins, :type => Array, :default => []
 
     ## associations ##
     references_many :pages,           :class_name => 'Locomotive::Page',          :validate => false
