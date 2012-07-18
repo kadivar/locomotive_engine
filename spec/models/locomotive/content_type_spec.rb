@@ -333,6 +333,18 @@ describe Locomotive::ContentType do
       end
 
     end
+    
+    
+    content 'from remote source' do
+      
+       it 'does not allow listing entries' do
+         @content_type.from_remote_source = true;
+         @content_type.remote_source_url = "https://api.twitter.com/1/statuses/user_timeline.json?include_entities=true&include_rts=true&screen_name=twitterapi&count=3"
+         @content_type.allow_add_entry?.should == false
+         @content_type.allow_list_entries?.should == false
+       end
+      
+    end
 
   end
 
