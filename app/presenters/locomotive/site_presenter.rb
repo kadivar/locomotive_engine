@@ -1,7 +1,7 @@
 module Locomotive
   class SitePresenter < BasePresenter
 
-    delegate :name, :locales, :subdomain, :domains, :robots_txt, :seo_title, :meta_keywords, :meta_description, :domains_without_subdomain, :to => :source
+    delegate :name, :locales, :enabled_plugins, :subdomain, :domains, :robots_txt, :seo_title, :meta_keywords, :meta_description, :domains_without_subdomain, :to => :source
 
     def domain_name
       Locomotive.config.domain
@@ -12,7 +12,7 @@ module Locomotive
     end
 
     def included_methods
-      super + %w(name locales domain_name subdomain domains robots_txt seo_title meta_keywords meta_description domains_without_subdomain memberships)
+      super + %w(name locales enabled_plugins domain_name subdomain domains robots_txt seo_title meta_keywords meta_description domains_without_subdomain memberships)
     end
 
     def as_json_for_html_view

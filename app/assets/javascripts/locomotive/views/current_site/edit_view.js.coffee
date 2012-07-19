@@ -20,6 +20,8 @@ class Locomotive.Views.CurrentSite.EditView extends Locomotive.Views.Shared.Form
 
     @add_toggle_mode_for_locales()
 
+    @add_toggle_mode_for_enabled_plugins()
+
     @make_locales_sortable()
 
     @render_domains()
@@ -28,13 +30,20 @@ class Locomotive.Views.CurrentSite.EditView extends Locomotive.Views.Shared.Form
 
     @enable_liquid_editing()
 
-  add_toggle_mode_for_locales: ->
-    @$('#site_locales_input .list input[type=checkbox]').bind 'change', (event) ->
+  add_toggle_mode_for: (el_class) ->
+    el_id = '#site_' + el_class + '_input'
+    @$(el_id + ' .list input[type=checkbox]').bind 'change', (event) =>
       el = $(event.target)
       if el.is(':checked')
         el.closest('.entry').addClass('selected')
       else
         el.closest('.entry').removeClass('selected')
+
+  add_toggle_mode_for_locales: ->
+    @add_toggle_mode_for('locales')
+
+  add_toggle_mode_for_enabled_plugins: ->
+    @add_toggle_mode_for('enabled_plugins')
 
   make_locales_sortable: ->
     @sortable_locales_list = @$('#site_locales_input .list').sortable

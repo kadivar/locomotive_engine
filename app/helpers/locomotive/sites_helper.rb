@@ -11,5 +11,9 @@ module Locomotive
       end
     end
 
+    def current_site_plugins
+      LocomotivePlugins.registered_plugins.keys
+    end
+
   end
 end

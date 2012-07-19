@@ -25,6 +25,9 @@
   = f.input :meta_keywords
   = f.input :meta_description
 
+= f.inputs :name => :plugins, :class => "inputs foldable folded" do
+  = f.input :enabled_plugins, :as => 'Locomotive::EnabledPlugins', :collection => current_site_plugins, :input_html => { :class => 'enabled_plugins' }
+
 - if can?(:index, Locomotive::Membership)
 
   = f.inputs :name => :memberships do

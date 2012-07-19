@@ -363,6 +363,45 @@ form.formtastic {
           }
         } // > li.locale, li.locales
 
+        &.enabled_plugins {
+          .list {
+            margin-left: 0px;
+          }
+
+          &.enabled_plugins {
+            label {
+              color: #8B8D9A;
+            }
+          }
+
+          .entry {
+            margin-left: 10px;
+
+            label {
+              float: none;
+              display: inline-block;
+              width: auto;
+              position: relative;
+
+              padding-left: 31px;
+              margin-left: 8px;
+
+              font-weight: bold;
+            }
+
+            &.selected {
+              label {
+                color: #585A69;
+              }
+            } // .entry.selected
+
+          } // .entry
+
+          .inline-hints {
+            clear: both;
+          }
+        }
+
         &.code {
 
           textarea, .CodeMirror-scroll {
