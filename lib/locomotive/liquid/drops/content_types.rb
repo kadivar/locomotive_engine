@@ -3,45 +3,20 @@ module Locomotive
     module Drops
       class ContentTypes < ::Liquid::Drop
 
+        include Locomotive::Liquid::Helpers::RemoteSource
+
+
         def before_method(meth)
           type = @context.registers[:site].content_types.where(:slug => meth.to_s).first
           if(type.from_remote_source)
-            cache_key = Digest::SHA1.hexdigest(type.remote_source_url)
-            
-            minimum_cache_time = 10
-            if type.remote_source_expiry == 'none'
-              expires_in = minimum_cache_time
-            else
-              expires_in = type.remote_source_expiry.to_i rescue 1.minute 
-            end
-            force = true
-            if(Rails.cache.exist?(cache_key+"_expiry"))
-               force = Rails.cache.read(cache_key+"_expiry") != expires_in
-            end
-            Rails.cache.fetch(cache_key, :expires_in => expires_in, :force => force) do
-              Rails.cache.write(cache_key+"_expiry", expires_in)
-              #is this site hosted by this app?
-              if Locomotive::Site.match_domain(URI.parse(type.remote_source_url).host).size > 0
-                Locomotive.log  "[Liquid template] Loading URL from this app: #{type.remote_source_url}"
-                JSON.parse(get_page_from_local_site(type.remote_source_url))
-              else
-                Locomotive.log  "[Liquid template] Loading Remote URL: #{type.remote_source_url}"
-                Locomotive::Httparty::Webservice.consume(type.remote_source_url)
-              end
-            end
+            load_remote_source(type.remote_source_url, type.remote_source_expiry)
           else
             ContentTypeProxyCollection.new(type)
           end
         end
         
         
-        protected
         
-        def get_page_from_local_site(url)
-          env = ::Rack::MockRequest.env_for(url)
-          response = Rails.application.call(env)
-          response[2][0]
-        end
 
       end
 

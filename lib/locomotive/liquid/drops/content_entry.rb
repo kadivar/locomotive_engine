@@ -3,6 +3,8 @@ module Locomotive
     module Drops
       class ContentEntry < Base
 
+        include Locomotive::Liquid::Helpers::RemoteSource
+
         delegate :_slug, :_permalink, :seo_title, :meta_keywords, :meta_description, :to => '_source'
 
         def _id
@@ -43,8 +45,16 @@ module Locomotive
           return '' if self._source.nil?
 
           if not @@forbidden_attributes.include?(meth.to_s)
-            value = self._source.send(meth)
-
+            
+            field = get_field_by_name(meth)
+            
+            case field['type']
+            when 'remote_source'
+              value = load_remote_source(self._source.send(meth), self._source.send(meth+"_expiry")||1.minute)
+            else
+              value = self._source.send(meth)
+            end
+            
             if value.respond_to?(:all) # check for an association
               filter_and_order_list(value)
             else
@@ -68,6 +78,11 @@ module Locomotive
             # no filter, default order
             list.ordered
           end
+        end
+        
+        
+        def get_field_by_name(name)
+          self._source.custom_fields_recipe['rules'].find{|x| x['name'] == name}
         end
 
       end

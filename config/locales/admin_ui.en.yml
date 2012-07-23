@@ -88,6 +88,8 @@ en:
           new_entry: + Add a new entry
         many_to_many:
           empty: The list is empty. Add an entry from the select box below.
+        remote_source:
+          expiry: Expiry
 
       form:
         required: Required
