@@ -10,7 +10,8 @@ module Locomotive
           if expiry_time == 'none'
             expires_in = minimum_cache_time
           else
-            expires_in = expiry_time.to_i rescue 1.minute 
+            
+            expires_in = [(expiry_time == 'simple'?  1.minute : expiry_time.to_i), minimum_cache_time].max
           end
           force = true
           if(Rails.cache.exist?(cache_key+"_expiry"))
