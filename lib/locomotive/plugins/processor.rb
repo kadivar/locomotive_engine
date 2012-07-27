@@ -7,7 +7,7 @@ module Locomotive
 
       def process_plugins
         plugin_drops_container_hash = {}
-        each_enabled_plugin do |plugin_id, plugin|
+        each_plugin_with_id do |plugin_id, plugin|
           plugin.controller = self
 
           # Call all before_filters
@@ -23,9 +23,9 @@ module Locomotive
         self.plugin_drops_container = DropContainer.new(plugin_drops_container_hash)
       end
 
-      def enabled_plugins
+      def plugins
         [].tap do |plugins|
-          each_enabled_plugin do |plugin_id, plugin|
+          each_plugin_with_id do |plugin_id, plugin|
             plugins << plugin
           end
         end
@@ -33,9 +33,11 @@ module Locomotive
 
       protected
 
-      def each_enabled_plugin
-        current_site.enabled_plugins.each do |plugin_id|
-          plugin = LocomotivePlugins.registered_plugins[plugin_id]
+      def each_plugin_with_id
+        current_site.enabled_plugins.each do |enabled_plugin|
+          plugin_id = enabled_plugin.plugin_id
+          config = enabled_plugin.config
+          plugin = LocomotivePlugins.registered_plugins[plugin_id].new(config)
           yield plugin_id, plugin
         end
       end

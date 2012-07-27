@@ -141,4 +141,9 @@ FactoryGirl.define do
   factory :content_entry, :class => Locomotive::ContentEntry do
   end
 
+  ## Plugins ##
+  factory :enabled_plugin, :class => Locomotive::EnabledPlugin do
+    plugin_id 'an_enabled_plugin_id'
+  end
+
 end
