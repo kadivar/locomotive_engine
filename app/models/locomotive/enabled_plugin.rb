@@ -9,7 +9,7 @@ module Locomotive
 
     ## relationships ##
 
-    embedded_in :site
+    embedded_in :site, :class_name => 'Locomotive::Site'
 
     ## methods ##
 
