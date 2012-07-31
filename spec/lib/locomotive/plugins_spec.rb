@@ -14,22 +14,23 @@ module Locomotive
         Locomotive::TestController.send(:include, Locomotive::Plugins::Processor)
         @controller = Locomotive::TestController.new
         @controller.stubs(:current_site).returns(@site)
+        @controller.stubs(:params).returns({})
       end
 
       context 'before_filters' do
 
         it 'should run all before_filters for enabled plugins' do
-          MobileDetectionPlugin.any_instance.expects(:my_method)
+          MobileDetectionPlugin.any_instance.expects(:determine_device)
           @controller.process_plugins
         end
 
         it 'should not run any before_filters for disabled plugins' do
-          LanguagePlugin.any_instance.expects(:another_method).never
+          LanguagePlugin.any_instance.expects(:get_language).never
           @controller.process_plugins
         end
 
         it 'should be able to access the controller from the before_filter' do
-          @controller.expects(:params)
+          @controller.expects(:params).returns({})
           @controller.process_plugins
         end
 
@@ -39,6 +40,7 @@ module Locomotive
 
         before(:each) do
           register_and_enable_plugin(UselessPlugin)
+          @controller.process_plugins
         end
 
         it 'should supply the enabled plugins' do
@@ -95,10 +97,10 @@ module Locomotive
         before_filter :determine_device
 
         def to_liquid
-          @my_drop ||= MobileDrop.new
+          @my_drop ||= MobileDetectionDrop.new
         end
 
-        def detemine_device
+        def determine_device
           # Access params
           if self.controller.params[:mobile]
             self.mobile = true
