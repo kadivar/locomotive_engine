@@ -5,8 +5,8 @@ module Locomotive
     describe Processor do
 
       before(:each) do
-        register_and_enable_plugin(MyEnabledPlugin)
-        register_plugin(MyDisabledPlugin)
+        register_and_enable_plugin(MobileDetectionPlugin)
+        register_plugin(LanguagePlugin)
 
         @site = FactoryGirl.build(:site)
         @site.stubs(:enabled_plugins).returns(@enabled_plugins)
@@ -19,12 +19,12 @@ module Locomotive
       context 'before_filters' do
 
         it 'should run all before_filters for enabled plugins' do
-          MyEnabledPlugin.any_instance.expects(:my_method)
+          MobileDetectionPlugin.any_instance.expects(:my_method)
           @controller.process_plugins
         end
 
         it 'should not run any before_filters for disabled plugins' do
-          MyDisabledPlugin.any_instance.expects(:another_method).never
+          LanguagePlugin.any_instance.expects(:another_method).never
           @controller.process_plugins
         end
 
@@ -38,16 +38,12 @@ module Locomotive
       context 'liquid' do
 
         before(:each) do
-          register_and_enable_plugin(AnotherEnabledPlugin)
-          @controller.process_plugins
+          register_and_enable_plugin(UselessPlugin)
         end
 
         it 'should supply the enabled plugins' do
           @controller.plugins.collect(&:class).should == \
-            [ MyEnabledPlugin, AnotherEnabledPlugin ]
-          @enabled_plugins.clear
-          @controller.process_plugins
-          @controller.plugins.should == []
+            [ MobileDetectionPlugin, UselessPlugin ]
         end
 
         it 'should build a container for the plugin liquid drops' do
@@ -59,13 +55,13 @@ module Locomotive
         it 'should retrieve the liquid drops for enabled plugins with drops' do
           @first_enabled_plugin = @controller.plugins.first
           container = @controller.plugin_drops_container
-          container['my_enabled_plugin'].class.should == @first_enabled_plugin.to_liquid.class
-          container['another_enabled_plugin'].should be_nil
+          container['mobile_detection_plugin'].class.should == @first_enabled_plugin.to_liquid.class
+          container['useless_plugin'].should be_nil
         end
 
         it 'should not retrieve the liquid drops for disabled plugins' do
           container = @controller.plugin_drops_container
-          container['my_disabled_plugin'].should be_nil
+          container['language_plugin'].should be_nil
         end
 
       end
@@ -90,50 +86,55 @@ module Locomotive
 
       ## Classes ##
 
-      class MyEnabledPlugin
+      class MobileDetectionPlugin
 
         include Locomotive::Plugin
 
-        before_filter :my_method
+        attr_accessor :mobile
+
+        before_filter :determine_device
 
         def to_liquid
-          @my_drop ||= MyEnabledDrop.new
+          @my_drop ||= MobileDrop.new
         end
 
-        def my_method
+        def detemine_device
           # Access params
-          self.controller.params
+          if self.controller.params[:mobile]
+            self.mobile = true
+          else
+            self.mobile = false
+          end
         end
 
       end
 
-      class AnotherEnabledPlugin
+      class UselessPlugin
         include Locomotive::Plugin
       end
 
-      class PluginWithScope
-        include Locomotive::Plugin
-      end
-
-      class MyDisabledPlugin
+      class LanguagePlugin
 
         include Locomotive::Plugin
 
-        before_filter :another_method
+        attr_accessor :language
 
-        def another_method
+        before_filter :get_language
+
+        def get_language
+          self.language = 'en'
         end
 
         def to_liquid
-          @my_drop ||= MyDisabledDrop.new
+          @my_drop ||= LanguageDrop.new
         end
 
       end
 
-      class MyEnabledDrop < ::Liquid::Drop
+      class MobileDetectionDrop < ::Liquid::Drop
       end
 
-      class MyDisabledDrop < ::Liquid::Drop
+      class LanguageDrop < ::Liquid::Drop
       end
 
     end

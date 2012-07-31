@@ -7,6 +7,10 @@ module Locomotive
     field :plugin_id
     field :config, :type => Hash
 
+    ## relationships ##
+
+    embedded_in :site
+
     ## methods ##
 
     def plugin_class

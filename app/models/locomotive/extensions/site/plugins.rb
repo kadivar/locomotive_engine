@@ -7,7 +7,7 @@ module Locomotive
 
         included do
 
-          field :enabled_plugins, :type => Array, :default => []
+          embeds_many :enabled_plugins
 
         end
 
