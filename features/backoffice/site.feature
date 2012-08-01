@@ -26,3 +26,8 @@ Feature: Manage my site
   Scenario: Adding a domain to a site
     Given I am an authenticated user
     Then I should be able to add a domain to my site
+
+  Scenario: Adding a plugin to a site
+    Given I am an authenticated user
+    And I have registered the plugin "my_plugin"
+    Then I should be able to add the plugin "my_plugin" to my site

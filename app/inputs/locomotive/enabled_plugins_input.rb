@@ -54,5 +54,10 @@ module Locomotive
       false
     end
 
+    def association_primary_key
+      # FIXME: this is a bit of a hack
+      method
+    end
+
   end
 end
