@@ -86,11 +86,10 @@ fr:
         remote_source:
           expiry: Expiration
       form:
-        required: Required
-        optional: Optional
-        default_label: Field name
+        required: Requis
+        default_label: Nom du champ
         select_options:
-          ask_name: "Type the label of the option"
+          ask_name: "Tapez le nom de l'option"
 
     sessions:
       new:

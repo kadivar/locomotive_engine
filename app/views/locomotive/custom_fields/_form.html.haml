@@ -30,7 +30,8 @@
       = g.select :type, options_for_custom_field_type, {}, { :class => 'type' }
 
     .required-input.col
-      = g.check_box :required, :class => 'required', :'data-on-label' => t('.required'), :'data-off-label' => t('.optional')
+      %span= t('.required')
+      = g.check_box :required, :class => 'required' #, :'data-on-label' => t('.required'), :'data-off-label' => t('.optional')
 
     %ol.nested{ :style => 'display: none' }
 
@@ -52,7 +53,7 @@
 
     %span.actions
       = link_to 'toggle', '#', :class => 'toggle'
-      = link_to 'x', '#', :class => 'remove', :confirm => t('locomotive.messages.confirm')
+      = link_to 'x', '#', :class => 'remove', :data => { :confirm => t('locomotive.messages.confirm') }
 
     .clear
 
@@ -72,4 +73,4 @@
 
     %span.actions
       = link_to 'drag', '#', :class => 'drag'
-      = link_to 'x', '#', :class => 'remove', :confirm => t('locomotive.messages.confirm')
+      = link_to 'x', '#', :class => 'remove', :data => { :confirm => t('locomotive.messages.confirm') }
