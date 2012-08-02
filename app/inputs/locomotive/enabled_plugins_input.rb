@@ -54,9 +54,42 @@ module Locomotive
       false
     end
 
+    def check_box_without_hidden_input(choice)
+      value = choice_value(choice)
+      template.check_box_tag(
+        input_name,
+        value,
+        checked?(value),
+        input_html_options.merge(:id => choice_input_dom_id(choice), :disabled => disabled?(value), :required => false)
+      )
+    end
+
+    def input_name
+      if builder.options.key?(:index)
+        "#{object_name}[#{builder.options[:index]}][#{association_primary_key || method}][][plugin_id]"
+      else
+        "#{object_name}[#{association_primary_key || method}][][plugin_id]"
+      end
+    end
+
     def association_primary_key
       # FIXME: this is a bit of a hack
       method
+    end
+
+    def selected_values
+      @selected_values ||= make_selected_values
+    end
+
+    protected
+
+    def make_selected_values
+      ret = (if object.respond_to?(method)
+        object.send(method).collect(&:plugin_id).compact.flatten
+      else
+        []
+      end)
+      ret
     end
 
   end
