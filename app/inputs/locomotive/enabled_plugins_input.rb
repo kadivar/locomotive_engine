@@ -64,14 +64,6 @@ module Locomotive
       )
     end
 
-    def input_name
-      if builder.options.key?(:index)
-        "#{object_name}[#{builder.options[:index]}][#{association_primary_key || method}][][plugin_id]"
-      else
-        "#{object_name}[#{association_primary_key || method}][][plugin_id]"
-      end
-    end
-
     def association_primary_key
       # FIXME: this is a bit of a hack
       method

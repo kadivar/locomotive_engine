@@ -23,12 +23,6 @@ module Locomotive
     def update
       @site = current_site
       @site.update_attributes(params[:site])
-
-      @site.enabled_plugins = params[:site][:enabled_plugins].collect do |plugin_hash|
-        Locomotive::EnabledPlugin.new(plugin_hash)
-      end
-      @site.save!
-
       respond_with @site, :location => edit_current_site_url(new_host_if_subdomain_changed)
     end
 
