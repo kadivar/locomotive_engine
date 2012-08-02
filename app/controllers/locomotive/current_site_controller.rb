@@ -11,6 +11,8 @@ module Locomotive
 
     before_filter :filter_attributes
 
+    before_filter :build_enabled_plugin_hashes, :only => [ :update ]
+
     respond_to :json, :only => :update
 
     def edit
@@ -20,8 +22,13 @@ module Locomotive
 
     def update
       @site = current_site
-      @site.enabled_plugins = [] unless params[:site][:enabled_plugins]
       @site.update_attributes(params[:site])
+
+      @site.enabled_plugins = params[:site][:enabled_plugins].collect do |plugin_hash|
+        Locomotive::EnabledPlugin.new(plugin_hash)
+      end
+      @site.save!
+
       respond_with @site, :location => edit_current_site_url(new_host_if_subdomain_changed)
     end
 
@@ -38,6 +45,13 @@ module Locomotive
         {}
       else
         { :host => site_url(@site, { :fullpath => false, :protocol => false }) }
+      end
+    end
+
+    def build_enabled_plugin_hashes
+      params[:site][:enabled_plugins] = \
+        (params[:site][:enabled_plugins] || []).collect do |plugin_id|
+        { :plugin_id => plugin_id }
       end
     end
 

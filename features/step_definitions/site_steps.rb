@@ -59,7 +59,7 @@ Then /^I should be able to add the plugin "([^"]*)" to my site$/ do |plugin_id|
   check "site_enabled_plugins_#{plugin_id}"
   click_button 'Save'
 
-  enabled_plugin_ids = @site.enabled_plugins.collect(&:plugin_id)
+  enabled_plugin_ids = @site.reload.enabled_plugins.collect(&:plugin_id)
   enabled_plugin_ids.count.should == 1
   enabled_plugin_ids.should include(plugin_id)
 end
