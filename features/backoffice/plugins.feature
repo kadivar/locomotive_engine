@@ -18,3 +18,15 @@ Feature: Add, view, and configure plugins
     Then the plugin "my_plugin" should be enabled
     When I unfold all folded inputs
     Then the "site_enabled_plugins_my_plugin" checkbox should be checked
+
+  Scenario: Configuring plugins
+    Given I am an authenticated "designer"
+    And the plugin "my_plugin" is enabled
+    When I go to site settings
+    And I unfold all folded inputs
+    And I follow "toggle" within "site_enabled_plugins_input"
+    And I fill in "my_plugin_config" with "A Value"
+    And I press "Save"
+    When I unfold all folded inputs
+    And I follow "toggle" within "site_enabled_plugins_input"
+    Then I should see "A Value"
