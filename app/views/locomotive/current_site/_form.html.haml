@@ -1,4 +1,5 @@
 - content_for :head do
+  = render 'locomotive/sites/enabled_plugins'
   = render 'locomotive/sites/domains'
   = render 'locomotive/sites/memberships'
 
@@ -26,7 +27,8 @@
   = f.input :meta_description
 
 = f.inputs :name => :plugins, :class => "inputs foldable folded" do
-  = f.input :enabled_plugins, :as => 'Locomotive::EnabledPlugins', :collection => current_site_plugins, :input_html => { :class => 'enabled_plugins' }
+  = #f.input :enabled_plugins, :as => 'Locomotive::EnabledPlugins', :collection => current_site_plugins, :input_html => { :class => 'enabled_plugins' }
+  = f.input :enabled_plugins, :as => '::Locomotive::Empty', :label => false, :wrapper_html => { :id => 'enabled_plugins_input' }
 
 - if can?(:index, Locomotive::Membership)
 

@@ -11,10 +11,6 @@ module Locomotive
       self.source.memberships.map { |membership| membership.as_json(self.options) }
     end
 
-    def enabled_plugins
-      self.source.enabled_plugins.collect(&:plugin_id)
-    end
-
     def included_methods
       super + %w(name locales enabled_plugins domain_name subdomain domains robots_txt seo_title meta_keywords meta_description domains_without_subdomain memberships)
     end

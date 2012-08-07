@@ -20,9 +20,11 @@ class Locomotive.Views.CurrentSite.EditView extends Locomotive.Views.Shared.Form
 
     @add_toggle_mode_for_locales()
 
-    @add_toggle_mode_for_enabled_plugins()
-
     @make_locales_sortable()
+
+    @render_enabled_plugins()
+
+    @add_toggle_mode_for_enabled_plugins()
 
     @render_domains()
 
@@ -52,6 +54,10 @@ class Locomotive.Views.CurrentSite.EditView extends Locomotive.Views.Shared.Form
       update: =>
         list = _.map @$('#site_locales_input .list input:checked'), (el) => $(el).val()
         @model.set locales: list
+
+  render_enabled_plugins: ->
+    @enabled_plugins = new Locomotive.Views.CurrentSite.EnabledPluginsView model: @model
+    @$('#enabled_plugins_input').append(@enabled_plugins.render().el)
 
   render_domains: ->
     @domains_view = new Locomotive.Views.Sites.DomainsView model: @model, errors: @options.errors

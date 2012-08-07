@@ -44,8 +44,8 @@ module Locomotive
 
     def build_enabled_plugin_hashes
       params[:site][:enabled_plugins] = \
-        (params[:site][:enabled_plugins] || []).collect do |plugin_id|
-        { :plugin_id => plugin_id }
+        (params[:site][:enabled_plugins] || []).delete_if do |plugin_hash|
+          !plugin_hash['enabled']
       end
     end
 
