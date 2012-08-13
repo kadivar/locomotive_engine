@@ -13,8 +13,12 @@ module Locomotive
 
     ## methods ##
 
+    def self.plugin_name(plugin_id)
+      plugin_id.humanize
+    end
+
     def name
-      self.plugin_id.humanize
+      plugin_name(self.plugin_id)
     end
 
     def plugin_class

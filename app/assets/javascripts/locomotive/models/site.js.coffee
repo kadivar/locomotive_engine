@@ -11,9 +11,9 @@ class Locomotive.Models.Site extends Backbone.Model
 
     memberships = new Locomotive.Models.MembershipsCollection(@get('memberships'))
 
-    enabled_plugins = new Locomotive.Models.EnabledPluginsCollection(@get('enabled_plugins'))
+    plugins = new Locomotive.Models.PluginsCollection(@get('plugins'))
 
-    @set domains: domains, memberships: memberships, enabled_plugins: enabled_plugins
+    @set domains: domains, memberships: memberships, plugins: plugins
 
   includes_domain: (name) ->
     name == @domain_with_domain() || _.any(@get('domains'), (domain) -> domain.get('name') == name)

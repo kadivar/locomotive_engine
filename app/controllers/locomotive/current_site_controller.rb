@@ -11,8 +11,6 @@ module Locomotive
 
     before_filter :filter_attributes
 
-    before_filter :build_enabled_plugin_hashes, :only => [ :update ]
-
     respond_to :json, :only => :update
 
     def edit
@@ -39,13 +37,6 @@ module Locomotive
         {}
       else
         { :host => site_url(@site, { :fullpath => false, :protocol => false }) }
-      end
-    end
-
-    def build_enabled_plugin_hashes
-      params[:site][:enabled_plugins] = \
-        (params[:site][:enabled_plugins] || []).delete_if do |plugin_hash|
-          !plugin_hash['enabled']
       end
     end
 

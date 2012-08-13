@@ -1,0 +1,17 @@
+%script{ :type => 'text/html', :id => 'plugins_list' }
+
+  %p.empty{ :style => 'display: block' }!= t('.empty')
+
+  %ul{ :style => 'display: none' }
+
+%script{ :type => 'text/html', :id => 'plugin_entry' }
+
+  %li
+    = check_box_tag 'site[enabled_plugin_ids][{{plugin_id}}]', '1', false,
+      :id => 'site_enabled_plugin_ids_{{plugin_id}}',
+      :class => 'enabled_plugin_ids'
+
+    %strong {{plugin_name}}
+
+    %span.actions
+      = link_to 'toggle', '#', :class => 'toggle'
