@@ -6,12 +6,14 @@
 
 %script{ :type => 'text/html', :id => 'plugin_entry' }
 
-  %li
-    = check_box_tag 'site[enabled_plugin_ids][{{plugin_id}}]', '1', false,
-      :id => 'site_enabled_plugin_ids_{{plugin_id}}',
-      :class => 'enabled_plugin_ids'
+  = hidden_field_tag 'site[plugins][][plugin_id]', '{{plugin_id}}',
+    :class => 'plugin_id'
 
-    %strong {{plugin_name}}
+  = check_box_tag 'site[plugins][][enabled]', '1', false,
+    :id => 'site_plugins_{{plugin_id}}_enabled',
+    :class => 'plugin_enabled'
 
-    %span.actions
-      = link_to 'toggle', '#', :class => 'toggle'
+  %strong {{plugin_name}}
+
+  %span.actions
+    = link_to 'toggle', '#', :class => 'toggle'

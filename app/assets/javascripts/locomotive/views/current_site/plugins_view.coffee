@@ -17,12 +17,16 @@ class Locomotive.Views.CurrentSite.PluginsView extends Backbone.View
     return @
 
   render_plugins: ->
-    available_plugins = @model.get('available_plugins')
-    if available_plugins.length != 0
+    plugins = @model.get('plugins')
+    if plugins.length != 0
       @$('> .empty').hide()
       @$('> ul').show()
-      _.each available_plugins, (available_plugin) =>
-        @_insert_entry(available_plugin)
+      plugins.each (plugin) =>
+        @_insert_entry(plugin)
 
   _insert_entry: (plugin) ->
-    @$('> ul').append(ich.plugin_entry(plugin))
+    view = new Locomotive.Views.CurrentSite.PluginEntryView model: plugin
+
+    (@_entry_views ||= []).push(view)
+
+    @$('ul').append(view.render().el)

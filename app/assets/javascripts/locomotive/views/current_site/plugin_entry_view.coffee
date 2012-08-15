@@ -9,4 +9,6 @@ class Locomotive.Views.CurrentSite.PluginEntryView extends Backbone.View
   render: ->
     $(@el).html(ich.plugin_entry(@model.toJSON()))
 
+    Backbone.ModelBinding.bind @, all: 'class'
+
     return @

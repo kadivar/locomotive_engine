@@ -56,8 +56,8 @@ class Locomotive.Views.CurrentSite.EditView extends Locomotive.Views.Shared.Form
         @model.set locales: list
 
   render_plugins: ->
-    @plugins = new Locomotive.Views.CurrentSite.PluginsView model: @model
-    @$('#plugins_input').append(@plugins.render().el)
+    @plugins_view = new Locomotive.Views.CurrentSite.PluginsView model: @model
+    @$('#plugins_input').append(@plugins_view.render().el)
 
   render_domains: ->
     @domains_view = new Locomotive.Views.Sites.DomainsView model: @model, errors: @options.errors
