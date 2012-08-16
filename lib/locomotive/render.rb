@@ -73,7 +73,7 @@ module Locomotive
         :controller     => self,
         :site           => current_site,
         :page           => @page,
-        :plugins        => self.respond_to?(:enabled_plugins) ? self.enabled_plugins : nil,
+        :plugins        => self.respond_to?(:plugins) ? self.plugins : [],
         :inline_editor  => self.editing_page?,
         :current_locomotive_account => current_locomotive_account
       }

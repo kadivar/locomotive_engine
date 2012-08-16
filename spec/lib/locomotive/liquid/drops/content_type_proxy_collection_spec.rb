@@ -65,7 +65,7 @@ module Locomotive
           @plugins ||= []
           @plugins.clear
           plugin_classes.each do |plugin_class|
-            @plugins << plugin_class.new
+            @plugins << plugin_class.new({})
           end
         end
 
