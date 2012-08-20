@@ -1,3 +1,11 @@
+GIT
+  remote: ../locomotive_plugins
+  revision: da761b550ddf61f32881dde5eb8f518f25cb8bd7
+  ref: v0.0.4
+  specs:
+    locomotive_plugins (0.0.4)
+      locomotive_liquid (~> 2.2.2)
+
 PATH
   remote: .
   specs:
@@ -25,7 +33,7 @@ PATH
       locomotive-mongoid-tree (~> 0.6.2)
       locomotive-tinymce-rails (~> 3.4.7.2)
       locomotive_liquid (= 2.2.2)
-      locomotive_plugins (~> 0.0.1)
+      locomotive_plugins (~> 0.0.4)
       mimetype-fu (~> 0.1.2)
       mongo (~> 1.5.2)
       mongoid (~> 2.4.9)
@@ -38,12 +46,6 @@ PATH
       rmagick (~> 2.12.2)
       sanitize (~> 2.0.3)
       unidecoder (~> 1.1.1)
-
-PATH
-  remote: ../locomotive_plugins
-  specs:
-    locomotive_plugins (0.0.1)
-      locomotive_liquid (~> 2.2.2)
 
 GEM
   remote: http://rubygems.org/
@@ -105,7 +107,7 @@ GEM
     childprocess (0.3.4)
       ffi (~> 1.0, >= 1.0.6)
     chunky_png (1.2.5)
-    codemirror-rails (2.24)
+    codemirror-rails (2.32)
       railties (~> 3.0)
     coffee-rails (3.2.2)
       coffee-script (>= 2.2.0)
@@ -129,7 +131,7 @@ GEM
       capybara (>= 1.1.2)
       cucumber (>= 1.1.8)
       nokogiri (>= 1.5.0)
-    custom_fields (2.0.0.rc12)
+    custom_fields (2.0.0.rc13)
       activesupport (~> 3.2.1)
       carrierwave-mongoid (~> 0.2.1)
       mongoid (~> 2.4.9)
@@ -176,7 +178,7 @@ GEM
     fssm (0.2.9)
     gherkin (2.11.1)
       json (>= 1.4.6)
-    haml (3.1.6)
+    haml (3.1.7)
     highline (1.6.13)
     hike (1.2.1)
     http_parser.rb (0.5.3)
@@ -217,7 +219,7 @@ GEM
     mocha (0.9.12)
     mongo (1.5.2)
       bson (= 1.5.2)
-    mongoid (2.4.11)
+    mongoid (2.4.12)
       activemodel (~> 3.1)
       mongo (<= 1.6.2)
       tzinfo (~> 0.3.22)
@@ -227,7 +229,7 @@ GEM
       net-ssh (>= 1.99.1)
     net-ssh (2.5.2)
     nokogiri (1.5.5)
-    orm_adapter (0.3.0)
+    orm_adapter (0.4.0)
     pickle (0.4.10)
       cucumber (>= 0.8)
       rake
