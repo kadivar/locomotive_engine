@@ -34,17 +34,18 @@ module Locomotive
             end
             enabled_plugins_by_id = enabled_plugins.inject({}) do |h, enabled_plugin|
               h[enabled_plugin.plugin_id] = enabled_plugin
+              h
             end
 
             # Enabled and disable
             LocomotivePlugins.registered_plugins.keys.each do |plugin_id|
               enabled_plugin = enabled_plugins_by_id[plugin_id]
               plugin_hash = plugin_hashes_by_id[plugin_id]
-              is_enabled = plugin_hash.try(:[], :enabled)
+              should_enable_plugin = plugin_hash.try(:[], :enabled)
 
-              if enabled_plugin && !is_enabled
+              if enabled_plugin && !should_enable_plugin
                 enabled_plugin.destroy
-              elsif !enabled_plugin && is_enabled
+              elsif !enabled_plugin && should_enable_plugin
                 self.enabled_plugins.build(:plugin_id => plugin_id)
               end
             end
