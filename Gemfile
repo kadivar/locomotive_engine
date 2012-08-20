@@ -14,7 +14,6 @@ group :development do
   # gem 'locomotive-aloha-rails', :path => '../gems/aloha-rails' # for Developers
 
   # gem 'locomotive_plugins', :path => '../locomotive_plugins' # For Developers
-  gem 'locomotive_plugins', :git => '../locomotive_plugins', :ref => 'v0.0.4' # For Developers
 
   gem 'rspec-rails', '~> 2.8.0' # In order to have rspec tasks and generators
   gem 'rspec-cells'

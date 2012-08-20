@@ -21,6 +21,7 @@ require 'RMagick'
 require 'cells'
 require 'sanitize'
 require 'unidecoder'
+require 'locomotive_plugins'
 
 require 'compass'
 require 'codemirror/rails'
