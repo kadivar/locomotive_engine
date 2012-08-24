@@ -1,0 +1,6 @@
+
+- @plugins.each do |plugin|
+  - str = plugin.config_template_string
+  - if str
+    %script{ :type => 'text/html' }
+      != str
