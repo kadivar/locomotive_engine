@@ -6,6 +6,8 @@ class Locomotive.Views.CurrentSite.PluginsView extends Backbone.View
 
   className: 'list'
 
+  id: 'plugin_list'
+
   initialize: ->
     Backbone.ModelBinding.bind @, checkbox: 'class'
 

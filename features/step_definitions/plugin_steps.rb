@@ -1,6 +1,11 @@
 
 class PluginClass
   include Locomotive::Plugin
+
+  def config_template_file
+    Rails.root.join('spec', 'fixtures', 'assets', 'plugin_config_template.html.haml')
+  end
+
 end
 
 Given /^I have registered the plugin "([^"]*)"$/ do |plugin_id|
