@@ -43,12 +43,7 @@ module Locomotive
     end
 
     def load_plugins
-      # TODO: duplication in Locomotive::Plugins::Processor#each_plugin_with_id
-      @plugins = current_site.enabled_plugins.collect do |enabled_plugin|
-        plugin_id = enabled_plugin.plugin_id
-        config = enabled_plugin.config
-        LocomotivePlugins.registered_plugins[plugin_id].new(config)
-      end
+      @plugins ||= current_site.plugin_objects_by_id.values
     end
 
   end

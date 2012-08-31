@@ -1,3 +1,5 @@
+
+
 module Locomotive
   module Extensions
     module Site
@@ -8,6 +10,8 @@ module Locomotive
         included do
 
           embeds_many :enabled_plugins, :class_name => 'Locomotive::EnabledPlugin'
+
+          ## Getter and setter virtual attributes ##
 
           def plugins
             enabled_ids = self.enabled_plugins.inject({}) do |h, enabled_plugin|
@@ -50,6 +54,18 @@ module Locomotive
               end
             end
 
+          end
+
+          ## Hash of instantiated plugin object for each enabled plugin ##
+
+          def enabled_plugin_objects_by_id
+            @plugin_objects_by_id ||= self.enabled_plugins.inject({}) do |h, enabled_plugin|
+              plugin_id = enabled_plugin.plugin_id
+              config = enabled_plugin.config
+              plugin = enabled_plugin.plugin_class.new(config)
+              h[plugin_id] = plugin
+              h
+            end
           end
 
         end
