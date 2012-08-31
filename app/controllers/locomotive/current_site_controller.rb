@@ -43,7 +43,7 @@ module Locomotive
     end
 
     def load_plugins
-      @plugins ||= current_site.plugin_objects_by_id.values
+      @plugins ||= current_site.enabled_plugin_objects_by_id.values
     end
 
   end
