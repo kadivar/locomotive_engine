@@ -11,6 +11,8 @@ module Locomotive
 
     before_filter :filter_attributes
 
+    before_filter :ensure_domains_list, :only => :update
+
     before_filter :load_plugins
 
     respond_to :json, :only => :update
@@ -40,6 +42,10 @@ module Locomotive
       else
         { :host => site_url(@site, { :fullpath => false, :protocol => false }) }
       end
+    end
+
+    def ensure_domains_list
+      params[:site][:domains] = [] unless params[:site][:domains]
     end
 
     def load_plugins

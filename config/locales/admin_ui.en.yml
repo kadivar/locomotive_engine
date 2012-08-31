@@ -91,7 +91,6 @@ en:
 
       form:
         required: Required
-        optional: Optional
         default_label: Field name
         select_options:
           ask_name: "Type the label of the option"
@@ -269,6 +268,7 @@ en:
       edit:
         title: '%{type} &mdash; editing entry'
       form:
+        edit_select_options: edit options
         has_many:
           new_entry: New entry
 
