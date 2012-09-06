@@ -32,16 +32,16 @@ describe Locomotive::Extensions::Site::Plugins do
   describe '#plugins=' do
 
     it 'enables a disabled plugin' do
-      site.plugins = [
-        {
+      site.plugins = {
+        '0' => {
           :plugin_id => 'mobile_detection',
-          :enabled => '1'
+          :plugin_enabled => 'true'
         },
-        {
+        '1' => {
           :plugin_id => 'language_detection',
-          :enabled => '1'
+          :plugin_enabled => 'true'
         }
-      ]
+      }
 
       enabled_plugin_ids = site.enabled_plugins.collect(&:plugin_id)
       enabled_plugin_ids.count.should == 2
@@ -50,16 +50,16 @@ describe Locomotive::Extensions::Site::Plugins do
     end
 
     it 'disables an enabled plugin' do
-      site.plugins = [
-        {
+      site.plugins = {
+        '0' => {
           :plugin_id => 'mobile_detection',
-          :enabled => nil
+          :plugin_enabled => 'false'
         },
-        {
+        '1' => {
           :plugin_id => 'language_detection',
-          :enabled => nil
+          :plugin_enabled => 'false'
         }
-      ]
+      }
 
       enabled_plugin_ids = site.enabled_plugins.collect(&:plugin_id)
       enabled_plugin_ids.should be_empty

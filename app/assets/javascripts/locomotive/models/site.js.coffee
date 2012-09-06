@@ -28,6 +28,8 @@ class Locomotive.Models.Site extends Backbone.Model
       hash.memberships_attributes = @get('memberships').toJSONForSave() if @get('memberships')? && @get('memberships').length > 0
       delete hash.domains
       hash.domains = _.map(@get('domains'), (domain) -> domain.get('name'))
+      delete hash.plugins
+      hash.plugins = @get('plugins').toJSON()
 
 class Locomotive.Models.CurrentSite extends Locomotive.Models.Site
 

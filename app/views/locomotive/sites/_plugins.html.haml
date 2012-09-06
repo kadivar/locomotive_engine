@@ -9,7 +9,7 @@
   = hidden_field_tag 'site[plugins][][plugin_id]', '{{plugin_id}}',
     :class => 'plugin_id'
 
-  = check_box_tag 'site[plugins][][enabled]', '1', false,
+  = check_box_tag 'site[plugins][][plugin_enabled]', '1', false,
     :id => 'site_plugins_{{plugin_id}}_enabled',
     :class => 'plugin_enabled'
 

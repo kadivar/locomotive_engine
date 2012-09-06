@@ -30,9 +30,9 @@ module Locomotive
             end
           end
 
-          def plugins=(plugins_hashes)
+          def plugins=(plugins_indexed_hash)
             # Convert to hashes for quick lookup
-            plugin_hashes_by_id = plugins_hashes.inject({}) do |h, plugin|
+            plugin_hashes_by_id = plugins_indexed_hash.inject({}) do |h, (index, plugin)|
               h[plugin[:plugin_id]] = plugin
               h
             end
@@ -45,7 +45,9 @@ module Locomotive
             LocomotivePlugins.registered_plugins.keys.each do |plugin_id|
               enabled_plugin = enabled_plugins_by_id[plugin_id]
               plugin_hash = plugin_hashes_by_id[plugin_id]
-              should_enable_plugin = plugin_hash.try(:[], :enabled)
+              should_enable_plugin = plugin_hash.try(:[], :plugin_enabled)
+
+              should_enable_plugin = false if should_enable_plugin == 'false'
 
               if enabled_plugin && !should_enable_plugin
                 enabled_plugin.destroy

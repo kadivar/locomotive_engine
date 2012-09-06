@@ -16,8 +16,12 @@ Given /^the plugin "(.*?)" is enabled$/ do |plugin_id|
   FactoryGirl.create(:enabled_plugin, :plugin_id => plugin_id)
 end
 
-Then /^the plugin "(.*?)" should be enabled$/ do |plugin_id|
-  enabled_plugin_ids = @site.reload.enabled_plugins.collect(&:plugin_id)
-  enabled_plugin_ids.count.should == 1
+Then /^the plugin "(.*?)" should be enabled when the AJAX finishes$/ do |plugin_id|
+  start_time = Time.now
+  while Time.now < start_time + Capybara.default_wait_time
+    enabled_plugin_ids = @site.reload.enabled_plugins.collect(&:plugin_id)
+    break if enabled_plugin_ids.include?(plugin_id)
+  end
+
   enabled_plugin_ids.should include(plugin_id)
 end
