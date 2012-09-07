@@ -1,6 +1,6 @@
 
-- @plugins.each do |plugin|
+- @plugins.each do |plugin_id, plugin|
   - str = plugin.config_template_string
   - if str
-    %script{ :type => 'text/html' }
+    %script{ :type => 'text/html', :id => "#{plugin_id}_config_view" }
       != str

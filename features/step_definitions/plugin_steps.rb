@@ -3,7 +3,9 @@ class PluginClass
   include Locomotive::Plugin
 
   def config_template_file
-    Rails.root.join('spec', 'fixtures', 'assets', 'plugin_config_template.html.haml')
+    # Rails root is at spec/dummy
+    engine_root = Rails.root.join('..', '..')
+    engine_root.join('spec', 'fixtures', 'assets', 'plugin_config_template.html.haml')
   end
 
 end
@@ -13,7 +15,7 @@ Given /^I have registered the plugin "([^"]*)"$/ do |plugin_id|
 end
 
 Given /^the plugin "(.*?)" is enabled$/ do |plugin_id|
-  FactoryGirl.create(:enabled_plugin, :plugin_id => plugin_id)
+  FactoryGirl.create(:enabled_plugin, :plugin_id => plugin_id, :site => @site)
 end
 
 Then /^the plugin "(.*?)" should be enabled when the AJAX finishes$/ do |plugin_id|
@@ -23,5 +25,6 @@ Then /^the plugin "(.*?)" should be enabled when the AJAX finishes$/ do |plugin_
     break if enabled_plugin_ids.include?(plugin_id)
   end
 
+  enabled_plugin_ids = @site.reload.enabled_plugins.collect(&:plugin_id)
   enabled_plugin_ids.should include(plugin_id)
 end
