@@ -25,6 +25,5 @@ Feature: Add, view, and configure plugins
     And I follow "toggle" within "#plugin_list"
     And I fill in "my_plugin_config" with "A Value"
     And I press "Save"
-    When I unfold all folded inputs
-    And I follow "toggle" within "#plugin_list"
-    Then I should see "A Value"
+    Then the plugin config for "my_plugin" should be:
+        | my_plugin_config  | A Value   |

@@ -9,12 +9,14 @@ class Locomotive.Views.CurrentSite.PluginEntryView extends Backbone.View
   render: ->
     $(@el).html(ich.plugin_entry(@model.toJSON()))
 
-    # Get plugin config view
-    config_view_id = "#{@model.get('plugin_id')}_config_view"
-    render_config_view = ich.templates[config_view_id]
-    if (render_config_view)
-      $(@el).children('ol.nested').html(render_config_view())
+    @render_config_view()
 
     Backbone.ModelBinding.bind @, all: 'class'
 
     return @
+
+  render_config_view: ->
+    @config_view = new Locomotive.Views.CurrentSite.PluginConfigView
+      plugin_id: @model.get('plugin_id')
+      model: @model.get('plugin_config')
+    @$('span.actions').before(@config_view.render().el)
