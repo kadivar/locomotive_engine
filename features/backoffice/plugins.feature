@@ -15,7 +15,7 @@ Feature: Add, view, and configure plugins
     And I unfold all folded inputs
     And I check "site_plugins_my_plugin_enabled"
     And I press "Save"
-    Then the plugin "my_plugin" should be enabled when the AJAX finishes
+    Then after the AJAX finishes, the plugin "my_plugin" should be enabled
 
   Scenario: Configuring plugins
     Given I am an authenticated "designer"
@@ -25,5 +25,5 @@ Feature: Add, view, and configure plugins
     And I follow "toggle" within "#plugin_list"
     And I fill in "my_plugin_config" with "A Value"
     And I press "Save"
-    Then the plugin config for "my_plugin" should be:
+    Then after the AJAX finishes, the plugin config for "my_plugin" should be:
         | my_plugin_config  | A Value   |

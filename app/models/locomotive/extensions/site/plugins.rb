@@ -41,7 +41,7 @@ module Locomotive
               h
             end
 
-            # Enabled and disable
+            # Enabled, disable, and set config
             LocomotivePlugins.registered_plugins.keys.each do |plugin_id|
               enabled_plugin = enabled_plugins_by_id[plugin_id]
               plugin_hash = plugin_hashes_by_id[plugin_id]
@@ -49,10 +49,15 @@ module Locomotive
 
               should_enable_plugin = false if should_enable_plugin == 'false'
 
-              if enabled_plugin && !should_enable_plugin
-                enabled_plugin.destroy
-              elsif !enabled_plugin && should_enable_plugin
-                self.enabled_plugins.build(:plugin_id => plugin_id)
+              if should_enable_plugin
+                # Enable if needed
+                enabled_plugin ||= self.enabled_plugins.build(:plugin_id => plugin_id)
+
+                # Set config parameters
+                enabled_plugin.config = plugin_hash[:plugin_config] || {}
+              else
+                # Disable if needed
+                enabled_plugin.destroy if enabled_plugin
               end
             end
 

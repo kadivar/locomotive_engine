@@ -72,6 +72,22 @@ describe Locomotive::Extensions::Site::Plugins do
       site.enabled_plugins.should == old_enabled_plugins
     end
 
+    it 'sets config parameters on enabled plugins' do
+      site.plugins = {
+        '0' => {
+          :plugin_id => 'mobile_detection',
+          :plugin_enabled => 'true',
+          :plugin_config => { 'key' => 'value' }
+        },
+        '1' => {
+          :plugin_id => 'language_detection',
+          :plugin_enabled => 'false'
+        }
+      }
+
+      site.enabled_plugins.first.config.should == { 'key' => 'value' }
+    end
+
   end
 
   protected
