@@ -27,6 +27,10 @@ describe Locomotive::Extensions::Site::Plugins do
       end[:plugin_enabled].should_not be_true
     end
 
+    it 'includes the plugin config' do
+      site.plugins.first[:plugin_config].should == { 'key' => 'value' }
+    end
+
   end
 
   describe '#plugins=' do
@@ -111,7 +115,10 @@ describe Locomotive::Extensions::Site::Plugins do
   end
 
   def enable_plugins
-    FactoryGirl.create(:enabled_plugin, :plugin_id => 'mobile_detection', :site => site)
+    FactoryGirl.create(:enabled_plugin,
+                       :plugin_id => 'mobile_detection',
+                       :config => { 'key' => 'value' },
+                       :site => site)
   end
 
 end

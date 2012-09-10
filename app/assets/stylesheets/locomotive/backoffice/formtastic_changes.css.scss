@@ -649,6 +649,23 @@ form.formtastic {
 
         } // > li#custom_fields_input
 
+        &#plugins_input {
+
+          padding-top: 17px;
+
+          li.plugin {
+            height: auto;
+            clear: both;
+
+            & > .col {
+              float: left;
+              margin-right: 20px;
+            }
+
+          } // li.plugin
+
+        } // > li#plugins_input
+
       } // > li
 
       &.nested {

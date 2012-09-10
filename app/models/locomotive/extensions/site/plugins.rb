@@ -14,18 +14,22 @@ module Locomotive
           ## Getter and setter virtual attributes ##
 
           def plugins
-            enabled_ids = self.enabled_plugins.inject({}) do |h, enabled_plugin|
-              h[enabled_plugin.plugin_id] = true
-              h
-            end
+            enabled_by_id = {}
+            configs_by_id = {}
 
-            enabled_ids.default = false
+            self.enabled_plugins.each do |enabled_plugin|
+              enabled_by_id[enabled_plugin.plugin_id] = true
+              configs_by_id[enabled_plugin.plugin_id] = enabled_plugin.config
+            end
+            enabled_by_id.default = false
+            configs_by_id.default = {}
 
             LocomotivePlugins.registered_plugins.keys.collect do |plugin_id|
               {
                 :plugin_id => plugin_id,
                 :plugin_name => EnabledPlugin.plugin_name(plugin_id),
-                :plugin_enabled => enabled_ids[plugin_id]
+                :plugin_enabled => enabled_by_id[plugin_id],
+                :plugin_config => configs_by_id[plugin_id]
               }
             end
           end

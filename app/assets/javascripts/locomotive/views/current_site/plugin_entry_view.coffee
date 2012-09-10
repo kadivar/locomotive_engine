@@ -6,6 +6,9 @@ class Locomotive.Views.CurrentSite.PluginEntryView extends Backbone.View
 
   className: 'plugin'
 
+  events:
+    'click a.toggle': 'toggle'
+
   render: ->
     $(@el).html(ich.plugin_entry(@model.toJSON()))
 
@@ -20,3 +23,14 @@ class Locomotive.Views.CurrentSite.PluginEntryView extends Backbone.View
       plugin_id: @model.get('plugin_id')
       model: @model.get('plugin_config')
     @$('span.actions').before(@config_view.render().el)
+
+  toggle: (event) ->
+    event.stopPropagation() & event.preventDefault()
+    form = @$('ol')
+
+    if form.is(':hidden')
+      @$('a.toggle').addClass('open')
+      form.slideDown()
+    else
+      @$('a.toggle').removeClass('open')
+      form.slideUp()
