@@ -47,7 +47,9 @@ describe Locomotive::Extensions::Site::Plugins do
         }
       }
 
-      enabled_plugin_ids = site.enabled_plugins.collect(&:plugin_id)
+      enabled_plugin_ids = site.plugins.select do |plugin|
+        plugin[:plugin_enabled]
+      end.collect { |plugin| plugin[:plugin_id] }
       enabled_plugin_ids.count.should == 2
       enabled_plugin_ids.should include('mobile_detection')
       enabled_plugin_ids.should include('language_detection')
@@ -65,15 +67,17 @@ describe Locomotive::Extensions::Site::Plugins do
         }
       }
 
-      enabled_plugin_ids = site.enabled_plugins.collect(&:plugin_id)
+      enabled_plugin_ids = site.plugins.select do |plugin|
+        plugin[:plugin_enabled]
+      end.collect { |plugin| plugin[:plugin_id] }
       enabled_plugin_ids.should be_empty
     end
 
     it 'leaves plugins as they were if there is no change' do
-      old_enabled_plugins = site.enabled_plugins
+      old_plugins = site.plugins
       plugins_array = site.plugins.clone
       site_plugins = plugins_array
-      site.enabled_plugins.should == old_enabled_plugins
+      site.plugins.should == old_plugins
     end
 
     it 'sets config parameters on enabled plugins' do
@@ -89,7 +93,7 @@ describe Locomotive::Extensions::Site::Plugins do
         }
       }
 
-      site.enabled_plugins.first.config.should == { 'key' => 'value' }
+      site.plugins.first[:plugin_config].should == { 'key' => 'value' }
     end
 
   end
