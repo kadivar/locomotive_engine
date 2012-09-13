@@ -28,6 +28,16 @@ Feature: Add, view, and configure plugins
     Then after the AJAX finishes, the plugin config for "my_plugin" should be:
         | my_plugin_config  | A Value   |
 
+  Scenario: Configuring disabled plugins
+    Given I am an authenticated "designer"
+    When I go to site settings
+    And I unfold all folded inputs
+    And I follow "toggle" within "#plugin_list"
+    And I fill in "my_plugin_config" with "A Value"
+    And I press "Save"
+    Then after the AJAX finishes, the plugin config for "my_plugin" should be:
+        | my_plugin_config  | A Value   |
+
   Scenario: Access content types from plugin config UI
     Given I am an authenticated "designer"
     And I have a custom model named "Projects" with
