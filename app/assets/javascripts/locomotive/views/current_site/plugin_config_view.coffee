@@ -13,7 +13,7 @@ class Locomotive.Views.CurrentSite.PluginConfigView extends Backbone.View
     config_view_id = "#{@options.plugin_id}_config_view"
     render_config_view = ich.templates[config_view_id]
     if (render_config_view)
-      $(@el).html(render_config_view())
+      $(@el).html(render_config_view({ content_types: Locomotive.content_types }))
 
     Backbone.ModelBinding.bind @, all: 'name'
 

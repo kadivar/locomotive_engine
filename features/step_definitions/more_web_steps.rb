@@ -54,3 +54,8 @@ Then /^it returns a (\d+) error page$/ do |code|
   puts page.status_code
   page.status_code.should == code.to_i
 end
+
+Then /^the "(.*?)" dropdown should contain "(.*?)"$/ do |name, text|
+  xpath = %{//select[@name="#{name}"]/option[text()="#{text}"]}
+  page.should have_xpath(xpath)
+end

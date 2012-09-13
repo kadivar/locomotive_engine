@@ -27,3 +27,18 @@ Feature: Add, view, and configure plugins
     And I press "Save"
     Then after the AJAX finishes, the plugin config for "my_plugin" should be:
         | my_plugin_config  | A Value   |
+
+  Scenario: Access content types from plugin config UI
+    Given I am an authenticated "designer"
+    And I have a custom model named "Projects" with
+        | label     | type      | required  |
+        | Name      | string    | true      |
+    And I have a custom model named "Clients" with
+        | label     | type      | required  |
+        | Name      | string    | true      |
+    And the plugin "my_plugin" is enabled
+    When I go to site settings
+    And I unfold all folded inputs
+    And I follow "toggle" within "#plugin_list"
+    Then the "content_type" dropdown should contain "Projects"
+    Then the "content_type" dropdown should contain "Clients"

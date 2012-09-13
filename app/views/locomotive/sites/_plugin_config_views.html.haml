@@ -1,4 +1,8 @@
 
+%script{ :type => 'text/javascript' }
+  :plain
+    Locomotive.content_types = #{current_site.content_types.to_json}
+
 - @plugins.each do |plugin_id, plugin|
   - str = plugin.config_template_string
   - if str
