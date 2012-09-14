@@ -98,7 +98,27 @@ describe Locomotive::Extensions::Site::Plugins do
 
   end
 
-  it 'allows only one plugin wrapper with a given ID on each site'
+  it 'allows only one plugin wrapper with a given ID on each site' do
+    site2 = FactoryGirl.create(:site, :subdomain => 'test2')
+
+    lambda do
+      FactoryGirl.create(:plugin_data,
+                         :plugin_id => 'mobile_detection',
+                         :site => site2)
+    end.should_not raise_error
+
+    lambda do
+      FactoryGirl.create(:plugin_data,
+                         :plugin_id => 'mobile_detection',
+                         :site => site2)
+    end.should raise_error
+
+    lambda do
+      FactoryGirl.create(:plugin_data,
+                         :plugin_id => 'mobile_detection',
+                         :site => site)
+    end.should raise_error
+  end
 
   protected
 
