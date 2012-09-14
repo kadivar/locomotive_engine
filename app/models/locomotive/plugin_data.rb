@@ -32,7 +32,7 @@ module Locomotive
     end
 
     def to_presenter(options)
-      Locomotive::EnabledPluginPresenter.new(self, options)
+      Locomotive::PluginDataPresenter.new(self, options)
     end
 
     def as_json(options = {})

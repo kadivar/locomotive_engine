@@ -1,5 +1,5 @@
 module Locomotive
-  class EnabledPluginPresenter < BasePresenter
+  class PluginDataPresenter < BasePresenter
 
     delegate :name, :plugin_id, :config, :plugin_class, :to => :source
 

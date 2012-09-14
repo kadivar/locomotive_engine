@@ -12,9 +12,6 @@ end
 
 Given /^I have registered the plugin "(.*)"$/ do |plugin_id|
   LocomotivePlugins.register_plugin(PluginClass, plugin_id)
-  FactoryGirl.create(:plugin_data,
-                     :plugin_id => plugin_id,
-                     :site => @site)
 end
 
 Given /^the plugin "(.*)" is enabled$/ do |plugin_id|

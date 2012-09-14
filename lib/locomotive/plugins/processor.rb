@@ -23,6 +23,8 @@ module Locomotive
         self.plugin_drops_container = DropContainer.new(plugin_drops_container_hash)
       end
 
+      # All enabled plugin objects for this site. These are put in a liquid
+      # register
       def plugins
         current_site.enabled_plugin_objects_by_id.values
       end

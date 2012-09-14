@@ -45,17 +45,28 @@ module Locomotive
               data_obj.config = plugin_hash[:plugin_config]
               data_obj.enabled = !!plugin_hash[:plugin_enabled]
             end
-
           end
 
-          ## Hash of instantiated plugin object for each enabled plugin ##
-
+          # Hash of instantiated plugin object for each enabled plugin
           def enabled_plugin_objects_by_id
             @enabled_plugin_objects_by_id ||= self.plugin_data.inject({}) do |h, plugin_data|
               plugin_id = plugin_data.plugin_id
-              config = plugin_data.config
-              plugin = plugin_data.plugin_class.new(config)
-              h[plugin_id] = plugin
+              h[plugin_id] = construct_plugin_object_for_data(plugin_data)
+              h
+            end
+          end
+
+          # Hash of instantiated plugin object for each registered plugin. This
+          # will create plugin_data objects for registered plugins if needed
+          def all_plugin_objects_by_id
+            @all_plugin_objects_by_id ||= LocomotivePlugins.registered_plugins.keys.inject({}) do |h, plugin_id|
+              plugin_obj = enabled_plugin_objects_by_id[plugin_id]
+              if plugin_obj
+                h[plugin_id] = plugin_obj
+              else
+                plugin_data = fetch_or_build_plugin_data(plugin_id)
+                h[plugin_id] = construct_plugin_object_for_data(plugin_data)
+              end
               h
             end
           end
@@ -71,8 +82,18 @@ module Locomotive
           end
 
           def fetch_or_build_plugin_data(plugin_id)
-            plugin_data_by_id[plugin_id] ||
-              self.plugin_data.build(:plugin_id => plugin_id)
+            existing_plugin = plugin_data_by_id[plugin_id]
+            if existing_plugin
+              existing_plugin
+            else
+              plugin_data_by_id[plugin_id] = self.plugin_data.build(:plugin_id => plugin_id)
+            end
+          end
+
+          def construct_plugin_object_for_data(plugin_data)
+            plugin_id = plugin_data.plugin_id
+            config = plugin_data.config
+            plugin_data.plugin_class.new(config)
           end
 
         end
