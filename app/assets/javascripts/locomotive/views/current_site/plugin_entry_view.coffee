@@ -14,6 +14,8 @@ class Locomotive.Views.CurrentSite.PluginEntryView extends Backbone.View
 
     @render_config_view()
 
+    @hide_toggle_unless_config_view()
+
     Backbone.ModelBinding.bind @, all: 'class'
 
     return @
@@ -23,6 +25,10 @@ class Locomotive.Views.CurrentSite.PluginEntryView extends Backbone.View
       plugin_id: @model.get('plugin_id')
       model: @model.get('plugin_config')
     @$('span.actions').before(@config_view.render().el)
+
+  hide_toggle_unless_config_view: ->
+    if !@config_view.has_config_view()
+      @$('a.toggle').hide()
 
   toggle: (event) ->
     event.stopPropagation() & event.preventDefault()
