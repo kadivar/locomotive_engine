@@ -28,7 +28,7 @@ describe Locomotive::Extensions::Site::Plugins do
     end
 
     it 'includes the plugin config' do
-      site.plugins.first[:plugin_config].should == { 'key' => 'value' }
+      site.plugins.first[:plugin_config].should == { :key => 'value' }
     end
 
   end
@@ -98,6 +98,8 @@ describe Locomotive::Extensions::Site::Plugins do
 
   end
 
+  it 'allows only one plugin wrapper with a given ID on each site'
+
   protected
 
   class MobileDetection
@@ -119,10 +121,15 @@ describe Locomotive::Extensions::Site::Plugins do
   end
 
   def enable_plugins
-    FactoryGirl.create(:enabled_plugin,
-                       :plugin_id => 'mobile_detection',
-                       :config => { 'key' => 'value' },
-                       :site => site)
+    FactoryGirl.create(:plugin_data,
+                      :plugin_id => 'mobile_detection',
+                      :config => { :key => 'value' },
+                      :enabled => true,
+                      :site => site)
+    FactoryGirl.create(:plugin_data,
+                      :plugin_id => 'language_detection',
+                      :enabled => false,
+                      :site => site)
   end
 
 end

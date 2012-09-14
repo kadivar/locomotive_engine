@@ -3,17 +3,17 @@
 require 'spec_helper'
 
 module Locomotive
-  describe EnabledPlugin do
+  describe PluginData do
 
     before(:each) do
       LocomotivePlugins.register_plugin(MyPlugin)
       plugin_id = LocomotivePlugins.default_id(MyPlugin)
-      @enabled_plugin = FactoryGirl.create(:enabled_plugin,
+      @plugin_data = FactoryGirl.create(:plugin_data,
                                            :plugin_id => plugin_id)
     end
 
     it 'should supply the plugin class' do
-      @enabled_plugin.plugin_class.should == MyPlugin
+      @plugin_data.plugin_class.should == MyPlugin
     end
 
     protected

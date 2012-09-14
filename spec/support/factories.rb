@@ -142,9 +142,9 @@ FactoryGirl.define do
   end
 
   ## Plugins ##
-  factory :enabled_plugin, :class => Locomotive::EnabledPlugin do
+  factory :plugin_data, :class => Locomotive::PluginData do
     site { Locomotive::Site.where(:subdomain => "acme").first || Factory(:site) }
-    plugin_id 'an_enabled_plugin_id'
+    plugin_id 'my_plugin_id'
   end
 
 end

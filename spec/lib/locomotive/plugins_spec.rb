@@ -9,7 +9,7 @@ module Locomotive
         register_plugin(LanguagePlugin)
 
         @site = FactoryGirl.build(:site)
-        @site.stubs(:enabled_plugins).returns(@enabled_plugins)
+        @site.stubs(:plugin_data).returns(@plugin_data)
 
         Locomotive::TestController.send(:include, Locomotive::Plugins::Processor)
         @controller = Locomotive::TestController.new
@@ -75,9 +75,10 @@ module Locomotive
       end
 
       def enable_plugin(plugin_id)
-        @enabled_plugins ||= []
-        @enabled_plugins << FactoryGirl.create(:enabled_plugin,
-                                               :plugin_id => plugin_id)
+        @plugin_data ||= []
+        @plugin_data << FactoryGirl.create(:plugin_data,
+                                           :plugin_id => plugin_id,
+                                           :enabled => true)
       end
 
       def register_and_enable_plugin(plugin_class)

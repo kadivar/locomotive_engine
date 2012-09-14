@@ -1,11 +1,17 @@
 module Locomotive
-  class EnabledPlugin
+  class PluginData
 
     include Locomotive::Mongoid::Document
 
     ## fields ##
     field :plugin_id
-    field :config, :type => Hash
+    field :config, :type => Hash, :default => {}
+    field :enabled, :default => false
+
+    ## validations ##
+
+    validates_presence_of :plugin_id
+    validates_uniqueness_of :plugin_id
 
     ## relationships ##
 
@@ -18,7 +24,7 @@ module Locomotive
     end
 
     def name
-      plugin_name(self.plugin_id)
+      self.class.plugin_name(self.plugin_id)
     end
 
     def plugin_class
