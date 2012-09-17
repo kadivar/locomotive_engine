@@ -2,10 +2,25 @@
 class PluginClass
   include Locomotive::Plugin
 
+  before_filter :set_greeting
+
+  def to_liquid
+    @drop ||= Drop.new
+  end
+  alias :drop :to_liquid
+
   def config_template_file
     # Rails root is at spec/dummy
     engine_root = Rails.root.join('..', '..')
     engine_root.join('spec', 'fixtures', 'assets', 'plugin_config_template.html.haml')
+  end
+
+  def set_greeting
+    self.drop.greeting = 'Hello, World!'
+  end
+
+  class Drop < ::Liquid::Drop
+    attr_accessor :greeting
   end
 
 end
@@ -27,6 +42,17 @@ Given /^the plugin "(.*)" is enabled$/ do |plugin_id|
                        :plugin_id => plugin_id,
                        :enabled => true,
                        :site => @site)
+  end
+end
+
+Given /^the plugin "(.*)" is disabled$/ do |plugin_id|
+  plugin_data = @site.reload.plugin_data.detect do |plugin_data|
+    plugin_data.plugin_id == plugin_id
+  end
+
+  if plugin_data
+    plugin_data.enabled = false
+    @site.save!
   end
 end
 

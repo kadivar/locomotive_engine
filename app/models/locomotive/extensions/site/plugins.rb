@@ -49,7 +49,9 @@ module Locomotive
 
           # Hash of instantiated plugin object for each enabled plugin
           def enabled_plugin_objects_by_id
-            @enabled_plugin_objects_by_id ||= self.plugin_data.inject({}) do |h, plugin_data|
+            @enabled_plugin_objects_by_id ||= (self.plugin_data.select do |plugin_data|
+              plugin_data.enabled
+            end).inject({}) do |h, plugin_data|
               plugin_id = plugin_data.plugin_id
               h[plugin_id] = construct_plugin_object_for_data(plugin_data)
               h
