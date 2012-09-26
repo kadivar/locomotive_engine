@@ -1,45 +1,26 @@
 module Locomotive
   class SiteDataPresenter
 
+    METHODS = %w{content_assets content_entries content_types current_site pages snippets theme_assets}
+
     attr_reader :site, :ability
 
     def initialize(site, ability)
       @site = site
       @ability = ability
+      @data = {}
     end
 
     def included_methods
-      %w(content_assets content_entries content_types current_site pages snippets theme_assets)
+      METHODS
     end
 
-    # Getters for each model (TODO: dry this up)
+    ## Getters for each model ##
 
-    def content_assets
-      @content_assets ||= load_content_assets if ability.can?(:index, ContentAsset)
-    end
-
-    def content_entries
-      @content_entries ||= load_content_entries if ability.can?(:index, ContentEntry)
-    end
-
-    def content_types
-      @content_types ||= load_content_types if ability.can?(:index, ContentType)
-    end
-
-    def current_site
-      @current_site ||= load_current_site if ability.can?(:index, site)
-    end
-
-    def pages
-      @pages ||= load_pages if ability.can?(:index, Page)
-    end
-
-    def snippets
-      @snippets ||= load_snippets if ability.can?(:index, Snippet)
-    end
-
-    def theme_assets
-      @theme_assets ||= load_theme_assets if ability.can?(:index, ThemeAsset)
+    METHODS.each do |method|
+      define_method(method) do
+        load_model_if_allowed(method)
+      end
     end
 
     def as_json(methods = nil)
@@ -53,10 +34,35 @@ module Locomotive
 
     protected
 
-    def load_content_assets
-      site.content_assets
+    ## Load the data for each model if allowed ##
+
+    def load_model_if_allowed(model)
+      return @data[model] if @data[model]
+
+      if can_load?(model)
+        @data[model] = self.send(:"load_#{model}")
+      else
+        nil
+      end
     end
 
+    def can_load?(model)
+      # One special case
+      if model == 'current_site'
+        object_to_authorize = site
+      else
+        object_to_authorize = "Locomotive::#{model.singularize.camelize}".constantize
+      end
+      ability.can?(:index, object_to_authorize)
+    end
+
+    ## Methods to load the data ##
+
+    METHODS.each do |model|
+      define_method(:"load_#{model}") { site.send(model) }
+    end
+
+    # Override loading content entries
     def load_content_entries
       site.content_types.inject({}) do |h, content_type|
         h[content_type.slug] = content_type.entries
@@ -64,24 +70,9 @@ module Locomotive
       end
     end
 
-    def load_content_types
-      site.content_types
-    end
-
+    # Override loading current site
     def load_current_site
       site
-    end
-
-    def load_pages
-      site.pages
-    end
-
-    def load_snippets
-      site.snippets
-    end
-
-    def load_theme_assets
-      site.theme_assets
     end
 
   end
