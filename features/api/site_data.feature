@@ -4,7 +4,7 @@ Feature: Site Data
   I will be able to create, read, update, and destroy many pieces of data at once
 
   Background:
-    Given I have the site: "test site" set up
+    Given I have the site: "test site" set up with name: "my site"
     And I have an "admin" API token
     And I have the following content assets:
       | id                          | file      |
@@ -24,16 +24,11 @@ Feature: Site Data
 
   Scenario: Listing all data
     When I do an API GET request to site_data.json
-    Then the JSON response at "accounts" should be an array
-    And the JSON response at "accounts" should have 1 entry
-    And the JSON response at "memberships" should be an array
-    And the JSON response at "memberships" should have 1 entry
-    And the JSON should have the following:
+    Then the JSON should have the following:
       | content_assets/0/filename       | "5k.png"              |
       | content_entries/projects/0/name | "Project 1"           |
       | content_types/0/name            | "Projects"            |
-      | current_site/name               | "test site"           |
+      | current_site/name               | "my site"             |
       | pages/0/fullpath                | "index"               |
-      | sites/0/name                    | "test site"           |
       | snippets/0/name                 | "My Snippet"          |
       | theme_assets/0/local_path       | "my_javascript.js"    |

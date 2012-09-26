@@ -80,6 +80,8 @@ Rails.application.routes.draw do
 
       resource  :my_account, :controller => 'my_account'
 
+      resource  :site_data, :controller => 'site_data'
+
     end
   end
 
