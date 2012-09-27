@@ -28,7 +28,6 @@ Feature: Site Data
       | content_assets/0/filename       | "5k.png"              |
       | content_entries/projects/0/name | "Project 1"           |
       | content_types/0/name            | "Projects"            |
-      | current_site/name               | "my site"             |
       | pages/0/fullpath                | "index"               |
       | snippets/0/name                 | "My Snippet"          |
       | theme_assets/0/local_path       | "my_javascript.js"    |

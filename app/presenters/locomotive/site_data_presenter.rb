@@ -1,7 +1,7 @@
 module Locomotive
   class SiteDataPresenter
 
-    METHODS = %w{content_assets content_entries content_types current_site pages snippets theme_assets}
+    METHODS = %w{content_assets content_entries content_types pages snippets theme_assets}
 
     attr_reader :site, :ability
 
@@ -47,12 +47,7 @@ module Locomotive
     end
 
     def can_load?(model)
-      # One special case
-      if model == 'current_site'
-        object_to_authorize = site
-      else
-        object_to_authorize = "Locomotive::#{model.singularize.camelize}".constantize
-      end
+      object_to_authorize = "Locomotive::#{model.singularize.camelize}".constantize
       ability.can?(:index, object_to_authorize)
     end
 
@@ -68,11 +63,6 @@ module Locomotive
         h[content_type.slug] = content_type.entries
         h
       end
-    end
-
-    # Override loading current site
-    def load_current_site
-      site
     end
 
   end
