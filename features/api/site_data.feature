@@ -32,3 +32,51 @@ Feature: Site Data
       | pages/0/fullpath                | "index"               |
       | snippets/0/name                 | "My Snippet"          |
       | theme_assets/0/local_path       | "my_javascript.js"    |
+
+  Scenario: Simple create
+    When I do an API POST to site_data.json with:
+    """
+    {
+      "content_types": [
+        {
+          "name": "Employees",
+          "entries_custom_fields": [
+            {
+              "label": "Name",
+              "type": "string"
+            }
+          ]
+        }
+      ],
+      "content_entries": {
+        "project": [
+          {
+            "name": "Another Project"
+          }
+        ],
+        "employees": [
+          {
+            "name": "John Smith"
+          }
+        ]
+      },
+      "pages": [
+        {
+          "title": "My New Page"
+        }
+      ],
+      "snippets": [
+        {
+          "name": "Another snippet",
+          "template": "The best snippet ever!"
+        }
+      ]
+    }
+    """
+    When I do an API GET request to site_data.json
+    Then the JSON should have the following:
+      | content_entries/projects/1/name     | "Another Project"     |
+      | content_entries/employees/0/name    | "John Smith"          |
+      | content_types/1/name                | "Employees"           |
+      | pages/2/title                       | "My New Page"         |
+      | snippets/1/name                     | "Another snippet"     |
