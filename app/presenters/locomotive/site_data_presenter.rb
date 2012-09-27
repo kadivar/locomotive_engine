@@ -1,7 +1,7 @@
 module Locomotive
   class SiteDataPresenter
 
-    METHODS = %w{content_assets content_entries content_types pages snippets theme_assets}
+    MODELS = %w{content_assets content_entries content_types pages snippets theme_assets}
 
     attr_reader :site, :ability
 
@@ -12,14 +12,14 @@ module Locomotive
     end
 
     def included_methods
-      METHODS
+      MODELS
     end
 
     ## Getters for each model ##
 
-    METHODS.each do |method|
-      define_method(method) do
-        load_model_if_allowed(method)
+    MODELS.each do |model|
+      define_method(model) do
+        load_model_if_allowed(model)
       end
     end
 
@@ -53,7 +53,7 @@ module Locomotive
 
     ## Methods to load the data ##
 
-    METHODS.each do |model|
+    MODELS.each do |model|
       define_method(:"load_#{model}") { site.send(model) }
     end
 
