@@ -36,40 +36,43 @@ Feature: Site Data
     When I do an API POST to site_data.json with:
     """
     {
-      "content_types": [
-        {
-          "name": "Employees",
-          "entries_custom_fields": [
-            {
-              "label": "Name",
-              "type": "string"
-            }
-          ]
-        }
-      ],
-      "content_entries": {
-        "project": [
+      "site_data": {
+        "content_types": [
           {
-            "name": "Another Project"
+            "name": "Employees",
+            "entries_custom_fields": [
+              {
+                "label": "Name",
+                "type": "string"
+              }
+            ]
           }
         ],
-        "employees": [
+        "content_entries": {
+          "projects": [
+            {
+              "name": "Another Project"
+            }
+          ],
+          "employees": [
+            {
+              "name": "John Smith"
+            }
+          ]
+        },
+        "pages": [
           {
-            "name": "John Smith"
+            "title": "My New Page",
+            "parent_fullpath": "index"
+          }
+        ],
+        "snippets": [
+          {
+            "name": "Another snippet",
+            "template": "The best snippet ever!"
           }
         ]
-      },
-      "pages": [
-        {
-          "title": "My New Page"
-        }
-      ],
-      "snippets": [
-        {
-          "name": "Another snippet",
-          "template": "The best snippet ever!"
-        }
-      ]
+      }
     }
     """
     When I do an API GET request to site_data.json
@@ -77,5 +80,5 @@ Feature: Site Data
       | content_entries/projects/1/name     | "Another Project"     |
       | content_entries/employees/0/name    | "John Smith"          |
       | content_types/1/name                | "Employees"           |
-      | pages/2/title                       | "My New Page"         |
+      | pages/3/title                       | "My New Page"         |
       | snippets/1/name                     | "Another snippet"     |
