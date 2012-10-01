@@ -11,12 +11,16 @@ module Locomotive
 
       def create
         @site_data = Locomotive::SiteDataPresenter.new(current_site, current_ability)
-        @site_data.create_models(params[:site_data])
 
         # Manually respond with the appropriate json
-        # FIXME: currently assuming no errors occur
         respond_to do |format|
-          format.json { render :json => @site_data }
+          if @site_data.create_models(params[:site_data])
+            puts 'Controller: success!'
+            format.json { render :json => @site_data, :status => :created }
+          else
+            puts 'Controller: failure!'
+            format.json { render :json => @site_data.errors, :status => :unprocessable_entity }
+          end
         end
       end
 

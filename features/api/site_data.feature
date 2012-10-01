@@ -82,3 +82,70 @@ Feature: Site Data
       | content_types/1/name                | "Employees"           |
       | pages/3/title                       | "My New Page"         |
       | snippets/1/name                     | "Another snippet"     |
+
+  Scenario: Failed create
+    When I do an API POST to site_data.json with:
+    """
+    {
+      "site_data": {
+        "content_types": [
+          {
+            "name": "Employees",
+            "entries_custom_fields": [
+              {
+                "label": "Name",
+                "type": "string"
+              }
+            ]
+          }
+        ],
+        "content_entries": {
+          "projects": [
+            {
+              "_slug": "",
+              "name": "Another Project"
+            }
+          ],
+          "employees": [
+            {
+              "name": "John Smith"
+            }
+          ]
+        },
+        "pages": [
+          {
+            "slug": "hello-world",
+            "title": "My New Page",
+            "parent_fullpath": "index"
+          }
+        ],
+        "snippets": [
+          {
+            "name": "Another snippet",
+            "template": "The best snippet ever!"
+          }
+        ]
+      }
+    }
+    """
+    Then the JSON response should be:
+    """
+    {
+      "errors": {
+        "pages": {
+          "0": {
+            "slug": ["is already taken"]
+          }
+        },
+        "content_entries": {
+          "employees": "content type does not exist"
+        }
+      }
+    }
+    """
+    When I do an API GET request to site_data.json
+    Then the JSON should not have "content_entries/projects/1"
+    And the JSON should not have "content_entries/employees"
+    And the JSON should not have "content_types/1"
+    And the JSON should not have "pages/3"
+    And the JSON should not have "snippets/1"
