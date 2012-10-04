@@ -78,8 +78,8 @@ Feature: Site Data
     When I do an API GET request to site_data.json
     Then the JSON should have the following:
       | content_entries/projects/1/name     | "Another Project"     |
-      | content_entries/employees/0/name    | "John Smith"          |
       | content_types/1/name                | "Employees"           |
+      | content_entries/employees/0/name    | "John Smith"          |
       | pages/3/title                       | "My New Page"         |
       | snippets/1/name                     | "Another snippet"     |
 
@@ -88,17 +88,6 @@ Feature: Site Data
     """
     {
       "site_data": {
-        "content_types": [
-          {
-            "name": "Employees",
-            "entries_custom_fields": [
-              {
-                "label": "Name",
-                "type": "string"
-              }
-            ]
-          }
-        ],
         "content_entries": {
           "projects": [
             {
@@ -138,7 +127,7 @@ Feature: Site Data
           }
         },
         "content_entries": {
-          "employees": "content type does not exist"
+          "employees": ["content type does not exist"]
         }
       }
     }
