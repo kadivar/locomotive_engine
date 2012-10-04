@@ -9,7 +9,7 @@ Feature: Site Data
     And I have the following content assets:
       | id                          | file      |
       | 4f832c2cb0d86d3f42000000    | 5k.png    |
-    And I have a custom model named "Projects" with
+    And I have a custom model named "Projects" with id "4f832c2cb0d86d3f42000005" and
       | label       | type      | required        |
       | Name        | string    | true            |
     And I have entries for "Projects" with
@@ -138,3 +138,44 @@ Feature: Site Data
     And the JSON should not have "content_types/1"
     And the JSON should not have "pages/3"
     And the JSON should not have "snippets/1"
+
+  Scenario: Simple update
+    When I do an API PUT to site_data.json with:
+    """
+    {
+      "site_data": {
+        "content_types": [
+          {
+            "id": "4f832c2cb0d86d3f42000005",
+            "name": "Awesome Projects"
+          }
+        ],
+        "content_entries": {
+          "projects": [
+            {
+              "id": "4f832c2cb0d86d3f42000001",
+              "name": "My Awesome Project"
+            }
+          ]
+        },
+        "pages": [
+          {
+            "id": "4f832c2cb0d86d3f42000002",
+            "title": "Awesomest page ever"
+          }
+        ],
+        "snippets": [
+          {
+            "id": "4f832c2cb0d86d3f42000003",
+            "name": "Awesome Snippet"
+          }
+        ]
+      }
+    }
+    """
+    When I do an API GET request to site_data.json
+    Then the JSON should have the following:
+      | content_entries/projects/0/name | "My Awesome Project"  |
+      | content_types/0/name            | "Awesome Projects"    |
+      | pages/2/title                   | "Awesomest page ever" |
+      | snippets/0/name                 | "Awesome Snippet"     |
