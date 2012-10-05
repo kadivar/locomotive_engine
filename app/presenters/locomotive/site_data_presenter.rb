@@ -49,7 +49,7 @@ module Locomotive
       end
 
       ids['content_entries'] = {}
-      attributes['content_entries'].each do |content_type_slug, entries|
+      (attributes['content_entries'] || []).each do |content_type_slug, entries|
         ids['content_entries'][content_type_slug] = entries.keys
       end
 
@@ -101,7 +101,8 @@ module Locomotive
         objects.each_with_index do |obj, index|
           unless obj.valid?
             all_valid = false
-            add_errors(obj, model, index)
+            id = obj.new_record? && index || obj.id
+            add_errors(obj, model, id)
           end
         end
       end
@@ -111,7 +112,8 @@ module Locomotive
           if obj.content_type
             unless obj.valid?
               all_valid = false
-              add_errors(obj, 'content_entries', content_type_slug, index)
+              id = obj.new_record? && index || obj.id
+              add_errors(obj, 'content_entries', content_type_slug, id)
             end
           else
             all_valid = false
@@ -286,9 +288,11 @@ module Locomotive
         if ids == :all || ids[content_type_slug] == :all
           entries = content_type.entries
         else
-          entries = content_type.entries.find(ids[content_type_slug])
+          if ids[content_type_slug]
+            entries = content_type.entries.find(ids[content_type_slug])
+          end
         end
-        h[content_type_slug] = entries
+        h[content_type_slug] = entries if entries
         h
       end
     end

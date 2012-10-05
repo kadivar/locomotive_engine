@@ -175,3 +175,28 @@ Feature: Site Data
       | content_types/0/name            | "Awesome Projects"    |
       | pages/1/title                   | "Awesomest page ever" |
       | snippets/0/name                 | "Awesome Snippet"     |
+
+  Scenario: Failed update
+    When I do an API PUT to site_data.json with:
+    """
+    {
+      "site_data": {
+        "content_types": {
+          "4f832c2cb0d86d3f42000005": {
+            "name": ""
+          }
+        },
+        "snippets": {
+          "4f832c2cb0d86d3f42000003": {
+            "name": "Awesome Snippet"
+          }
+        }
+      }
+    }
+    """
+    Then the JSON response should have the following:
+      | "errors/content_types/4f832c2cb0d86d3f42000005/name/0" | "can't be blank"  |
+    When I do an API GET request to site_data.json
+    Then the JSON at "content_types/0/name" should not be ""
+    And the JSON at "pages/1/title" should not be "Awesomest page ever"
+    And the JSON at "snippets/0/name" should not be "Awesome snippet"
