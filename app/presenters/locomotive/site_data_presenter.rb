@@ -42,7 +42,20 @@ module Locomotive
     #   }
     # }
     def self.find_from_attributes(site, attributes)
-      raise 'not implemented'
+      ids = {}
+
+      ORDERED_NORMAL_MODELS.each do |model|
+        ids[model] = (attributes[model] || {}).keys
+      end
+
+      ids['content_entries'] = {}
+      attributes['content_entries'].each do |content_type_slug, entries|
+        ids['content_entries'][content_type_slug] = entries.keys
+      end
+
+      obj = self.new(site)
+      obj.send(:load_data, ids)
+      obj
     end
 
     # Methods to use when building json object
@@ -118,7 +131,8 @@ module Locomotive
       ORDERED_NORMAL_MODELS.each do |model|
         attributes_list = all_attributes[model]
         attributes_list.try(:each) do |attributes|
-          self.send(:"build_#{model.singularize}_object", attributes)
+          obj = self.send(:"build_#{model.singularize}_object")
+          assign_attributes_to(obj, attributes)
         end
       end
 
@@ -140,8 +154,9 @@ module Locomotive
           end
           content_type.send(:set_label_field) unless content_type.label_field_id
 
-          attributes_list.each_with_index do |attributes, index|
-            build_content_entry_object(content_type, attributes)
+          attributes_list.each do |attributes|
+            obj = build_content_entry_object(content_type)
+            assign_attributes_to(obj, attributes)
           end
         else
           build_content_entry_without_type(content_type_slug)
@@ -149,8 +164,28 @@ module Locomotive
       end
     end
 
-    def assign_attributes
-      raise 'not implemented'
+    def assign_attributes(attributes)
+      MODELS.each do |model|
+        if attributes[model]
+          if model == 'content_entries'
+            self.content_entries.each do |content_type_slug, entries|
+              entries.each do |obj|
+                attributes_for_obj = attributes[model][content_type_slug][obj.id.to_s]
+                if attributes_for_obj
+                  assign_attributes_to(obj, attributes_for_obj)
+                end
+              end
+            end
+          else
+            self.send(:"#{model}").each do |obj|
+              attributes_for_obj = attributes[model][obj.id.to_s]
+              if attributes_for_obj
+                assign_attributes_to(obj, attributes_for_obj)
+              end
+            end
+          end
+        end
+      end
     end
 
     ## Save all objects ##
@@ -261,23 +296,28 @@ module Locomotive
     ## Build object in a model ##
 
     MODELS.each do |model|
-      define_method(:"build_#{model.singularize}_object") do |attributes|
+      define_method(:"build_#{model.singularize}_object") do
         model_collection = site.send(:"#{model}")
         obj = model_collection.build
-        obj.to_presenter.assign_attributes(attributes)
         self.send(:"#{model}") << obj
+        obj
       end
     end
 
     # Override building content_entry
-    def build_content_entry_object(content_type, attributes)
+    def build_content_entry_object(content_type)
       obj = content_type.entries.build
-      obj.to_presenter.assign_attributes(attributes)
       self.content_entries[content_type.slug] << obj
+      obj
     end
 
     def build_content_entry_without_type(content_type_slug)
       self.content_entries[content_type_slug] << Locomotive::ContentEntry.new
+    end
+
+    # Assign attributes to an object using its presenter
+    def assign_attributes_to(obj, attributes)
+      obj.to_presenter.assign_attributes(attributes)
     end
 
   end

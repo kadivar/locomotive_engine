@@ -173,5 +173,5 @@ Feature: Site Data
     Then the JSON should have the following:
       | content_entries/projects/0/name | "My Awesome Project"  |
       | content_types/0/name            | "Awesome Projects"    |
-      | pages/2/title                   | "Awesomest page ever" |
+      | pages/1/title                   | "Awesomest page ever" |
       | snippets/0/name                 | "Awesome Snippet"     |
