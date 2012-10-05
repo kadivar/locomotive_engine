@@ -11,6 +11,8 @@ module Locomotive
 
     attr_reader :site, :errors
 
+    # If attributes are provided, use them to build the models (see
+    # documentation fot build_models)
     def initialize(site, attributes = nil)
       @site = site
       @data = {}
@@ -126,8 +128,23 @@ module Locomotive
       all_valid
     end
 
-    ## Working with models ##
-
+    # Build models and assign their attributes. The attributes should look like
+    # the following example:
+    #
+    # {
+    #   :pages => [
+    #     {
+    #       # Page attrbutes
+    #     }
+    #   ],
+    #   :content_entries => {
+    #     :projects => [
+    #       {
+    #         # Project attributes
+    #       }
+    #     ]
+    #   }
+    # }
     def build_models(all_attributes)
       # Need to build them in a particular order so all dependencies are met
       ORDERED_NORMAL_MODELS.each do |model|
@@ -166,6 +183,23 @@ module Locomotive
       end
     end
 
+    # Assign attributes to objects by id. The attributes should look like the
+    # following example:
+    #
+    # {
+    #   :pages => {
+    #     "4f832c2cb0d86d3f42000001" => {
+    #       # Page attrbutes
+    #     }
+    #   },
+    #   :content_entries => {
+    #     :projects => {
+    #       "4f832c2cb0d86d3f42000002" => {
+    #         # Project attributes
+    #       }
+    #     }
+    #   }
+    # }
     def assign_attributes(attributes)
       MODELS.each do |model|
         if attributes[model]
