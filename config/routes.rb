@@ -80,7 +80,8 @@ Rails.application.routes.draw do
 
       resource  :my_account, :controller => 'my_account'
 
-      resource  :site_data, :controller => 'site_data', :only => [ :show, :create ]
+      resource  :site_data, :controller => 'site_data',
+        :only => [ :show, :create, :update ]
 
     end
   end

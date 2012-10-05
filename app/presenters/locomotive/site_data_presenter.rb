@@ -9,23 +9,64 @@ module Locomotive
     # All models handled by this class
     MODELS = ORDERED_NORMAL_MODELS + %w{content_entries}
 
-    attr_reader :site, :ability, :errors
+    attr_reader :site, :errors
 
-    def initialize(site, ability, attributes = nil)
+    def initialize(site, attributes = nil)
       @site = site
-      @ability = ability
       @data = {}
       self.build_models(attributes) if attributes
     end
 
-    def self.all(site, ability)
-      obj = self.new(site, ability)
-      obj.send(:load_all_data)
+    # Load all data from the database
+    def self.all(site)
+      obj = self.new(site)
+      obj.send(:load_data)
       obj
     end
 
+    # Find all data according to the ids in the attributes. The attributes
+    # should look like the following example:
+    #
+    # {
+    #   :pages => {
+    #     "4f832c2cb0d86d3f42000001" => {
+    #       # Page attrbutes
+    #     }
+    #   },
+    #   :content_entries => {
+    #     :projects => {
+    #       "4f832c2cb0d86d3f42000002" => {
+    #         # Project attributes
+    #       }
+    #     }
+    #   }
+    # }
+    def self.find_from_attributes(site, attributes)
+      raise 'not implemented'
+    end
+
+    # Methods to use when building json object
     def included_methods
       MODELS
+    end
+
+    # Authorize action with loaded data
+    def authorize!(ability, action)
+      messages = []
+      failed = false
+
+      MODELS.each do |model|
+        begin
+          ability.authorize!(action, model_class(model))
+        rescue CanCan::AccessDenied => e
+          failed = true
+          messages << e.message
+        end
+      end
+
+      if failed
+        raise CanCan::AccessDenied.new(messages)
+      end
     end
 
     ## Getters for each model ##
@@ -70,7 +111,7 @@ module Locomotive
       all_valid
     end
 
-    ## Build models ##
+    ## Working with models ##
 
     def build_models(all_attributes)
       # Need to build them in a particular order so all dependencies are met
@@ -108,6 +149,10 @@ module Locomotive
       end
     end
 
+    def assign_attributes
+      raise 'not implemented'
+    end
+
     ## Save all objects ##
 
     def save
@@ -139,6 +184,11 @@ module Locomotive
     end
 
     protected
+
+    # Get the class for a model
+    def model_class(model)
+      "Locomotive::#{model.singularize.camelize}".constantize
+    end
 
     ## Validity and errors ##
 
@@ -174,33 +224,36 @@ module Locomotive
 
     ## Load the data for each model ##
 
-    def load_all_data
-      MODELS.each { |model| load_model_if_allowed(model) }
-    end
-
-    def load_model_if_allowed(model)
-      if can_load?(model)
-        @data[model] = self.send(:"load_#{model}")
-      else
-        nil
+    def load_data(ids = :all)
+      MODELS.each do |model|
+        if ids == :all
+          data = self.send(:"load_#{model}", ids)
+        else
+          data = self.send(:"load_#{model}", ids[model])
+        end
+        @data[model] = data
       end
     end
 
-    def can_load?(model)
-      object_to_authorize = "Locomotive::#{model.singularize.camelize}".constantize
-      ability.can?(:read, object_to_authorize)
+    ORDERED_NORMAL_MODELS.each do |model|
+      define_method(:"load_#{model}") do |ids|
+        if ids == :all
+          site.send(model)
+        else
+          site.send(model).find(ids)
+        end
+      end
     end
 
-    ## Methods to load the data ##
-
-    MODELS.each do |model|
-      define_method(:"load_#{model}") { site.send(model) }
-    end
-
-    # Override loading content entries
-    def load_content_entries
+    def load_content_entries(ids)
       site.content_types.inject({}) do |h, content_type|
-        h[content_type.slug] = content_type.entries
+        content_type_slug = content_type.slug
+        if ids == :all || ids[content_type_slug] == :all
+          entries = content_type.entries
+        else
+          entries = content_type.entries.find(ids[content_type_slug])
+        end
+        h[content_type_slug] = entries
         h
       end
     end

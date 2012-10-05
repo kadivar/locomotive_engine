@@ -144,32 +144,28 @@ Feature: Site Data
     """
     {
       "site_data": {
-        "content_types": [
-          {
-            "id": "4f832c2cb0d86d3f42000005",
+        "content_types": {
+          "4f832c2cb0d86d3f42000005": {
             "name": "Awesome Projects"
           }
-        ],
+        },
         "content_entries": {
-          "projects": [
-            {
-              "id": "4f832c2cb0d86d3f42000001",
+          "projects": {
+            "4f832c2cb0d86d3f42000001": {
               "name": "My Awesome Project"
             }
-          ]
+          }
         },
-        "pages": [
-          {
-            "id": "4f832c2cb0d86d3f42000002",
+        "pages": {
+          "4f832c2cb0d86d3f42000002": {
             "title": "Awesomest page ever"
           }
-        ],
-        "snippets": [
-          {
-            "id": "4f832c2cb0d86d3f42000003",
+        },
+        "snippets": {
+          "4f832c2cb0d86d3f42000003": {
             "name": "Awesome Snippet"
           }
-        ]
+        }
       }
     }
     """
