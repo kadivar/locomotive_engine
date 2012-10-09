@@ -55,6 +55,23 @@ module Locomotive
         ids['content_entries'][content_type_slug] = entries.keys
       end
 
+      self.find_from_ids(site, ids)
+    end
+
+    # Find all data according to the ids given. The ids should look like the
+    # following example:
+    #
+    # {
+    #   :pages => [
+    #     "4f832c2cb0d86d3f42000001"
+    #   ],
+    #   :content_entries => {
+    #     :projects => [
+    #       "4f832c2cb0d86d3f42000002"
+    #     ]
+    #   }
+    # }
+    def self.find_from_ids(site, ids)
       obj = self.new(site)
       obj.send(:load_data, ids)
       obj
@@ -224,6 +241,20 @@ module Locomotive
       end
     end
 
+    # Destroy all loaded objects
+    def destroy_all
+      ORDERED_NORMAL_MODELS.each do |model|
+        self.send(:"#{model}").each do |object|
+          object.destroy
+        end
+      end
+      self.content_entries.each do |content_type_slug, entries|
+        entries.each do |object|
+          object.destroy
+        end
+      end
+    end
+
     ## Save all objects ##
 
     def save
@@ -317,6 +348,7 @@ module Locomotive
     end
 
     def load_content_entries(ids)
+      ids ||= {}
       site.content_types.inject({}) do |h, content_type|
         content_type_slug = content_type.slug
         if ids == :all || ids[content_type_slug] == :all

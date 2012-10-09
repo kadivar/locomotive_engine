@@ -81,7 +81,7 @@ Rails.application.routes.draw do
       resource  :my_account, :controller => 'my_account'
 
       resource  :site_data, :controller => 'site_data',
-        :only => [ :show, :create, :update ]
+        :only => [ :show, :create, :update, :destroy ]
 
     end
   end

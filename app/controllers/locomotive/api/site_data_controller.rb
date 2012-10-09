@@ -11,7 +11,7 @@ module Locomotive
       end
 
       def create
-        # FIXME don't assign anything until after authorization
+        # FIXME shouldn't assign anything until after authorization
         @site_data = Locomotive::SiteDataPresenter.new(current_site,
           params[:site_data])
         @site_data.authorize!(current_ability, :create)
@@ -39,6 +39,17 @@ module Locomotive
           else
             format.json { render :json => @site_data.errors, :status => :unprocessable_entity }
           end
+        end
+      end
+
+      def destroy
+        @site_data = Locomotive::SiteDataPresenter.find_from_ids(
+          current_site, params[:site_data])
+        @site_data.authorize!(current_ability, :destroy)
+        @site_data.destroy_all
+
+        respond_to do |format|
+          format.json { head :no_content }
         end
       end
 

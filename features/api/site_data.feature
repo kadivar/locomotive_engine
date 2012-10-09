@@ -224,9 +224,7 @@ Feature: Site Data
       }
     }
     """
-    Then I print the JSON response
     When I do an API GET request to site_data.json
-    Then I print the JSON response
     Then the JSON at "content_assets" should have 0 entries
     And the JSON at "content_entries" should have 0 entries
     And the JSON at "content_types" should have 0 entries
