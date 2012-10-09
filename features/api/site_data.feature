@@ -200,3 +200,36 @@ Feature: Site Data
     Then the JSON at "content_types/0/name" should not be ""
     And the JSON at "pages/1/title" should not be "Awesomest page ever"
     And the JSON at "snippets/0/name" should not be "Awesome snippet"
+
+  Scenario: Simple delete
+    When I do an API DELETE to site_data.json with:
+    """
+    {
+      "site_data": {
+        "content_assets": [
+          "4f832c2cb0d86d3f42000000"
+        ],
+        "content_types": [
+          "4f832c2cb0d86d3f42000005"
+        ],
+        "pages": [
+          "4f832c2cb0d86d3f42000002"
+        ],
+        "theme_assets": [
+          "4f832c2cb0d86d3f42000004"
+        ],
+        "snippets": [
+          "4f832c2cb0d86d3f42000003"
+        ]
+      }
+    }
+    """
+    Then I print the JSON response
+    When I do an API GET request to site_data.json
+    Then I print the JSON response
+    Then the JSON at "content_assets" should have 0 entries
+    And the JSON at "content_entries" should have 0 entries
+    And the JSON at "content_types" should have 0 entries
+    And the JSON at "pages" should have 2 entries
+    And the JSON at "theme_assets" should have 0 entries
+    And the JSON at "snippets" should have 0 entries
