@@ -12,7 +12,7 @@ module Locomotive
     attr_reader :site, :errors
 
     # If attributes are provided, use them to build the models (see
-    # documentation fot build_models)
+    # documentation for build_models)
     def initialize(site, attributes = nil)
       @site = site
       @data = {}
@@ -253,6 +253,13 @@ module Locomotive
           object.destroy
         end
       end
+    end
+
+    # Mirror the current state with the given attributes
+    def mirror(attributes)
+      self.destroy_all
+      @data = {}
+      self.build_models(attributes)
     end
 
     ## Save all objects ##

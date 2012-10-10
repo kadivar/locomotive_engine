@@ -265,7 +265,8 @@ Feature: Site Data
       }
     }
     """
+    When I do an API GET request to site_data.json
     Then the JSON should have the following:
-      | content_types/0/name | "Employees" |
-      | content_entries/employees/0/name | "My First Project""   |
-      | content_types/0/name                    | "Projects"            |
+      | content_types/0/name                | "Employees"   |
+      | content_entries/employees/0/name    | "John Doe"    |
+      | pages/1/title                       | "Contact Us"  |

@@ -26,6 +26,21 @@ module Locomotive
         end
       end
 
+      def mirror
+        @site_data = Locomotive::SiteDataPresenter.all(current_site)
+        @site_data.authorize!(current_ability, :destroy)
+        @site_data.authorize!(current_ability, :create)
+        @site_data.mirror(params[:site_data])
+
+        respond_to do |format|
+          if @site_data.save
+            format.json { render :json => @site_data, :status => :created }
+          else
+            format.json { render :json => @site_data.errors, :status => :unprocessable_entity }
+          end
+        end
+      end
+
       def update
         @site_data = Locomotive::SiteDataPresenter.find_from_attributes(
           current_site, params[:site_data])

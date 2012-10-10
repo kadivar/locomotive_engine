@@ -80,8 +80,11 @@ Rails.application.routes.draw do
 
       resource  :my_account, :controller => 'my_account'
 
-      resource  :site_data, :controller => 'site_data',
-        :only => [ :show, :create, :update, :destroy ]
+      resource  :site_data, :controller => 'site_data' do
+        member do
+          post 'mirror'
+        end
+      end
 
     end
   end
