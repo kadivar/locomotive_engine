@@ -206,7 +206,7 @@ module Locomotive
     # {
     #   :pages => {
     #     "4f832c2cb0d86d3f42000001" => {
-    #       # Page attrbutes
+    #       # Page attributes
     #     }
     #   },
     #   :content_entries => {

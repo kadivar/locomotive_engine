@@ -231,3 +231,41 @@ Feature: Site Data
     And the JSON at "pages" should have 2 entries
     And the JSON at "theme_assets" should have 0 entries
     And the JSON at "snippets" should have 0 entries
+
+  Scenario: Simple mirror
+    When I do an API POST to site_data/mirror.json with:
+    """
+    {
+      "site_data": {
+        "content_types": [
+          {
+            "name": "Employees",
+            "entries_custom_fields": [
+              {
+                "name": "name",
+                "label": "Name",
+                "type": "string"
+              }
+            ]
+          }
+        ],
+        "content_entries": {
+          "employees": [
+            {
+              "name": "John Doe"
+            }
+          ]
+        },
+        "pages": [
+          {
+            "title": "Contact Us",
+            "parent_fullpath": "index"
+          }
+        ]
+      }
+    }
+    """
+    Then the JSON should have the following:
+      | content_types/0/name | "Employees" |
+      | content_entries/employees/0/name | "My First Project""   |
+      | content_types/0/name                    | "Projects"            |
