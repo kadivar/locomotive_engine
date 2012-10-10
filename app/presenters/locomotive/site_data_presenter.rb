@@ -1,15 +1,11 @@
 module Locomotive
   class SiteDataPresenter
 
-    # The models which are handled by this class in the order that they must
-    # be created. Only the models which don't require special functionality
-    # are included
-    ORDERED_NORMAL_MODELS = %w{content_assets theme_assets snippets content_types pages}
+    include Extensions::SiteDataPresenter::Authorization
+    include Extensions::SiteDataPresenter::Load
+    include Extensions::SiteDataPresenter::Validation
 
-    # All models handled by this class
-    MODELS = ORDERED_NORMAL_MODELS + %w{content_entries}
-
-    attr_reader :site, :errors
+    attr_reader :site
 
     # If attributes are provided, use them to build the models (see
     # documentation for build_models)
@@ -22,7 +18,7 @@ module Locomotive
     # Load all data from the database
     def self.all(site)
       obj = self.new(site)
-      obj.send(:load_data)
+      obj.load_data
       obj
     end
 
@@ -46,7 +42,7 @@ module Locomotive
     def self.find_from_attributes(site, attributes)
       ids = {}
 
-      ORDERED_NORMAL_MODELS.each do |model|
+      self.ordered_normal_models.each do |model|
         ids[model] = (attributes[model] || {}).keys
       end
 
@@ -73,76 +69,39 @@ module Locomotive
     # }
     def self.find_from_ids(site, ids)
       obj = self.new(site)
-      obj.send(:load_data, ids)
+      obj.load_data(ids)
       obj
+    end
+
+    # The models which are handled by this class in the order that they must
+    # be created. Only the models which don't require special functionality
+    # are included
+    def self.ordered_normal_models
+      %w{content_assets theme_assets snippets content_types pages}
+    end
+
+    # All models handled by this class
+    def self.models
+      ordered_normal_models + %w{content_entries}
+    end
+
+    %w{models ordered_normal_models}.each do |meth|
+      define_method(:"#{meth}") { self.class.send(:"#{meth}") }
     end
 
     # Methods to use when building json object
     def included_methods
-      MODELS
-    end
-
-    # Authorize action with loaded data
-    def authorize!(ability, action)
-      messages = []
-      failed = false
-
-      MODELS.each do |model|
-        begin
-          ability.authorize!(action, model_class(model))
-        rescue CanCan::AccessDenied => e
-          failed = true
-          messages << e.message
-        end
-      end
-
-      if failed
-        raise CanCan::AccessDenied.new(messages)
-      end
+      self.class.models
     end
 
     ## Getters for each model ##
 
-    MODELS.each do |model|
+    self.ordered_normal_models.each do |model|
       define_method(model) { @data[model] ||= [] }
     end
 
     def content_entries
       @data['content_entries'] ||= Hash.new { |h, k| h[k] = [] }
-    end
-
-    ## Validity ##
-
-    def valid?
-      all_valid = true
-      ORDERED_NORMAL_MODELS.each do |model|
-        objects = self.send(:"#{model}")
-        objects.each_with_index do |obj, index|
-          unless obj.valid?
-            all_valid = false
-            id = obj.new_record? && index || obj.id
-            add_errors(obj, model, id)
-          end
-        end
-      end
-
-      self.content_entries.each do |content_type_slug, entries|
-        entries.each_with_index do |obj, index|
-          if obj.content_type
-            unless obj.valid?
-              all_valid = false
-              id = obj.new_record? && index || obj.id
-              add_errors(obj, 'content_entries', content_type_slug, id)
-            end
-          else
-            all_valid = false
-            add_errors('content type does not exist', 'content_entries',
-                       content_type_slug)
-          end
-        end
-      end
-
-      all_valid
     end
 
     # Build models and assign their attributes. The attributes should look like
@@ -164,7 +123,7 @@ module Locomotive
     # }
     def build_models(all_attributes)
       # Need to build them in a particular order so all dependencies are met
-      ORDERED_NORMAL_MODELS.each do |model|
+      self.class.ordered_normal_models.each do |model|
         attributes_list = all_attributes[model]
         attributes_list.try(:each) do |attributes|
           obj = self.send(:"build_#{model.singularize}_object")
@@ -218,7 +177,7 @@ module Locomotive
     #   }
     # }
     def assign_attributes(attributes)
-      MODELS.each do |model|
+      self.class.models.each do |model|
         if attributes[model]
           if model == 'content_entries'
             self.content_entries.each do |content_type_slug, entries|
@@ -243,7 +202,7 @@ module Locomotive
 
     # Destroy all loaded objects
     def destroy_all
-      ORDERED_NORMAL_MODELS.each do |model|
+      self.class.ordered_normal_models.each do |model|
         self.send(:"#{model}").each do |object|
           object.destroy
         end
@@ -266,7 +225,7 @@ module Locomotive
 
     def save
       if self.valid?
-        ORDERED_NORMAL_MODELS.each do |model|
+        self.class.ordered_normal_models.each do |model|
           self.send(:"#{model}").each { |obj| obj.save! }
         end
         self.content_entries.each do |_, entries|
@@ -294,85 +253,9 @@ module Locomotive
 
     protected
 
-    # Get the class for a model
-    def model_class(model)
-      "Locomotive::#{model.singularize.camelize}".constantize
-    end
-
-    ## Validity and errors ##
-
-    attr_accessor :valid
-
-    def add_errors(model_or_string, *path)
-      @errors ||= {}
-      @errors['errors'] ||= {}
-
-      is_string = model_or_string.kind_of?(String)
-
-      # Build path
-      current_container = @errors['errors']
-      path.each_with_index do |element, index|
-        if index == path.length - 1 && is_string
-          current_container[element] ||= []
-        else
-          current_container[element] ||= {}
-        end
-        current_container = current_container[element]
-      end
-
-      # Add error messages
-      if is_string
-        current_container << model_or_string
-      else
-        model_or_string.errors.messages.each do |k, v|
-          current_container[k] ||= []
-          current_container[k] += v
-        end
-      end
-    end
-
-    ## Load the data for each model ##
-
-    def load_data(ids = :all)
-      MODELS.each do |model|
-        if ids == :all
-          data = self.send(:"load_#{model}", ids)
-        else
-          data = self.send(:"load_#{model}", ids[model])
-        end
-        @data[model] = data
-      end
-    end
-
-    ORDERED_NORMAL_MODELS.each do |model|
-      define_method(:"load_#{model}") do |ids|
-        if ids == :all
-          site.send(model)
-        else
-          site.send(model).find(ids)
-        end
-      end
-    end
-
-    def load_content_entries(ids)
-      ids ||= {}
-      site.content_types.inject({}) do |h, content_type|
-        content_type_slug = content_type.slug
-        if ids == :all || ids[content_type_slug] == :all
-          entries = content_type.entries
-        else
-          if ids[content_type_slug]
-            entries = content_type.entries.find(ids[content_type_slug])
-          end
-        end
-        h[content_type_slug] = entries if entries
-        h
-      end
-    end
-
     ## Build object in a model ##
 
-    MODELS.each do |model|
+    self.models.each do |model|
       define_method(:"build_#{model.singularize}_object") do
         model_collection = site.send(:"#{model}")
         obj = model_collection.build
