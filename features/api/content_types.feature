@@ -156,3 +156,34 @@ Feature: Content Types
     And the JSON response at "0/public_submission_account_emails" should be an array
     And the JSON response at "0/public_submission_account_emails" should have 1 entry
     And the JSON response at "0/public_submission_account_emails/0" should be "user1@a.com"
+
+  Scenario: Creating Content Type with relationship field
+    Given I have a custom model named "Company" with
+      | label   | type          | required  | target    |
+      | Name    | string        | true      |           |
+      | Desc    | text          | false     |           |
+    When I do an API POST to content_types.json with:
+    """
+    {
+      "content_type": {
+        "name": "Employees",
+        "entries_custom_fields": [
+          {
+            "name": "name",
+            "label": "Name",
+            "type": "string"
+          },
+          {
+            "name": "works_at",
+            "label": "Works at",
+            "type": "belongs_to",
+            "content_type_slug": "company"
+          }
+        ]
+      }
+    }
+    """
+    When I do an API GET request to content_types.json
+    Then the JSON response should be an array
+    And the JSON response should have 2 entries
+    And the JSON response at "1/entries_custom_fields/1/label" should be "Works at"

@@ -41,6 +41,12 @@ module Locomotive
       # Update the ones with the same name, and create the new ones
       entries_custom_fields.each do |field|
         name = field['name']
+        if field['content_type_slug']
+          content_type_slug = field.delete('content_type_slug')
+          field['class_name'] = self.source.site.content_types.where(
+            :slug => content_type_slug).first.klass_with_custom_fields(
+            :entries).to_s
+        end
         db_field = self.source.entries_custom_fields.where(:name => name).first if name
         if db_field
           db_field.assign_attributes(field)
@@ -84,7 +90,7 @@ module Locomotive
     end
 
     def custom_fields_write_methods
-      %w(hint inverse_of label localized name order_by position required text_formatting type ui_enabled class_name select_options)
+      %w(hint inverse_of label localized name order_by position required text_formatting type ui_enabled class_name select_options content_type_slug)
     end
 
     def save
