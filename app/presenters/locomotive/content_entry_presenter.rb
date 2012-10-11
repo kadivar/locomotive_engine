@@ -85,6 +85,11 @@ module Locomotive
       end
     end
 
+    def save
+      objects_to_save.each { |obj| obj.save } if objects_to_save
+      super
+    end
+
     protected
 
     # Mimic format used by to_json
@@ -175,11 +180,6 @@ module Locomotive
           obj.send(:"position_in_#{inverse_field}=", index)
         end
       end
-    end
-
-    def save
-      objects_to_save.each { |obj| obj.save } if objects_to_save
-      super
     end
 
     # Delegate custom field setters to source

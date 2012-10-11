@@ -13,7 +13,7 @@ module Locomotive
               unless obj.valid?
                 all_valid = false
                 id = obj.new_record? && index || obj.id
-                add_errors(obj, model, id)
+                set_errors(obj, model, id)
               end
             end
           end
@@ -24,11 +24,11 @@ module Locomotive
                 unless obj.valid?
                   all_valid = false
                   id = obj.new_record? && index || obj.id
-                  add_errors(obj, 'content_entries', content_type_slug, id)
+                  set_errors(obj, 'content_entries', content_type_slug, id)
                 end
               else
                 all_valid = false
-                add_errors('content type does not exist', 'content_entries',
+                set_errors('content type does not exist', 'content_entries',
                   content_type_slug)
               end
             end
@@ -39,7 +39,7 @@ module Locomotive
 
         protected
 
-        def add_errors(model_or_string, *path)
+        def set_errors(model_or_string, *path)
           @errors ||= {}
           @errors['errors'] ||= {}
 
@@ -47,23 +47,20 @@ module Locomotive
 
           # Build path
           current_container = @errors['errors']
+          current_element = nil
           path.each_with_index do |element, index|
-            if index == path.length - 1 && is_string
-              current_container[element] ||= []
-            else
+            current_element = element
+            unless index == path.length - 1
               current_container[element] ||= {}
+              current_container = current_container[element]
             end
-            current_container = current_container[element]
           end
 
           # Add error messages
           if is_string
-            current_container << model_or_string
+            current_container[current_element] = [model_or_string]
           else
-            model_or_string.errors.messages.each do |k, v|
-              current_container[k] ||= []
-              current_container[k] += v
-            end
+            current_container[current_element] = model_or_string.errors.messages
           end
         end
 

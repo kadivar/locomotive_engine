@@ -139,7 +139,7 @@ module Locomotive
         content_types_by_slug[content_type.slug] ||= content_type
       end
 
-      all_attributes['content_entries'].each do |content_type_slug, attributes_list|
+      all_attributes['content_entries'].try(:each) do |content_type_slug, attributes_list|
         content_type = content_types_by_slug[content_type_slug]
 
         if content_type
@@ -226,10 +226,10 @@ module Locomotive
     def save
       if self.valid?
         self.class.ordered_normal_models.each do |model|
-          self.send(:"#{model}").each { |obj| obj.save! }
+          self.send(:"#{model}").each { |obj| presenter_for(obj).save }
         end
         self.content_entries.each do |_, entries|
-          entries.each { |obj| obj.save! }
+          entries.each { |obj| presenter_for(obj).save }
         end
       else
         false
@@ -277,7 +277,12 @@ module Locomotive
 
     # Assign attributes to an object using its presenter
     def assign_attributes_to(obj, attributes)
-      obj.to_presenter.assign_attributes(attributes)
+      presenter_for(obj).assign_attributes(attributes)
+    end
+
+    def presenter_for(obj)
+      @presenters ||= {}
+      @presenters[obj] ||= obj.to_presenter
     end
 
   end
