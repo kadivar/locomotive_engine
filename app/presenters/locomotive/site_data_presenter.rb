@@ -3,7 +3,7 @@ module Locomotive
 
     include Extensions::SiteDataPresenter::Authorization
     include Extensions::SiteDataPresenter::Load
-    include Extensions::SiteDataPresenter::Validation
+    include Extensions::SiteDataPresenter::ValidationAndSave
 
     attr_reader :site
 
@@ -219,21 +219,6 @@ module Locomotive
       self.destroy_all
       @data = {}
       self.build_models(attributes)
-    end
-
-    ## Save all objects ##
-
-    def save
-      if self.valid?
-        self.class.ordered_normal_models.each do |model|
-          self.send(:"#{model}").each { |obj| presenter_for(obj).save }
-        end
-        self.content_entries.each do |_, entries|
-          entries.each { |obj| presenter_for(obj).save }
-        end
-      else
-        false
-      end
     end
 
     ## JSON to return ##

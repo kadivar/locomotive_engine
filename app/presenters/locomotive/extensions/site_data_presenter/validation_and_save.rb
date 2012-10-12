@@ -1,9 +1,24 @@
 module Locomotive
   module Extensions
     module SiteDataPresenter
-      module Validation
+      module ValidationAndSave
 
         attr_reader :errors
+
+        def save
+          if self.valid?
+            self.class.ordered_normal_models.each do |model|
+              self.send(:"#{model}").each { |obj| presenter_for(obj).save }
+            end
+            self.content_entries.each do |_, entries|
+              entries.each { |obj| presenter_for(obj).save }
+            end
+          else
+            false
+          end
+        end
+
+        protected
 
         def valid?
           all_valid = true
@@ -36,8 +51,6 @@ module Locomotive
 
           all_valid
         end
-
-        protected
 
         def set_errors(model_or_string, *path)
           @errors ||= {}
