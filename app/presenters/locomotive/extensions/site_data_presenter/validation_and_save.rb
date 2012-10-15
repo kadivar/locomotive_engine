@@ -4,6 +4,7 @@ module Locomotive
       module ValidationAndSave
 
         include ContentTypes
+        include ContentEntries
 
         attr_reader :errors
 
