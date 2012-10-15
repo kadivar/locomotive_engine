@@ -93,11 +93,17 @@ module Locomotive
           valid = true
           objects = self.send(:"#{model}")
           objects.each_with_index do |obj, index|
-            unless obj.valid?
-              valid = false
-              id = obj.new_record? && index || obj.id
-              set_errors(obj, model, id)
-            end
+            validate_object(obj, model, index)
+          end
+          valid
+        end
+
+        def validate_object(obj, model, index)
+          valid = true
+          unless obj.valid?
+            valid = false
+            id = obj.new_record? && index || obj.id
+            set_errors(obj, model, id)
           end
           valid
         end

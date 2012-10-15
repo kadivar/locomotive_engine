@@ -71,26 +71,34 @@ module Locomotive
 
           # Do the first stage of saving content_types. We need this so that
           # relationship fields can be linked together correctly in the second
-          # stage
+          # stage. Don't change any objects which are already in the database
           def save_content_types_first_stage
-            # FIXME: do this is one loop
             fields = {}
             field_content_type_slugs = {}
-            self.content_types.each do |ct|
-              fields[ct] = remove_relationship_fields(ct)
-              field_content_type_slugs[ct] = remove_field_content_type_slugs(ct)
+
+            all_valid = true
+
+            self.content_types.each_with_index do |ct, index|
+              if ct.new_record?
+                fields[ct] = remove_relationship_fields(ct)
+                field_content_type_slugs[ct] = remove_field_content_type_slugs(ct)
+
+                valid = validate_object(ct, 'content_types', index)
+                if valid
+                  default_save_model('content_types')
+                end
+
+                all_valid &&= valid
+
+                add_relationship_fields(ct, fields[ct])
+                add_field_content_type_slugs(ct, field_content_type_slugs[ct])
+
+                add_content_type_object_to_destroy(ct)
+              end
             end
-            valid = default_validate_model('content_types')
-            if valid
-              default_save_model('content_types')
-            end
-            self.content_types.each do |ct|
-              add_relationship_fields(ct, fields[ct])
-              add_field_content_type_slugs(ct, field_content_type_slugs[ct])
-            end
+
             content_type_first_stage_done = true
-            self.content_types.each { |ct| add_content_type_object_to_destroy(ct) }
-            valid
+            all_valid
           end
 
 
