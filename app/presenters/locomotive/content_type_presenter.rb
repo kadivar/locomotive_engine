@@ -5,7 +5,12 @@ module Locomotive
 
     delegate :name=, :description=, :slug=, :order_by=, :order_direction=, :label_field_name=, :group_by_field_id=, :raw_item_template=, :public_submission_enabled=, :to => :source
 
-    attr_writer :order_by_attribute, :group_by_field_name
+    attr_writer :order_by_attribute, :group_by_field_name,
+      :field_content_type_slugs
+
+    def field_content_type_slugs
+      @field_content_type_slugs ||= {}
+    end
 
     def set_order_by_attribute
       return unless @order_by_attribute
@@ -41,18 +46,27 @@ module Locomotive
       # Update the ones with the same name, and create the new ones
       entries_custom_fields.each do |field|
         name = field['name']
-        if field['content_type_slug']
-          content_type_slug = field.delete('content_type_slug')
-          field['class_name'] = self.source.site.content_types.where(
-            :slug => content_type_slug).first.klass_with_custom_fields(
-            :entries).to_s
-        end
-        db_field = self.source.entries_custom_fields.where(:name => name).first if name
+        content_type_slug = field.delete(:content_type_slug)
+
+        db_field = get_field(name) if name
         if db_field
           db_field.assign_attributes(field)
         else
-          self.source.entries_custom_fields.build(field)
+          db_field = self.source.entries_custom_fields.build(field)
         end
+
+        if content_type_slug
+          field_content_type_slugs[db_field] = content_type_slug
+        end
+      end
+    end
+
+    def set_field_class_names
+      field_content_type_slugs.each do |db_field, content_type_slug|
+        content_type = self.source.site.content_types.where(
+          :slug => content_type_slug).first
+        db_field.class_name = content_type.klass_with_custom_fields(
+          :entries).to_s
       end
     end
 
@@ -96,6 +110,7 @@ module Locomotive
     def save
       set_order_by_attribute
       set_group_by_field_name
+      set_field_class_names
       super
     end
 

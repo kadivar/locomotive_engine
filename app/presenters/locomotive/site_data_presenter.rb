@@ -74,15 +74,21 @@ module Locomotive
     end
 
     # The models which are handled by this class in the order that they must
-    # be created. Only the models which don't require special functionality
-    # are included
+    # be created. Only the models which are stored by this class in a simple
+    # array are included
     def self.ordered_normal_models
       %w{content_assets theme_assets snippets content_types pages}
     end
 
+    # All models handled by this class in the order in which they should be
+    # saved
+    def self.ordered_models
+      ordered_normal_models + %w{content_entries}
+    end
+
     # All models handled by this class
     def self.models
-      ordered_normal_models + %w{content_entries}
+      self.ordered_models
     end
 
     %w{models ordered_normal_models}.each do |meth|
@@ -231,6 +237,8 @@ module Locomotive
       methods = self.included_methods
       {}.tap do |hash|
         methods.each do |meth|
+          # FIXME: this is going to recreate all the presenters. Would be
+          # faster if we just used the ones which are stored
           hash[meth] = self.send(meth.to_sym) rescue nil
         end
       end

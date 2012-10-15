@@ -97,7 +97,7 @@ Feature: Site Data
           ],
           "employees": [
             {
-              "name": "John Smith"
+              "name": "John Doe"
             }
           ]
         },
