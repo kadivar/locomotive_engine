@@ -10,21 +10,9 @@ module Locomotive
 
           let(:site_data) { ::Locomotive::SiteDataPresenter.new(site) }
 
-          let(:projects_content_type) do
-            projects = FactoryGirl.build(:content_type, :name => 'Projects')
-            projects.entries_custom_fields.build(
-              :label => 'Title', :type => 'string')
-            projects.save!
-            projects
-          end
+          let(:projects_content_type) { create_projects_content_type }
 
-          let(:employees_content_type) do
-            employees = FactoryGirl.build(:content_type, :name => 'Employees')
-            employees.entries_custom_fields.build(
-              :label => 'Name', :type => 'string')
-            employees.save!
-            employees
-          end
+          let(:employees_content_type) { create_employees_content_type }
 
           before(:each) do
             setup_projects_employees_relationship
@@ -33,29 +21,12 @@ module Locomotive
           it 'should set up relationships between content entries' do
             params = {
               :content_entries => {
-                :projects => [
-                  {
-                    :title => 'Website',
-                    :employees => [ 'Joe', 'Bob' ]
-                  },
-                  {
-                    :title => 'E-commerce App',
-                    :employees => [ 'Joe' ]
-                  }
-                ],
-                :employees => [
-                  {
-                    :name => 'Joe'
-                  },
-                  {
-                    :name => 'Bob'
-                  }
-                ]
+                :projects => projects_params,
+                :employees => employees_params
               }
             }.with_indifferent_access
 
             site_data.build_models(params)
-
             site_data.save.should be_true
 
             site.reload
@@ -81,6 +52,46 @@ module Locomotive
           end
 
           protected
+
+          def create_projects_content_type
+            projects = FactoryGirl.build(:content_type, :name => 'Projects')
+            projects.entries_custom_fields.build(
+              :label => 'Title', :type => 'string')
+            projects.save!
+            projects
+          end
+
+          def create_employees_content_type
+            employees = FactoryGirl.build(:content_type, :name => 'Employees')
+            employees.entries_custom_fields.build(
+              :label => 'Name', :type => 'string')
+            employees.save!
+            employees
+          end
+
+          def projects_params
+            [
+              {
+                :title => 'Website',
+                :employees => [ 'joe', 'bob' ]
+              },
+              {
+                :title => 'E-commerce App',
+                :employees => [ 'joe' ]
+              }
+            ]
+          end
+
+          def employees_params
+            [
+              {
+                :name => 'Joe'
+              },
+              {
+                :name => 'Bob'
+              }
+            ]
+          end
 
           def setup_projects_employees_relationship
             projects_class = projects_content_type.klass_with_custom_fields(:entries)

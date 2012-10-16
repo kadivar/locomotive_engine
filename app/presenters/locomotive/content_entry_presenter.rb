@@ -7,7 +7,11 @@ module Locomotive
 
     delegate :_slug=, :_position=, :seo_title=, :meta_keywords=, :meta_description=, :to => :source
 
-    attr_accessor :objects_to_save
+    attr_accessor :relationship_field_methods, :objects_to_save
+
+    def relationship_field_methods
+      @relationship_field_methods ||= {}
+    end
 
     # Lists of all the attributes editable thru the html form for instance
     #
@@ -85,9 +89,39 @@ module Locomotive
       end
     end
 
-    def save
+    def resolve_relationships
+      relationship_field_methods.each do |meth, args|
+        field_name = get_custom_field_name_for_method(meth)
+
+        # If it's a "many" or "belong_to" field, pass in the right objects
+        if is_many_custom_field?(field_name)
+          new_args = args.collect { |list| get_many_field_objects(field_name, list) }
+
+          # Get the objects which we need to save
+          self.objects_to_save ||= []
+          self.objects_to_save += new_args.flatten
+
+          # If it's a has_many field, set the positions
+          if is_has_many_custom_field?(field_name)
+            self.set_positions_for_has_many(new_args.flatten, field_name)
+          end
+
+          self.source.send(meth, *new_args)
+        elsif is_belongs_to_custom_field?(field_name)
+          new_args = args.collect { |slug| get_belongs_field_object(meth, slug) }
+          self.source.send(meth, *new_args)
+        end
+      end
+      relationship_field_methods = {}
+    end
+
+    def save(should_resolve_relationships = true)
+      if should_resolve_relationships
+        resolve_relationships
+      end
+      puts "Objects to save: #{objects_to_save}"
       objects_to_save.each { |obj| obj.save } if objects_to_save
-      super
+      super()
     end
 
     protected
@@ -144,9 +178,15 @@ module Locomotive
     end
 
     def get_many_field_objects(meth, slug_list)
+      puts '====== GET MANY FIELD OBJECTS ======'
+      puts "Slugs: #{slug_list}"
       target_klass = get_target_klass_for_custom_field_method(meth)
+      puts "Target klass: #{target_klass}"
+      puts "Target klass slugs: #{target_klass.all.collect(&:_slug)}"
       # FIXME: too many DB accesses
-      slug_list.collect { |slug| target_klass.where(:_slug => slug).first }
+      ret = slug_list.collect { |slug| target_klass.where(:_slug => slug).first }
+      puts '====== END GET MANY FIELD OBJECTS ======'
+      ret
     end
 
     def get_belongs_field_object(meth, slug)
@@ -169,6 +209,10 @@ module Locomotive
       field && field.type == 'belongs_to'
     end
 
+    def is_relationship_field?(meth)
+      is_many_custom_field?(meth) || is_belongs_to_custom_field?(meth)
+    end
+
     def set_positions_for_has_many(objs, meth)
       field = get_custom_field_name_for_method(meth)
       objs.each_with_index do |obj, index|
@@ -185,28 +229,14 @@ module Locomotive
     # Delegate custom field setters to source
 
     def method_missing(meth, *args, &block)
-      # If the setter is missing but it's in the available_custom_field_names, delegate it to the source
+      # If the setter is missing but it's in the available_custom_field_names,
+      # delegate it to the source or hold onto it to resolve later
       field_name = get_custom_field_name_for_method(meth)
       if self.available_custom_field_names.include?(field_name)
-        # If it's a "many" or "belong_to" field, pass in the right objects
-        if is_many_custom_field?(field_name)
-          new_args = args.collect { |list| get_many_field_objects(field_name, list) }
-
-          # Get the objects which we need to save
-          self.objects_to_save ||= []
-          self.objects_to_save += new_args.flatten
-
-          # If it's a has_many field, set the positions
-          if is_has_many_custom_field?(field_name)
-            self.set_positions_for_has_many(new_args.flatten, field_name)
-          end
-
-          self.source.send(meth, *new_args, &block)
-        elsif is_belongs_to_custom_field?(field_name)
-          new_args = args.collect { |slug| get_belongs_field_object(meth, slug) }
-          self.source.send(meth, *new_args, &block)
+        if is_relationship_field?(field_name)
+          relationship_field_methods[meth] = args
         else
-          self.source.send(meth, *args, &block)
+          self.source.send(meth, *args)
         end
       else
         super

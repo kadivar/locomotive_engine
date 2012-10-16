@@ -7,6 +7,12 @@ module Locomotive
           protected
 
           def save_content_entries
+            # Save without relationship fields
+            self.content_entries.each do |_, entries|
+              entries.each { |obj| presenter_for(obj).save(false) }
+            end
+
+            # Save normally
             self.content_entries.each do |_, entries|
               entries.each { |obj| presenter_for(obj).save }
             end
@@ -30,6 +36,12 @@ module Locomotive
               end
             end
             all_valid
+          end
+
+          ## Save without relationships ##
+
+          def save_without_relationship_fields(obj)
+            presenter = presenter_for(obj)
           end
 
         end
