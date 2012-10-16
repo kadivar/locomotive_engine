@@ -27,6 +27,8 @@ module Locomotive
             }.with_indifferent_access
 
             site_data.build_models(params)
+            site_data.save
+            puts site_data.errors
             site_data.save.should be_true
 
             site.reload
@@ -99,7 +101,7 @@ module Locomotive
 
             projects_content_type.entries_custom_fields.build(
               :label => 'Employees', :type => 'many_to_many',
-              :class_name => employees_class.to_s)
+              :class_name => employees_class.to_s, :required => true)
             projects_content_type.save!
 
             employees_content_type.entries_custom_fields.build(

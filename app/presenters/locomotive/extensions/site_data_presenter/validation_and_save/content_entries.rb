@@ -38,11 +38,42 @@ module Locomotive
             all_valid
           end
 
-          ## Save without relationships ##
 
-          def save_without_relationship_fields(obj)
-            presenter = presenter_for(obj)
+          ## Cleanup ##
+
+          # TODO: duplicated in content_types. DRY it up!
+
+          # Array of content_entry objects which have been saved and need to be
+          # destroyed on cleanup
+          def content_entry_objects_to_destroy
+            @content_entry_objects_to_destroy ||= []
           end
+
+          # Add a content_entry object to be destroyed on cleanup
+          def add_content_entry_object_to_destroy(content_entry)
+            content_entry_objects_to_destroy << content_entry
+          end
+
+          # Clear the list of content_entry objects to be destroyed on cleanup
+          def reset_content_entry_objects_to_destroy
+            @content_entry_objects_to_destroy = []
+          end
+
+          # Destroy all content_entry objects which have been saved in the
+          # first stage. Reset the list of content_entry objects to be
+          # destroyed
+          def cleanup_content_entries
+            content_entry_objects_to_destroy.each do |obj|
+              obj.destroy unless obj.new_record?
+            end
+            reset_content_entry_objects_to_destroy
+            content_entry_first_stage_done = false
+          end
+
+
+          ## First stage of save ##
+
+          # TODO
 
         end
       end
