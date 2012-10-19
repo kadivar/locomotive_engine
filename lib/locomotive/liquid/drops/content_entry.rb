@@ -50,7 +50,11 @@ module Locomotive
             
             case field['type']
             when 'remote_source'
-              value = load_remote_source(self._source.send(meth), self._source.send(meth+"_expiry")||1.minute)
+              if self._source.send(meth)
+                value = load_remote_source(self._source.send(meth), self._source.send(meth+"_expiry")||1.minute)
+              else
+                value = nil
+              end
             else
               value = self._source.send(meth)
             end
