@@ -139,7 +139,6 @@ module Locomotive
               site_data.build_models(params)
               site_data.send(:minimal_save_all).should be_true
 
-              site.reload
               content_type = site.content_types.where(:slug => 'projects').first
               project = content_type.entries.where(:_slug => 'project-1').first
 
@@ -148,9 +147,42 @@ module Locomotive
               project.description.should_not == new_project_attributes[:description]
             end
 
-            it 'should generate the slug from the label field'
+            it 'should generate the slug from the label field' do
+              params = {
+                :content_entries => {
+                  :projects => [
+                    new_project_attributes_without_slug
+                  ]
+                }
+              }.with_indifferent_access
+              site_data.build_models(params)
+              site_data.send(:minimal_save_all).should be_true
 
-            it 'should validate the uniqueness of the slug'
+              content_type = site.content_types.where(:slug => 'projects').first
+              project = content_type.entries.where(:_slug => 'project-1').first
+
+              project._slug.should == 'project-1'
+              project.name.should == 'Project 1'
+              project.description.should_not == new_project_attributes[:description]
+            end
+
+            it 'should generate a unique slug' do
+              params = {
+                :content_entries => {
+                  :projects => [
+                    new_project_attributes,
+                    new_project_attributes
+                  ]
+                }
+              }.with_indifferent_access
+              site_data.build_models(params)
+              site_data.send(:minimal_save_all).should be_true
+
+              content_type = site.content_types.where(:slug => 'projects').first
+
+              content_type.entries[0]._slug.should == 'project-1'
+              content_type.entries[1]._slug.should == 'project-2'
+            end
 
           end
 
@@ -203,6 +235,12 @@ module Locomotive
               :name => 'Project 1',
               :description => 'The first project ever'
             }
+          end
+
+          def new_project_attributes_without_slug
+            attrs = new_project_attributes
+            attrs.delete(:_slug)
+            attrs
           end
 
         end

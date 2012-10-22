@@ -50,7 +50,8 @@ module Locomotive
             presence_val = ::Mongoid::Validations::PresenceValidator
             if (raw_filter.kind_of?(uniqueness_val) ||
                 raw_filter.kind_of?(presence_val)) \
-                && raw_filter.attributes.include?(:slug)
+                && (raw_filter.attributes.include?(:slug) \
+                || raw_filter.attributes.include?(:_slug))
               return false
             end
 
