@@ -1,6 +1,14 @@
 module Locomotive
   class ContentTypePresenter < BasePresenter
 
+    before_save :set_order_by_attribute
+    before_save :set_group_by_field_name
+    before_save :set_field_class_names
+
+    validate :order_by_attribute_must_exist
+    validate :group_by_field_name_must_exist
+    validate :field_class_names_must_exist
+
     delegate :name, :description, :slug, :order_by, :order_by_attribute, :order_direction, :label_field_name, :group_by_field_id, :raw_item_template, :public_submission_enabled, :to => :source
 
     delegate :name=, :description=, :slug=, :order_by=, :order_direction=, :label_field_name=, :group_by_field_id=, :raw_item_template=, :public_submission_enabled=, :to => :source
@@ -24,6 +32,17 @@ module Locomotive
       end
     end
 
+    def order_by_attribute_must_exist
+      return unless @order_by_attribute
+
+      if %w{created_at updated_at _position}.include?(@order_by_attribute)
+        self.source.order_by = @order_by_attribute
+      else
+        field = get_field(@order_by_attribute)
+        self.errors.add(:order_by_attribute) unless field
+      end
+    end
+
     def set_group_by_field_name
       return unless @group_by_field_name
 
@@ -34,6 +53,13 @@ module Locomotive
     def group_by_field_name
       # Get the name of the group_by field in the model
       self.source.entries_custom_fields.find(self.source.group_by_field_id).name
+    end
+
+    def group_by_field_name_must_exist
+      return unless @group_by_field_name
+
+      field = get_field(@group_by_field_name)
+      self.errors.add(:group_by_field_name) unless field
     end
 
     def entries_custom_fields
@@ -67,6 +93,14 @@ module Locomotive
           :slug => content_type_slug).first
         db_field.class_name = content_type.klass_with_custom_fields(
           :entries).to_s
+      end
+    end
+
+    def field_class_names_must_exist
+      field_content_type_slugs.each do |db_field, content_type_slug|
+        content_type = self.source.site.content_types.where(
+          :slug => content_type_slug).first
+        self.errors.add(:entries) unless content_type
       end
     end
 
@@ -105,13 +139,6 @@ module Locomotive
 
     def custom_fields_write_methods
       %w(hint inverse_of label localized name order_by position required text_formatting type ui_enabled class_name select_options content_type_slug)
-    end
-
-    def save
-      set_order_by_attribute
-      set_group_by_field_name
-      set_field_class_names
-      super
     end
 
     protected

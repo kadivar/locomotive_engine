@@ -5,9 +5,14 @@ class Locomotive::BasePresenter
   include ActionView::Helpers::TextHelper
   include ActionView::Helpers::NumberHelper
 
+  include ActiveModel::Validations
+  extend ActiveModel::Callbacks
+
+  define_model_callbacks :save
+
   attr_reader :source, :options, :ability, :depth
 
-  delegate :created_at, :updated_at, :errors, :save, :to => :source
+  delegate :created_at, :updated_at, :errors, :to => :source
 
   def initialize(object, options = {})
     @source   = object
@@ -53,6 +58,10 @@ class Locomotive::BasePresenter
     end
   end
 
+  def to_json(options = {})
+    self.as_json.to_json(options)
+  end
+
   def assign_attributes(new_attributes)
     return unless new_attributes
 
@@ -68,6 +77,16 @@ class Locomotive::BasePresenter
   def update_attributes(new_attributes)
     self.assign_attributes(new_attributes)
     self.save
+  end
+
+  def save
+    return false unless self.valid?
+
+    result = false
+    run_callbacks :save do
+      result = self.source.save
+    end
+    result
   end
 
 end
