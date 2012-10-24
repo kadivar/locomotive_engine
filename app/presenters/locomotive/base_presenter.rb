@@ -9,10 +9,12 @@ class Locomotive::BasePresenter
   extend ActiveModel::Callbacks
 
   define_model_callbacks :save
+  define_model_callbacks :validation
+  define_model_callbacks :source_validation
 
   attr_reader :source, :options, :ability, :depth
 
-  delegate :created_at, :updated_at, :errors, :to => :source
+  delegate :created_at, :updated_at, :to => :source
 
   def initialize(object, options = {})
     @source   = object
@@ -30,6 +32,21 @@ class Locomotive::BasePresenter
   end
 
   alias :_id :id
+
+  def valid?(*args)
+    valid = false
+    run_callbacks :validation do
+      valid = super
+
+      run_callbacks :source_validation do
+        valid = self.source.valid? && valid
+        self.source.errors.each do |attribute, error|
+          self.errors.add(attribute, error)
+        end
+      end
+    end
+    valid
+  end
 
   def ability?
     self.ability.present?

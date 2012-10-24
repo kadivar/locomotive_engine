@@ -3,7 +3,7 @@ module Locomotive
 
     before_save :set_order_by_attribute
     before_save :set_group_by_field_name
-    before_save :set_field_class_names
+    before_source_validation :set_field_class_names
 
     validate :order_by_attribute_must_exist
     validate :group_by_field_name_must_exist
@@ -52,7 +52,7 @@ module Locomotive
 
     def group_by_field_name
       # Get the name of the group_by field in the model
-      self.source.entries_custom_fields.find(self.source.group_by_field_id).name
+      self.source.group_by_field.try(:name)
     end
 
     def group_by_field_name_must_exist
@@ -100,7 +100,7 @@ module Locomotive
       field_content_type_slugs.each do |db_field, content_type_slug|
         content_type = self.source.site.content_types.where(
           :slug => content_type_slug).first
-        self.errors.add(:entries) unless content_type
+        self.errors.add(:entries_custom_fields) unless content_type
       end
     end
 
