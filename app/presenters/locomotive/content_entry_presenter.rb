@@ -52,10 +52,6 @@ module Locomotive
       self.source.updated_at = formatted_time(updated_at)
     end
 
-    def errors
-      self.source.errors.to_hash.stringify_keys
-    end
-
     def content_type_slug
       self.source.content_type.slug
     end
@@ -115,6 +111,7 @@ module Locomotive
       relationship_field_methods = {}
     end
 
+    # TODO: sort this out
     def save(should_resolve_relationships = true)
       if should_resolve_relationships
         resolve_relationships
