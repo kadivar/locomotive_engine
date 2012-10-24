@@ -91,8 +91,12 @@ module Locomotive
       field_content_type_slugs.each do |db_field, content_type_slug|
         content_type = self.source.site.content_types.where(
           :slug => content_type_slug).first
-        db_field.class_name = content_type.klass_with_custom_fields(
-          :entries).to_s
+        if content_type
+          db_field.class_name = content_type.klass_with_custom_fields(
+            :entries).to_s
+        else
+          db_field.class_name = nil
+        end
       end
     end
 

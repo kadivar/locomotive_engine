@@ -34,18 +34,16 @@ class Locomotive::BasePresenter
   alias :_id :id
 
   def valid?(*args)
-    valid = false
     run_callbacks :validation do
-      valid = super
-
+      super
       run_callbacks :source_validation do
-        valid = self.source.valid? && valid
+        self.source.valid?
         self.source.errors.each do |attribute, error|
           self.errors.add(attribute, error)
         end
       end
     end
-    valid
+    self.errors.empty?
   end
 
   def ability?
