@@ -16,16 +16,12 @@ module Locomotive
 
       def create
         @content_asset = current_site.content_assets.new
-        @content_asset_presenter = @content_asset.to_presenter
-        @content_asset_presenter.update_attributes(params[:content_asset])
-        respond_with @content_asset, :location => main_app.locomotive_api_content_assets_url
+        update_and_respond_with_presenter(@content_asset, params[:content_asset])
       end
 
       def update
         @content_asset = current_site.content_assets.find(params[:id])
-        @content_asset_presenter = @content_asset.to_presenter
-        @content_asset_presenter.update_attributes(params[:content_asset])
-        respond_with @content_asset, :location => main_app.locomotive_api_content_assets_url
+        update_and_respond_with_presenter(@content_asset, params[:content_asset])
       end
 
       def destroy

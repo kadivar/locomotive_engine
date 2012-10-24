@@ -41,6 +41,13 @@ module Locomotive
         self.setup_i18n_fallbacks
       end
 
+      def update_and_respond_with_presenter(resource, attributes, location = nil)
+        presenter = resource.to_presenter
+        presenter.update_attributes(attributes)
+        location ||= resource
+        respond_with(presenter, :location => location)
+      end
+
     end
   end
 end

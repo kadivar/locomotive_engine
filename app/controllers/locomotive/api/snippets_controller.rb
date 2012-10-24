@@ -16,16 +16,12 @@ module Locomotive
 
       def create
         @snippet = current_site.snippets.new
-        @snippet_presenter = @snippet.to_presenter
-        @snippet_presenter.update_attributes(params[:snippet])
-        respond_with @snippet, :location => main_app.locomotive_api_snippets_url
+        update_and_respond_with_presenter(@snippet, params[:snippet])
       end
 
       def update
         @snippet = current_site.snippets.find(params[:id])
-        @snippet_presenter = @snippet.to_presenter
-        @snippet_presenter.update_attributes(params[:snippet])
-        respond_with @snippet, :location => main_app.locomotive_api_snippets_url
+        update_and_respond_with_presenter(@snippet, params[:snippet])
       end
 
       def destroy

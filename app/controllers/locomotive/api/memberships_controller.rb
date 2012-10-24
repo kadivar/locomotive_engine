@@ -19,15 +19,11 @@ module Locomotive
       def create
         build_params = params[:membership].merge({ :role => 'author' }) # force author by default
         @membership = current_site.memberships.new
-        @membership_presenter = @membership.to_presenter
-        @membership_presenter.update_attributes(build_params)
-        respond_with(@membership)
+        update_and_respond_with_presenter(@membership, build_params)
       end
 
       def update
-        @membership_presenter = @membership.to_presenter
-        @membership_presenter.update_attributes(params[:membership])
-        respond_with(@membership)
+        update_and_respond_with_presenter(@membership, params[:membership])
       end
 
       def destroy

@@ -16,16 +16,12 @@ module Locomotive
 
       def create
         @page = current_site.pages.new
-        @page_presenter = @page.to_presenter
-        @page_presenter.update_attributes(params[:page])
-        respond_with @page, :location => main_app.locomotive_api_pages_url
+        update_and_respond_with_presenter(@page, params[:page])
       end
 
       def update
         @page = current_site.pages.find(params[:id])
-        @page_presenter = @page.to_presenter
-        @page_presenter.update_attributes(params[:page])
-        respond_with @page, :location => main_app.locomotive_api_pages_url
+        update_and_respond_with_presenter(@page, params[:page])
       end
 
       def destroy

@@ -21,9 +21,7 @@ module Locomotive
       def create
         @account = Locomotive::Account.new
         authorize! :create, @account
-        @account_presenter = @account.to_presenter
-        @account_presenter.update_attributes(params[:account])
-        respond_with(@account)
+        update_and_respond_with_presenter(@account, params[:account])
       end
 
       def destroy

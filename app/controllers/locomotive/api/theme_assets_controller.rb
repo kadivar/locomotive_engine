@@ -16,16 +16,12 @@ module Locomotive
 
       def create
         @theme_asset = current_site.theme_assets.new
-        @theme_asset_presenter = @theme_asset.to_presenter
-        @theme_asset_presenter.update_attributes(params[:theme_asset])
-        respond_with @theme_asset, :location => main_app.locomotive_api_theme_assets_url
+        update_and_respond_with_presenter(@theme_asset, params[:theme_asset])
       end
 
       def update
         @theme_asset = current_site.theme_assets.find(params[:id])
-        @theme_asset_presenter = @theme_asset.to_presenter
-        @theme_asset_presenter.update_attributes(params[:theme_asset])
-        respond_with @theme_asset, :location => main_app.locomotive_api_theme_assets_url
+        update_and_respond_with_presenter(@theme_asset, params[:theme_asset])
       end
 
       def destroy
