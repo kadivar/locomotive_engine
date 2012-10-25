@@ -9,6 +9,7 @@ def wait_for_ajax(&block)
       # Try again
     end
   end
+  block.call
 end
 
 Then /^after the AJAX finishes, (.*)$/ do |*args|
