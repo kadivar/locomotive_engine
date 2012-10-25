@@ -120,6 +120,27 @@ module Locomotive
               }
             end
 
+            it 'should save the custom fields' do
+              params = {
+                :content_types => [
+                  new_content_type_attributes_with_custom_fields
+                ]
+              }.with_indifferent_access
+              site_data.build_models(params)
+              site_data.send(:minimal_save_all).should be_true
+
+              content_type = site.content_types.where(:slug => 'projects').first
+
+              content_type.slug.should == 'projects'
+              content_type.name.should == 'Projects'
+              content_type.entries_custom_fields.each_with_index do |field, index|
+                attributes = new_content_type_attributes_with_custom_fields[:entries_custom_fields][index]
+                field.label.should == attributes[:label]
+                field.type.should == attributes[:type]
+                field.name.should == attributes[:label].underscore
+              end
+            end
+
           end
 
           context 'content_entries' do
@@ -212,6 +233,21 @@ module Locomotive
               :name => 'Projects',
               :description => 'Projects that the company does'
             }
+          end
+
+          def new_content_type_attributes_with_custom_fields
+            new_content_type_attributes.merge({
+              :entries_custom_fields => [
+                {
+                  :label => 'Name',
+                  :type => 'string'
+                },
+                {
+                  :label => 'Employees',
+                  :type => 'has_many'
+                }
+              ]
+            })
           end
 
           def new_content_type_attributes_without_slug

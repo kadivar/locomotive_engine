@@ -56,7 +56,7 @@ module Locomotive
 
             site_data.build_models(params)
 
-            site_data.save.should be_true
+            site_data.save(:two_phase => true).should be_true
 
             site.reload
 
@@ -85,7 +85,7 @@ module Locomotive
 
             site_data.build_models(params)
 
-            site_data.save.should be_false
+            site_data.save(:two_phase => true).should be_false
 
             site.reload
 

@@ -9,22 +9,18 @@ module Locomotive
 
         attr_reader :errors
 
-        def save(two_phase = false)
+        def save(options = {})
+          options = {
+            :two_phase => false
+          }.merge(options)
+
           first_save_ok = true
-          if two_phase
+          if options[:two_phase]
             first_save_ok = minimal_save_all
           end
 
-          puts 'Did minimal save!'
-          puts "Went ok? #{first_save_ok}"
-          puts "Pages: #{self.site.pages.all.to_ary}"
-
           if first_save_ok && self.valid?
             save_all
-
-            puts 'Did full save!'
-            puts "Pages: #{self.site.pages.all.to_ary}"
-
             true
           else
             cleanup
@@ -59,13 +55,12 @@ module Locomotive
         def valid?
           all_valid = true
           _all_objects do |obj, model, *path|
-            puts "Saving page: #{obj}" if model == 'pages'
             if model == 'content_entries' && !obj.content_type
               content_type_slug, index = *path
               all_valid = false
               set_errors('content type does not exist', model, content_type_slug)
             else
-              unless obj.valid?
+              unless presenter_for(obj).valid?
                 all_valid = false
                 set_errors(obj, model, *path)
               end

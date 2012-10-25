@@ -16,19 +16,12 @@ module Locomotive
               _all_objects do |obj, model, *path|
                 if models_for_minimal_save.include?(model)
                   without_extra_attributes(obj, model) do
-                    # TODO: validating...not DRY
-                    #if model == 'content_entries' && !obj.content_type
-                      #content_type_slug, index = *path
-                      #all_valid = false
-                      #set_errors('content type does not exist', model, content_type_slug)
-                    #else
-                      if obj.valid?
-                        all_valid = obj.save && all_valid
-                      else
-                        all_valid = false
-                        set_errors(obj, model, *path)
-                      end
-                    #end
+                    if obj.valid?
+                      all_valid = obj.save && all_valid
+                    else
+                      all_valid = false
+                      set_errors(obj, model, *path)
+                    end
                   end
                 end
               end
@@ -146,10 +139,24 @@ module Locomotive
               meth = new_meth if obj.respond_to?(:"#{new_meth}")
 
               attributes_removed[meth] = obj.send(:"#{meth}")
+
               obj.send(:"#{meth}=", removal_value(model, meth))
             end
 
+            if model == 'content_types'
+              arr = []
+              obj.entries_custom_fields.each do |field|
+                arr << field.clone
+              end
+              attributes_removed[:entries_custom_fields] = arr
+              obj.entries_custom_fields = nil
+            end
+
             yield
+
+            if model == 'content_types'
+              obj.entries_custom_fields = attributes_removed.delete(:entries_custom_fields)
+            end
 
             attributes_removed.each do |meth, val|
               obj.send(:"#{meth}=", val)

@@ -82,15 +82,18 @@ module Locomotive
         end
 
         if content_type_slug
-          field_content_type_slugs[db_field] = content_type_slug
+          db_field.send(:set_name)
+          field_content_type_slugs[db_field.name] = content_type_slug
         end
       end
     end
 
     def set_field_class_names
-      field_content_type_slugs.each do |db_field, content_type_slug|
+      field_content_type_slugs.each do |field_name, content_type_slug|
         content_type = self.source.site.content_types.where(
           :slug => content_type_slug).first
+        db_field = self.source.entries_custom_fields.where(
+          :name => field_name).first
         if content_type
           db_field.class_name = content_type.klass_with_custom_fields(
             :entries).to_s
@@ -101,7 +104,9 @@ module Locomotive
     end
 
     def field_class_names_must_exist
-      field_content_type_slugs.each do |db_field, content_type_slug|
+      field_content_type_slugs.each do |field_name, content_type_slug|
+        self_content_type = self.source
+        site_content_types = self.source.site.content_types.first
         content_type = self.source.site.content_types.where(
           :slug => content_type_slug).first
         self.errors.add(:entries_custom_fields) unless content_type
