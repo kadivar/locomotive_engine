@@ -11,22 +11,21 @@ module Locomotive
           end
 
           def minimal_save_all
-            all_valid = true
+            self.errors.clear
             without_callbacks_and_validations do
               _all_objects do |obj, model, *path|
                 if models_for_minimal_save.include?(model)
                   without_extra_attributes(obj, model) do
                     if obj.valid?
-                      all_valid = obj.save && all_valid
+                      obj.save(validate: false)
                     else
-                      all_valid = false
                       set_errors(obj, model, *path)
                     end
                   end
                 end
               end
             end
-            all_valid
+            self.errors.empty?
           end
 
           def callback_names

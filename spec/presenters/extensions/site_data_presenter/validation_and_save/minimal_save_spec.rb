@@ -54,11 +54,9 @@ module Locomotive
               site_data.send(:minimal_save_all).should be_false
 
               site_data.errors.should == {
-                'errors' => {
-                  'pages' => {
-                    1 => {
-                      :slug => [ 'is already taken' ]
-                    }
+                'pages' => {
+                  1 => {
+                    :slug => [ 'is already taken' ]
                   }
                 }
               }
@@ -110,11 +108,9 @@ module Locomotive
               site_data.send(:minimal_save_all).should be_false
 
               site_data.errors.should == {
-                'errors' => {
-                  'content_types' => {
-                    1 => {
-                      :slug => [ 'is already taken' ]
-                    }
+                'content_types' => {
+                  1 => {
+                    :slug => [ 'is already taken' ]
                   }
                 }
               }

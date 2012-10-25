@@ -3,11 +3,7 @@ module Locomotive
     module SiteDataPresenter
       module ValidationAndSave
 
-        include ContentTypes
-        include ContentEntries
         include MinimalSave
-
-        attr_reader :errors
 
         def save(options = {})
           options = {
@@ -19,13 +15,19 @@ module Locomotive
             first_save_ok = minimal_save_all
           end
 
-          if first_save_ok && self.valid?
-            save_all
-            true
-          else
-            cleanup
-            false
+          second_save_ok = false
+          if first_save_ok
+            second_save_ok = self.valid? && save_all_without_validation
           end
+
+          save_ok = first_save_ok && second_save_ok
+
+          cleanup unless save_ok
+          save_ok
+        end
+
+        def errors
+          @errors ||= {}
         end
 
         protected
@@ -46,27 +48,27 @@ module Locomotive
           end
         end
 
-        def save_all
+        def save_all_without_validation
           _all_objects do |obj|
-            presenter_for(obj).save
+            presenter_for(obj).save(validate: false)
           end
+          self.errors.empty?
         end
 
         def valid?
-          all_valid = true
+          self.errors.clear
           _all_objects do |obj, model, *path|
             if model == 'content_entries' && !obj.content_type
               content_type_slug, index = *path
-              all_valid = false
               set_errors('content type does not exist', model, content_type_slug)
             else
-              unless presenter_for(obj).valid?
-                all_valid = false
-                set_errors(obj, model, *path)
+              presenter = presenter_for(obj)
+              unless presenter.valid?
+                set_errors(presenter, model, *path)
               end
             end
           end
-          all_valid
+          self.errors.empty?
         end
 
         def cleanup
@@ -76,13 +78,10 @@ module Locomotive
         end
 
         def set_errors(model_or_string, *path)
-          @errors ||= {}
-          @errors['errors'] ||= {}
-
           is_string = model_or_string.kind_of?(String)
 
           # Build path
-          current_container = @errors['errors']
+          current_container = @errors
           current_element = nil
           path.each_with_index do |element, index|
             current_element = element
