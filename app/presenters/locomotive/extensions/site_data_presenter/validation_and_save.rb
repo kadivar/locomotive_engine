@@ -19,7 +19,7 @@ module Locomotive
 
           save_ok = first_save_ok && second_save_ok
 
-          cleanup unless save_ok
+          cleanup! unless save_ok
           save_ok
         end
 
@@ -37,17 +37,20 @@ module Locomotive
         protected
 
         # Yields object, model, *path
-        def _all_objects(always_use_indices = false, &block)
+        def _all_objects(always_use_indices = false, *models, &block)
           self.class.ordered_normal_models.each do |model|
+            next unless models.include?(model)
             self.send(:"#{model}").each_with_index do |obj, index|
               id = (obj.new_record? || always_use_indices) ? index : obj.id
               yield obj, model, id
             end
           end
-          self.content_entries.each do |content_type_slug, entries|
-            entries.each_with_index do |obj, index|
-              id = (obj.new_record? || always_use_indices) ? index : obj.id
-              yield obj, 'content_entries', content_type_slug, id
+          if models.include?('content_entries')
+            self.content_entries.each do |content_type_slug, entries|
+              entries.each_with_index do |obj, index|
+                id = (obj.new_record? || always_use_indices) ? index : obj.id
+                yield obj, 'content_entries', content_type_slug, id
+              end
             end
           end
         end
@@ -76,7 +79,7 @@ module Locomotive
           self.errors.empty?
         end
 
-        def cleanup
+        def cleanup!
           _all_objects do |obj|
             obj.destroy
           end

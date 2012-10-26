@@ -13,9 +13,9 @@ module Locomotive
           # Minimally save all new records
           def minimal_save_all
             self.errors.clear
-            without_callbacks_and_validations do
-              _all_objects do |obj, model, *path|
-                if models_for_minimal_save.include?(model)
+            models_for_minimal_save.each do |model|
+              without_callbacks_and_validations(model) do
+                _all_objects(false, model) do |obj, model, *path|
                   without_extra_attributes(obj, model) do
                     if obj.valid?
                       obj.save(validate: false)
@@ -71,22 +71,33 @@ module Locomotive
             !filters_to_keep[model].include?(filter.to_s)
           end
 
-          def without_callbacks
+          def without_callbacks(model)
             callbacks = {}
 
-            # Skip all callbacks
-            self.models_for_minimal_save.each do |model|
-              klass = model_class(model)
+            # Get all classes for this model
+            klasses = []
+            if model == 'content_entries'
+              klasses += self.site.content_types.collect do |ct|
+                ct.klass_with_custom_fields(:entries)
+              end
+            end
+            klasses << model_class(model)
 
-              callbacks[model] = []
+            # Skip callbacks on each klass
+            klasses.each do |klass|
+              # Collect the callbacks which should be skipped
+              callbacks[klass] = []
               callback_names.each do |callback_name|
                 klass.send(:"_#{callback_name}_callbacks").each do |callback|
                   if should_skip_callback(model, callback)
-                    callbacks[model] << callback
+                    callbacks[klass] << callback
                   end
                 end
               end
-              callbacks[model].each do |callback|
+            end
+
+            klasses.each do |klass|
+              callbacks[klass].each do |callback|
                 # TODO: only skip the callback for this site
                 klass.skip_callback(callback.name, callback.kind,
                   callback.filter, callback.options)
@@ -96,9 +107,8 @@ module Locomotive
             yield
 
             # Set all callbacks
-            self.models_for_minimal_save.each do |model|
-              klass = model_class(model)
-              callbacks[model].each do |callback|
+            klasses.each do |klass|
+              callbacks[klass].each do |callback|
                 klass.set_callback(callback.name, callback.kind,
                   callback.filter, callback.options)
               end
@@ -106,17 +116,22 @@ module Locomotive
           end
           alias :without_callbacks_and_validations :without_callbacks
 
-          def attributes_to_keep(model)
+          def should_keep_attribute(model, obj, attr)
             default_attributes_to_keep = %w{_id _type slug site_id}
             attributes_to_keep_for_model = Hash.new { |hash, key| hash[key] = [] }
 
             attributes_to_keep_for_model.merge!({
               'pages' => %w{title},
               'content_types' => %w{name},
-              'content_entries' => %w{name content_type_id custom_fields_recipe}
+              'content_entries' => %w{content_type_id custom_fields_recipe}
             })
 
-            default_attributes_to_keep + attributes_to_keep_for_model[model]
+            to_keep = default_attributes_to_keep + attributes_to_keep_for_model[model]
+
+            # For content_entries, need to keep the label field
+            to_keep << obj.content_type.label_field_name if model == 'content_entries'
+
+            to_keep.include?(attr)
           end
 
           def removal_value(model, meth)
@@ -132,7 +147,7 @@ module Locomotive
             attributes_removed = {}
 
             obj.attributes.keys.each do |attr|
-              next if attributes_to_keep(model).include?(attr)
+              next if should_keep_attribute(model, obj, attr)
 
               meth = attr
               new_meth = "#{attr}_translations"

@@ -143,6 +143,7 @@ module Locomotive
 
             before(:each) do
               create_projects_content_type!
+              create_employees_content_type!
             end
 
             it 'should only save content_entry slug, name and site_id' do
@@ -160,7 +161,7 @@ module Locomotive
               project = content_type.entries.where(:_slug => 'project-1').first
 
               project._slug.should == 'project-1'
-              project.name.should == 'Project 1'
+              project.title.should == 'Project 1'
               project.description.should_not == new_project_attributes[:description]
             end
 
@@ -169,18 +170,26 @@ module Locomotive
                 :content_entries => {
                   :projects => [
                     new_project_attributes_without_slug
+                  ],
+                  :employees => [
+                    new_employee_attributes_without_slug
                   ]
                 }
               }.with_indifferent_access
               site_data.build_models(params)
               site_data.send(:minimal_save_all).should be_true
 
-              content_type = site.content_types.where(:slug => 'projects').first
-              project = content_type.entries.where(:_slug => 'project-1').first
+              projects_content_type = site.content_types.where(:slug => 'projects').first
+              employees_content_type = site.content_types.where(:slug => 'employees').first
+              project = projects_content_type.entries.where(:_slug => 'project-1').first
+              employee = employees_content_type.entries.where(:_slug => 'bob').first
 
               project._slug.should == 'project-1'
-              project.name.should == 'Project 1'
+              project.title.should == 'Project 1'
               project.description.should_not == new_project_attributes[:description]
+
+              employee._slug.should == 'bob'
+              employee.name.should == 'Bob'
             end
 
             it 'should generate a unique slug' do
@@ -201,7 +210,34 @@ module Locomotive
               content_type.entries[1]._slug.should == 'project-2'
             end
 
+            it 'should save when object has required relationship fields' do
+              add_required_relationship_to_projects!
+              params = {
+                :content_entries => {
+                  :projects => [
+                    new_project_attributes_with_required_relationships
+                  ]
+                }
+              }.with_indifferent_access
+              site_data.build_models(params)
+              begin
+                site_data.send(:minimal_save_all).should be_true
+              rescue
+                puts "Errors: #{site_data.errors}"
+                raise
+              end
+
+              content_type = site.content_types.where(:slug => 'projects').first
+
+              project = content_type.entries.where(:_slug => 'project-1').first
+              project.employees.should be_empty
+            end
+
           end
+
+          it 'should only skip callbacks and validations for the current_site'
+
+          it 'should fail gracefully on content_entries when its content_type fails'
 
           protected
 
@@ -255,16 +291,39 @@ module Locomotive
           ## Content entry data ##
 
           def create_projects_content_type!
-            content_type = FactoryGirl.build(:content_type, :name => 'Projects')
-            content_type.entries_custom_fields.build(:label => 'Name', :type => 'string')
-            content_type.entries_custom_fields.build(:label => 'Description', :type => 'text')
-            content_type.save!
+            @projects_content_type = FactoryGirl.build(:content_type,
+              :name => 'Projects')
+            @projects_content_type.entries_custom_fields.build(
+              :label => 'Title', :type => 'string')
+            @projects_content_type.entries_custom_fields.build(
+              :label => 'Description', :type => 'text')
+            @projects_content_type.save!
+          end
+
+          def create_employees_content_type!
+            @employees_content_type = FactoryGirl.build(:content_type,
+              :name => 'Employees')
+            @employees_content_type.entries_custom_fields.build(
+              :label => 'Name', :type => 'string')
+            @employees_content_type.save!
+          end
+
+          def add_required_relationship_to_projects!
+            create_projects_content_type! unless @projects_content_type
+            create_employees_content_type! unless @employees_content_type
+
+            class_name = @employees_content_type.klass_with_custom_fields(:entries).to_s
+
+            @projects_content_type.entries_custom_fields.build(
+              :label => 'Employees', :type => 'has_many',
+              :class_name => class_name, :required => true)
+            @projects_content_type.save!
           end
 
           def new_project_attributes
             {
               :slug => 'project-1',
-              :name => 'Project 1',
+              :title => 'Project 1',
               :description => 'The first project ever'
             }
           end
@@ -273,6 +332,28 @@ module Locomotive
             attrs = new_project_attributes
             attrs.delete(:_slug)
             attrs
+          end
+
+          def new_project_attributes
+            {
+              :slug => 'project-1',
+              :title => 'Project 1',
+              :description => 'The first project ever'
+            }
+          end
+
+          def new_project_attributes_with_required_relationships
+            {
+              :slug => 'project-1',
+              :title => 'Project 1',
+              :description => 'The first project ever'
+            }
+          end
+
+          def new_employee_attributes_without_slug
+            {
+              :name => 'Bob'
+            }
           end
 
         end
