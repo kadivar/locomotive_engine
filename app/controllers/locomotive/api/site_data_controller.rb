@@ -18,7 +18,7 @@ module Locomotive
 
         # Manually respond with the appropriate json
         respond_to do |format|
-          if @site_data.save(true)
+          if @site_data.insert
             format.json { render :json => @site_data, :status => :created }
           else
             format.json { render :json => @site_data.errors, :status => :unprocessable_entity }
@@ -33,7 +33,7 @@ module Locomotive
         @site_data.mirror(params[:site_data])
 
         respond_to do |format|
-          if @site_data.save(true)
+          if @site_data.insert
             format.json { render :json => @site_data, :status => :created }
           else
             format.json { render :json => @site_data.errors, :status => :unprocessable_entity }
@@ -49,7 +49,7 @@ module Locomotive
 
         # Manually respond with the appropriate json
         respond_to do |format|
-          if @site_data.save(false)
+          if @site_data.update
             format.json { render :json => @site_data, :status => :created }
           else
             format.json { render :json => @site_data.errors, :status => :unprocessable_entity }

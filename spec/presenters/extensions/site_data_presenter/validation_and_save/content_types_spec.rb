@@ -56,7 +56,7 @@ module Locomotive
 
             site_data.build_models(params)
 
-            site_data.save(:two_phase => true).should be_true
+            site_data.insert.should be_true
 
             site.reload
 
@@ -85,22 +85,15 @@ module Locomotive
 
             site_data.build_models(params)
 
-            site_data.save(:two_phase => true).should be_false
+            site_data.insert.should be_false
 
             site.reload
 
             site.content_types.count.should == 0
-            site_data.errors.should == {
-              'errors' => {
-                'content_types' => {
-                  0 => {
-                    'entries_custom_fields' => {
-                      1 => [ 'invalid content_type_slug' ]
-                    }
-                  }
-                }
-              }
-            }
+
+            custom_field_errors = site_data.errors.with_indifferent_access[
+              :content_types][0][:entries_custom_fields]
+            custom_field_errors.should include('invalid content_type_slug "employees"')
           end
 
         end

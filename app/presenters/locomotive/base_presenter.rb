@@ -94,8 +94,12 @@ class Locomotive::BasePresenter
     self.save
   end
 
-  def save
-    return false unless self.valid?
+  def save(options = {})
+    options = {
+      validate: true
+    }.merge(options)
+
+    return false if options[:validate] && self.invalid?
 
     result = false
     run_callbacks :save do

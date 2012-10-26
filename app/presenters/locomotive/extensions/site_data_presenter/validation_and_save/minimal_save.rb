@@ -10,6 +10,7 @@ module Locomotive
             %w{pages content_types content_entries}
           end
 
+          # Minimally save all new records
           def minimal_save_all
             self.errors.clear
             without_callbacks_and_validations do

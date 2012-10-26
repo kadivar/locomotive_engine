@@ -109,7 +109,8 @@ module Locomotive
         site_content_types = self.source.site.content_types.first
         content_type = self.source.site.content_types.where(
           :slug => content_type_slug).first
-        self.errors.add(:entries_custom_fields) unless content_type
+        self.errors.add(:entries_custom_fields,
+          %{invalid content_type_slug "#{content_type_slug}"}) unless content_type
       end
     end
 
