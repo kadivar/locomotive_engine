@@ -40,7 +40,7 @@ Feature: API Validations
     And the JSON response at "name/0" should be "can't be blank"
     And the JSON response at "order_by_attribute/0" should be "is invalid"
     And the JSON response at "group_by_field_name/0" should be "is invalid"
-    And the JSON response at "entries_custom_fields/0" should be "is invalid"
+    And the JSON response at "entries_custom_fields/0" should be "invalid content_type_slug \"projects\""
     When I do an API GET request to content_types.json
     Then the JSON response should be an array
     And the JSON response should have 0 entries
