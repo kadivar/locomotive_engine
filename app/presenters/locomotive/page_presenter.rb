@@ -1,6 +1,8 @@
 module Locomotive
   class PagePresenter < BasePresenter
 
+    before_save :set_editable_elements
+
     delegate :title, :slug, :fullpath, :seo_title, :meta_keywords, :meta_description, :handle, :position, :raw_template, :published, :listed, :templatized, :templatized_from_parent, :target_klass_slug, :redirect, :redirect_url, :template_changed, :cache_strategy, :response_type, :depth, :position, :translated_in, :to => :source
 
     delegate :title=, :slug=, :fullpath=, :seo_title=, :meta_keywords=, :meta_description=, :handle=, :raw_template=, :published=, :listed=, :templatized=, :templatized_from_parent=, :target_klass_name=, :redirect=, :redirect_url=, :cache_strategy=, :response_type=, :position=, :to => :source
@@ -70,11 +72,6 @@ module Locomotive
     def as_json_for_html_view
       methods = included_methods.clone - %w(raw_template)
       self.as_json(methods)
-    end
-
-    def save
-      set_editable_elements
-      super
     end
 
     protected
