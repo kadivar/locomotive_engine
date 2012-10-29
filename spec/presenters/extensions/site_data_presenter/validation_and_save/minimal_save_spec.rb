@@ -230,6 +230,37 @@ module Locomotive
 
           end
 
+          it 'should minimally save content types and content entries together' do
+            params = {
+              :content_types => [
+                {
+                  :name => 'Employees',
+                  :entries_custom_fields => [
+                    {
+                      :label => 'Name',
+                      :type => 'string'
+                    }
+                  ]
+                }
+              ],
+              :content_entries => {
+                :employees => [
+                  {
+                    :name => 'John Smith'
+                  }
+                ]
+              }
+            }.with_indifferent_access
+
+            site_data.build_models(params)
+            site_data.send(:minimal_save_all).should be_true
+
+            content_type = site.content_types.where(:slug => 'employees').first
+
+            content_type.entries_custom_fields[0].name.should == 'name'
+            content_type.entries[0]._label.should == 'John Smith'
+          end
+
           it 'should only skip callbacks and validations for the current_site'
 
           it 'should fail gracefully on content_entries when its content_type fails'
