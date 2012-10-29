@@ -1,6 +1,9 @@
 module Locomotive
   class ContentEntryPresenter < BasePresenter
 
+    before_source_validation :resolve_relationships
+    before_save :save_related_objects
+
     delegate  :_label, :_slug, :_position, :translated_in, :seo_title,
               :meta_keywords, :meta_description, :select_custom_fields,
               :file_custom_fields, :has_many_custom_fields, :many_to_many_custom_fields, :to => :source
@@ -85,6 +88,8 @@ module Locomotive
       end
     end
 
+    protected
+
     def resolve_relationships
       relationship_field_methods.each do |meth, args|
         field_name = get_custom_field_name_for_method(meth)
@@ -111,17 +116,9 @@ module Locomotive
       relationship_field_methods = {}
     end
 
-    # TODO: sort this out
-    def save(should_resolve_relationships = true)
-      if should_resolve_relationships
-        resolve_relationships
-      end
-      puts "Objects to save: #{objects_to_save}"
+    def save_related_objects
       objects_to_save.each { |obj| obj.save } if objects_to_save
-      super()
     end
-
-    protected
 
     # Mimic format used by to_json
     def formatted_time(time_str)
@@ -175,15 +172,9 @@ module Locomotive
     end
 
     def get_many_field_objects(meth, slug_list)
-      puts '====== GET MANY FIELD OBJECTS ======'
-      puts "Slugs: #{slug_list}"
       target_klass = get_target_klass_for_custom_field_method(meth)
-      puts "Target klass: #{target_klass}"
-      puts "Target klass slugs: #{target_klass.all.collect(&:_slug)}"
       # FIXME: too many DB accesses
-      ret = slug_list.collect { |slug| target_klass.where(:_slug => slug).first }
-      puts '====== END GET MANY FIELD OBJECTS ======'
-      ret
+      slug_list.collect { |slug| target_klass.where(:_slug => slug).first }
     end
 
     def get_belongs_field_object(meth, slug)

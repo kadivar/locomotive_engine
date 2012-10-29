@@ -10,11 +10,9 @@ module Locomotive
 
           let(:site_data) { ::Locomotive::SiteDataPresenter.new(site) }
 
-          let(:projects_content_type) { create_projects_content_type }
-
-          let(:employees_content_type) { create_employees_content_type }
-
           before(:each) do
+            create_projects_content_type!
+            create_employees_content_type!
             setup_projects_employees_relationship
           end
 
@@ -27,9 +25,7 @@ module Locomotive
             }.with_indifferent_access
 
             site_data.build_models(params)
-            site_data.save
-            puts site_data.errors
-            site_data.save.should be_true
+            site_data.insert.should be_true
 
             site.reload
             projects = site.content_types.where(:slug => 'projects').first.entries
@@ -46,29 +42,43 @@ module Locomotive
             # Check to make sure the relationships are there
             website.employees.should include(joe)
             website.employees.should include(bob)
-            ecommerce.employees.should include (joe)
+            ecommerce.employees.should include(joe)
 
             bob.projects.should include(website)
             joe.projects.should include(website)
             joe.projects.should include(ecommerce)
           end
 
+          it 'should not save if the relationship fields are invalid'
+
+          it 'should not save if the content_type slug is invalid'
+
           protected
 
-          def create_projects_content_type
-            projects = FactoryGirl.build(:content_type, :name => 'Projects')
-            projects.entries_custom_fields.build(
-              :label => 'Title', :type => 'string')
-            projects.save!
-            projects
+          def projects_content_type
+            @projects_content_type ||= create_projects_content_type!
           end
 
-          def create_employees_content_type
-            employees = FactoryGirl.build(:content_type, :name => 'Employees')
-            employees.entries_custom_fields.build(
+          def employees_content_type
+            @employees_content_type ||= create_employees_content_type!
+          end
+
+          def create_projects_content_type!
+            @projects_content_type = FactoryGirl.build(:content_type, :name => 'Projects')
+            @projects_content_type.entries_custom_fields.build(
+              :label => 'Title', :type => 'string')
+            @projects_content_type.entries_custom_fields.build(
+              :label => 'Description', :type => 'text')
+            @projects_content_type.save!
+            @projects_content_type
+          end
+
+          def create_employees_content_type!
+            @employees_content_type = FactoryGirl.build(:content_type, :name => 'Employees')
+            @employees_content_type.entries_custom_fields.build(
               :label => 'Name', :type => 'string')
-            employees.save!
-            employees
+            @employees_content_type.save!
+            @employees_content_type
           end
 
           def projects_params

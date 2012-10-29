@@ -38,6 +38,7 @@ module Locomotive
 
         # Yields object, model, *path
         def _all_objects(always_use_indices = false, *models, &block)
+          models = self.models if models.blank?
           self.class.ordered_normal_models.each do |model|
             next unless models.include?(model)
             self.send(:"#{model}").each_with_index do |obj, index|
