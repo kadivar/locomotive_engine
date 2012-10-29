@@ -215,17 +215,12 @@ module Locomotive
               params = {
                 :content_entries => {
                   :projects => [
-                    new_project_attributes_with_required_relationships
+                    new_project_attributes
                   ]
                 }
               }.with_indifferent_access
               site_data.build_models(params)
-              begin
-                site_data.send(:minimal_save_all).should be_true
-              rescue
-                puts "Errors: #{site_data.errors}"
-                raise
-              end
+              site_data.send(:minimal_save_all).should be_true
 
               content_type = site.content_types.where(:slug => 'projects').first
 
@@ -332,22 +327,6 @@ module Locomotive
             attrs = new_project_attributes
             attrs.delete(:_slug)
             attrs
-          end
-
-          def new_project_attributes
-            {
-              :slug => 'project-1',
-              :title => 'Project 1',
-              :description => 'The first project ever'
-            }
-          end
-
-          def new_project_attributes_with_required_relationships
-            {
-              :slug => 'project-1',
-              :title => 'Project 1',
-              :description => 'The first project ever'
-            }
           end
 
           def new_employee_attributes_without_slug
