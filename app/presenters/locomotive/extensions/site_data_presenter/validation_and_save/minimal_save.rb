@@ -13,7 +13,7 @@ module Locomotive
           def minimal_save_model(model)
             if should_minimally_save_model?(model)
               without_callbacks_and_validations(model) do
-                _all_objects(false, model) do |obj, model, *path|
+                all_objects(false, model) do |obj, model, *path|
                   if obj.new_record?
                     without_extra_attributes(obj, model) do
                       if obj.valid?

@@ -33,7 +33,7 @@ module Locomotive
         protected
 
         # Yields object, model, *path
-        def _all_objects(always_use_indices = false, *models, &block)
+        def all_objects(always_use_indices = false, *models, &block)
           models = self.models if models.blank?
           self.class.ordered_normal_models.each do |model|
             next unless models.include?(model)
@@ -54,7 +54,7 @@ module Locomotive
 
         def save_model_without_validation(model)
           result = true
-          _all_objects do |obj|
+          all_objects do |obj|
             presenter = presenter_for(obj)
             result = presenter.save(validate: false) && result
           end
@@ -63,7 +63,7 @@ module Locomotive
 
         def model_valid?(model, options = {})
           self.clear_errors!(model)
-          _all_objects(options[:always_use_indices], model) do |obj, model, *path|
+          all_objects(options[:always_use_indices], model) do |obj, model, *path|
             if model == 'content_entries' && !obj.content_type
               content_type_slug, index = *path
               set_errors('content type does not exist', model, content_type_slug)
@@ -78,7 +78,7 @@ module Locomotive
         end
 
         def cleanup!
-          _all_objects do |obj|
+          all_objects do |obj|
             obj.destroy
           end
         end
