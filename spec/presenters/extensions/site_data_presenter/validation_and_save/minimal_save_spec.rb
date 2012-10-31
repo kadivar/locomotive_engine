@@ -43,7 +43,7 @@ module Locomotive
               page.title.should == 'New page'
             end
 
-            it 'should validate the uniqueness and presence of the slug' do
+            it 'should validate the uniqueness of the slug' do
               params = {
                 :pages => [
                   new_page_attributes,
@@ -61,6 +61,30 @@ module Locomotive
                 }
               }
             end
+
+            it 'should validate the uniqueness of the slug against pages already in the database' do
+              FactoryGirl.create(:page, :title => new_page_attributes[:title],
+                                :slug => new_page_attributes[:slug],
+                                :parent => site.pages.where(:slug => 'index').first,
+                                :site => site)
+              params = {
+                :pages => [
+                  new_page_attributes
+                ]
+              }.with_indifferent_access
+              site_data.build_models(params)
+              site_data.send(:minimal_save_model, 'pages').should be_false
+
+              site_data.errors.should == {
+                'pages' => {
+                  0 => {
+                    :slug => [ 'is already taken' ]
+                  }
+                }
+              }
+            end
+
+            it 'should save pages in order of depth'
 
           end
 
@@ -261,7 +285,8 @@ module Locomotive
             {
               :slug => 'new-page',
               :title => 'New page',
-              :raw_template => 'New page template'
+              :raw_template => 'New page template',
+              :parent_fullpath => 'index'
             }
           end
 

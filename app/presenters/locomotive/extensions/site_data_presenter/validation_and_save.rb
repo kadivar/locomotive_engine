@@ -83,6 +83,22 @@ module Locomotive
           result
         end
 
+        def save_all_without_validation
+          result = true
+          self.ordered_models.each do |model|
+            result = self.save_model_without_validation(model) && result
+          end
+          result
+        end
+
+        def valid?
+          self.clear_errors!
+          self.models.each do |model|
+            self.model_valid?(model)
+          end
+          self.no_errors?
+        end
+
         def model_valid?(model, options = {})
           self.clear_errors!(model)
           all_objects(options[:always_use_indices], model) do |obj, model, *path|

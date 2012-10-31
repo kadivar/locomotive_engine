@@ -120,15 +120,13 @@ Feature: Site Data
     Then the JSON response should be:
     """
     {
-      "errors": {
-        "pages": {
-          "0": {
-            "slug": ["is already taken"]
-          }
-        },
-        "content_entries": {
-          "employees": ["content type does not exist"]
+      "pages": {
+        "0": {
+          "slug": ["is already taken"]
         }
+      },
+      "content_entries": {
+        "employees": ["content type does not exist"]
       }
     }
     """

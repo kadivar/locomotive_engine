@@ -137,7 +137,7 @@ module Locomotive
             attributes_to_keep_for_model = Hash.new { |hash, key| hash[key] = [] }
 
             attributes_to_keep_for_model.merge!({
-              'pages' => %w{title},
+              'pages' => %w{title parent_id},
               'content_types' => %w{name},
               'content_entries' => %w{content_type_id custom_fields_recipe}
             })
