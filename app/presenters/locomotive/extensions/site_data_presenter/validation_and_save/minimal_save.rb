@@ -7,9 +7,9 @@ module Locomotive
           protected
 
           # Minimally save all new records for the given model if the model
-          # should be minimally saved. Set errors for the object if
-          # validation fails. Returns true if self.errors is empty after all
-          # objects have been saved.
+          # should be minimally saved. Set errors for the object if validation
+          # fails. Returns true if there are no errors for this model after the
+          # save
           def minimal_save_model(model)
             if should_minimally_save_model?(model)
               without_callbacks_and_validations(model) do
@@ -26,7 +26,7 @@ module Locomotive
                 end
               end
             end
-            self.errors.empty?
+            self.no_errors?(model)
           end
 
           def should_minimally_save_model(model)

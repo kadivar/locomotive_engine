@@ -55,10 +55,7 @@ module Locomotive
             }.with_indifferent_access
 
             site_data.build_models(params)
-
             site_data.insert.should be_true
-
-            site.reload
 
             site.content_types.count.should == 2
             projects_type = site.content_types.where(:slug => 'projects').first

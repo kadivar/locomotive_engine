@@ -5,20 +5,16 @@ module Locomotive
 
         include MinimalSave
 
-        # Do a first pass where each object is validated and saved minimally to
+        # Do a first pass where each new object is validated and saved minimally to
         # the database. Then validate and save all objects
         def insert
-          first_save_ok = true
-          first_save_ok = minimal_save_all
-
-          second_save_ok = false
-          if first_save_ok
-            second_save_ok = self.valid?(:always_use_indices => true)
-            second_save_ok &&= save_all_without_validation
+          self.clear_errors!
+          self.ordered_models.each do |model|
+            this_model_ok = minimal_save_model(model)
+            this_model_ok &&= model_valid?(model, :always_use_indices => true)
+            this_model_ok && save_model_without_validation(model)
           end
-
-          save_ok = first_save_ok && second_save_ok
-
+          save_ok = self.no_errors?
           cleanup! unless save_ok
           save_ok
         end
@@ -31,7 +27,7 @@ module Locomotive
         end
 
         def errors
-          @errors ||= {}
+          @errors ||= {}.with_indifferent_access
         end
 
         protected
@@ -56,17 +52,18 @@ module Locomotive
           end
         end
 
-        def save_all_without_validation
+        def save_model_without_validation(model)
           result = true
           _all_objects do |obj|
-            result = presenter_for(obj).save(validate: false) && result
+            presenter = presenter_for(obj)
+            result = presenter.save(validate: false) && result
           end
           result
         end
 
-        def valid?(options = {})
-          self.errors.clear
-          _all_objects(options[:always_use_indices]) do |obj, model, *path|
+        def model_valid?(model, options = {})
+          self.clear_errors!(model)
+          _all_objects(options[:always_use_indices], model) do |obj, model, *path|
             if model == 'content_entries' && !obj.content_type
               content_type_slug, index = *path
               set_errors('content type does not exist', model, content_type_slug)
@@ -77,7 +74,7 @@ module Locomotive
               end
             end
           end
-          self.errors.empty?
+          self.no_errors?(model)
         end
 
         def cleanup!
@@ -105,6 +102,31 @@ module Locomotive
             current_container[current_element] = [model_or_string]
           else
             current_container[current_element] = model_or_string.errors.messages
+          end
+        end
+
+        def clear_errors!(model = nil)
+          if model
+            self.errors[model] = nil
+          else
+            self.errors.clear
+          end
+        end
+
+        def no_errors?(model = nil)
+          cleanup_errors!
+          if model
+            self.errors[model].blank?
+          else
+            self.errors.blank?
+          end
+        end
+
+        def cleanup_errors!
+          self.errors.each do |k, v|
+            if v.blank?
+              self.errors.delete(k)
+            end
           end
         end
 

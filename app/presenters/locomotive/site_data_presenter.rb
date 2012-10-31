@@ -91,7 +91,7 @@ module Locomotive
       self.ordered_models
     end
 
-    %w{models ordered_normal_models}.each do |meth|
+    %w{models ordered_models ordered_normal_models}.each do |meth|
       define_method(:"#{meth}") { self.class.send(:"#{meth}") }
     end
 
