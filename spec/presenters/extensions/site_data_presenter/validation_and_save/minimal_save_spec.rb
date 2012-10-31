@@ -12,7 +12,7 @@ module Locomotive
 
           context 'pages' do
 
-            it 'should only save page slug, title and site_id' do
+            it 'should only save page slug, title, site_id' do
               params = {
                 :pages => [
                   new_page_attributes
@@ -66,7 +66,7 @@ module Locomotive
 
           context 'content_types' do
 
-            it 'should only save content_type slug, name and site_id' do
+            it 'should only save content_type slug, name, and site_id' do
               params = {
                 :content_types => [
                   new_content_type_attributes
@@ -116,10 +116,10 @@ module Locomotive
               }
             end
 
-            it 'should save the custom fields' do
+            it 'should save the non-relationship custom fields' do
               params = {
                 :content_types => [
-                  new_content_type_attributes_with_custom_fields
+                  new_content_type_attributes
                 ]
               }.with_indifferent_access
               site_data.build_models(params)
@@ -129,12 +129,10 @@ module Locomotive
 
               content_type.slug.should == 'projects'
               content_type.name.should == 'Projects'
-              content_type.entries_custom_fields.each_with_index do |field, index|
-                attributes = new_content_type_attributes_with_custom_fields[:entries_custom_fields][index]
-                field.label.should == attributes[:label]
-                field.type.should == attributes[:type]
-                field.name.should == attributes[:label].underscore
-              end
+              content_type.entries_custom_fields.count.should == 1
+              content_type.entries_custom_fields.first.label.should == 'Name'
+              content_type.entries_custom_fields.first.type.should == 'string'
+              content_type.entries_custom_fields.first.name.should == 'name'
             end
 
           end
@@ -255,8 +253,6 @@ module Locomotive
 
           it 'should only skip callbacks and validations for the current_site'
 
-          it 'should fail gracefully on content_entries when its content_type fails'
-
           protected
 
           ## Page data ##
@@ -281,12 +277,7 @@ module Locomotive
             {
               :slug => 'projects',
               :name => 'Projects',
-              :description => 'Projects that the company does'
-            }
-          end
-
-          def new_content_type_attributes_with_custom_fields
-            new_content_type_attributes.merge({
+              :description => 'Projects that the company does',
               :entries_custom_fields => [
                 {
                   :label => 'Name',
@@ -297,7 +288,7 @@ module Locomotive
                   :type => 'has_many'
                 }
               ]
-            })
+            }
           end
 
           def new_content_type_attributes_without_slug

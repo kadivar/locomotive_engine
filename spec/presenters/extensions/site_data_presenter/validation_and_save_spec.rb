@@ -40,6 +40,39 @@ module Locomotive
           content_type.entries[0]._label.should == 'John Smith'
         end
 
+        it 'should fail gracefully on content_entries when its content_type fails' do
+          params = {
+            :content_types => [
+              {
+                :name => 'Employees',
+                :entries_custom_fields => []
+              }
+            ],
+            :content_entries => {
+              :employees => [
+                {
+                  :name => 'John Smith'
+                }
+              ]
+            }
+          }.with_indifferent_access
+
+          site_data.build_models(params)
+          site_data.insert.should be_false
+
+          site_data.errors.should == {
+            'content_types' => {
+              0 => {
+                :entries_custom_fields => [ 'At least, one custom field is required' ]
+              }
+            },
+            'content_entries' => {
+              'employees' => [ 'content type does not exist' ]
+            }
+          }
+        end
+
+
       end
     end
   end

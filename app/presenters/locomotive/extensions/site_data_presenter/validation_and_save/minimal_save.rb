@@ -53,6 +53,7 @@ module Locomotive
             # Always validate presence and uniqueness of slug
             uniqueness_val = ::Mongoid::Validations::UniquenessValidator
             presence_val = ::Mongoid::Validations::PresenceValidator
+            length_val = ::ActiveModel::Validations::LengthValidator
             if (raw_filter.kind_of?(uniqueness_val) ||
                 raw_filter.kind_of?(presence_val)) \
                 && (raw_filter.attributes.include?(:slug) \
@@ -66,8 +67,11 @@ module Locomotive
                 return false
               end
             elsif model == 'content_types'
-              if (raw_filter.kind_of?(presence_val)) \
+              if raw_filter.kind_of?(presence_val) \
                   && raw_filter.attributes.include?(:name)
+                return false
+              elsif raw_filter.kind_of?(length_val) \
+                  && raw_filter.attributes.include?(:entries_custom_fields)
                 return false
               end
             end
@@ -156,18 +160,23 @@ module Locomotive
           end
 
           def remove_specific_attributes_for_model(obj, model)
-            custom_fields = []
+            custom_fields_to_save = []
+            all_custom_fields = []
+
+            # Remove relationship fields
             if model == 'content_types'
+              relationship_field_types = Set.new(%w{belings_to has_many many_to_many})
               obj.entries_custom_fields.each do |field|
-                custom_fields << field.clone
+                all_custom_fields << field.clone
+                custom_fields_to_save << field.clone unless relationship_field_types.include?(field.type)
               end
-              obj.entries_custom_fields = nil
+              obj.entries_custom_fields = custom_fields_to_save
             end
 
             yield
 
             if model == 'content_types'
-              obj.entries_custom_fields = custom_fields
+              obj.entries_custom_fields = all_custom_fields
             end
           end
 

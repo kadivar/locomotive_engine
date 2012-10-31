@@ -137,24 +137,30 @@ module Locomotive
         end
       end
 
-      # Grab all the content types by slug. This includes newly created
-      # content types, as well as the ones in the database
+      # Grab all the content types by slug. This includes newly created content
+      # types, as well as the ones in the database. If it's newly created, try
+      # to prepare it for building content_entries
       content_types_by_slug = {}
       (self.content_types + site.content_types).each do |content_type|
-        content_type.send(:normalize_slug) unless content_type.slug
-        content_types_by_slug[content_type.slug] ||= content_type
+        begin
+          if content_type.new_record?
+            content_type.send(:normalize_slug) unless content_type.slug
+            # Make sure it has a label field and the custom fields have names
+            content_type.entries_custom_fields.each do |field|
+              field.send(:set_name)
+            end
+            content_type.send(:set_label_field) unless content_type.label_field_id
+          end
+          content_types_by_slug[content_type.slug] ||= content_type
+        rescue
+          # Just leave it out of the hash
+        end
       end
 
       all_attributes['content_entries'].try(:each) do |content_type_slug, attributes_list|
         content_type = content_types_by_slug[content_type_slug]
 
         if content_type
-          # Make sure it has a label field and the custom fields have names
-          content_type.entries_custom_fields.each do |field|
-            field.send(:set_name)
-          end
-          content_type.send(:set_label_field) unless content_type.label_field_id
-
           attributes_list.each do |attributes|
             obj = build_content_entry_object(content_type)
             assign_attributes_to(obj, attributes)
