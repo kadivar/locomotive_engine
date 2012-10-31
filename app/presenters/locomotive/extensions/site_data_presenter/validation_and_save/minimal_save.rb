@@ -6,23 +6,21 @@ module Locomotive
 
           protected
 
-          def models_for_minimal_save
-            %w{pages content_types content_entries}
-          end
-
-          # Minimally save all new records
-          def minimal_save_all(*models)
-            self.errors.clear
-            models_for_minimal_save.each do |model|
-              next unless models.include?(model) || models.empty?
-
+          # Minimally save all new records for the given model if the model
+          # should be minimally saved. Set errors for the object if
+          # validation fails. Returns true if self.errors is empty after all
+          # objects have been saved.
+          def minimal_save_model(model)
+            if should_minimally_save_model?(model)
               without_callbacks_and_validations(model) do
                 _all_objects(false, model) do |obj, model, *path|
-                  without_extra_attributes(obj, model) do
-                    if obj.valid?
-                      obj.save(validate: false)
-                    else
-                      set_errors(obj, model, *path)
+                  if obj.new_record?
+                    without_extra_attributes(obj, model) do
+                      if obj.valid?
+                        obj.save(validate: false)
+                      else
+                        set_errors(obj, model, *path)
+                      end
                     end
                   end
                 end
@@ -30,6 +28,13 @@ module Locomotive
             end
             self.errors.empty?
           end
+
+          def should_minimally_save_model(model)
+            @_models_for_minimal_save ||=
+              Set.new(%w{pages content_types content_entries})
+            @_models_for_minimal_save.include?(model)
+          end
+          alias :should_minimally_save_model? :should_minimally_save_model
 
           def callback_names
             @callback_names ||= ::Mongoid::Callbacks::CALLBACKS.collect do |callback|

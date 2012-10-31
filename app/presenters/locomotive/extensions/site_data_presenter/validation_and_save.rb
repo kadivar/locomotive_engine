@@ -90,7 +90,7 @@ module Locomotive
           is_string = model_or_string.kind_of?(String)
 
           # Build path
-          current_container = @errors
+          current_container = self.errors
           current_element = nil
           path.each_with_index do |element, index|
             current_element = element

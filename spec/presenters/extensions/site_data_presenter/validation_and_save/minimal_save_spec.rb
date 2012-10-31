@@ -19,7 +19,7 @@ module Locomotive
                 ]
               }.with_indifferent_access
               site_data.build_models(params)
-              site_data.send(:minimal_save_all).should be_true
+              site_data.send(:minimal_save_model, 'pages').should be_true
 
               page = site.pages.where(:slug => 'new-page').first
 
@@ -35,7 +35,7 @@ module Locomotive
                 ]
               }.with_indifferent_access
               site_data.build_models(params)
-              site_data.send(:minimal_save_all).should be_true
+              site_data.send(:minimal_save_model, 'pages').should be_true
 
               page = site.pages.where(:slug => 'new-page').first
 
@@ -51,7 +51,7 @@ module Locomotive
                 ]
               }.with_indifferent_access
               site_data.build_models(params)
-              site_data.send(:minimal_save_all).should be_false
+              site_data.send(:minimal_save_model, 'pages').should be_false
 
               site_data.errors.should == {
                 'pages' => {
@@ -73,7 +73,7 @@ module Locomotive
                 ]
               }.with_indifferent_access
               site_data.build_models(params)
-              site_data.send(:minimal_save_all).should be_true
+              site_data.send(:minimal_save_model, 'content_types').should be_true
 
               content_type = site.content_types.where(:slug => 'projects').first
 
@@ -89,7 +89,7 @@ module Locomotive
                 ]
               }.with_indifferent_access
               site_data.build_models(params)
-              site_data.send(:minimal_save_all).should be_true
+              site_data.send(:minimal_save_model, 'content_types').should be_true
 
               content_type = site.content_types.where(:slug => 'projects').first
 
@@ -105,7 +105,7 @@ module Locomotive
                 ]
               }.with_indifferent_access
               site_data.build_models(params)
-              site_data.send(:minimal_save_all).should be_false
+              site_data.send(:minimal_save_model, 'content_types').should be_false
 
               site_data.errors.should == {
                 'content_types' => {
@@ -123,7 +123,7 @@ module Locomotive
                 ]
               }.with_indifferent_access
               site_data.build_models(params)
-              site_data.send(:minimal_save_all).should be_true
+              site_data.send(:minimal_save_model, 'content_types').should be_true
 
               content_type = site.content_types.where(:slug => 'projects').first
 
@@ -155,7 +155,7 @@ module Locomotive
                 }
               }.with_indifferent_access
               site_data.build_models(params)
-              site_data.send(:minimal_save_all).should be_true
+              site_data.send(:minimal_save_model, 'content_entries').should be_true
 
               content_type = site.content_types.where(:slug => 'projects').first
               project = content_type.entries.where(:_slug => 'project-1').first
@@ -177,7 +177,7 @@ module Locomotive
                 }
               }.with_indifferent_access
               site_data.build_models(params)
-              site_data.send(:minimal_save_all).should be_true
+              site_data.send(:minimal_save_model, 'content_entries').should be_true
 
               projects_content_type = site.content_types.where(:slug => 'projects').first
               employees_content_type = site.content_types.where(:slug => 'employees').first
@@ -202,7 +202,7 @@ module Locomotive
                 }
               }.with_indifferent_access
               site_data.build_models(params)
-              site_data.send(:minimal_save_all).should be_true
+              site_data.send(:minimal_save_model, 'content_entries').should be_true
 
               content_type = site.content_types.where(:slug => 'projects').first
 
@@ -221,7 +221,7 @@ module Locomotive
                 }
               }.with_indifferent_access
               site_data.build_models(params)
-              site_data.send(:minimal_save_all).should be_true
+              site_data.send(:minimal_save_model, 'content_entries').should be_true
 
               content_type = site.content_types.where(:slug => 'projects').first
 
@@ -256,7 +256,8 @@ module Locomotive
 
             site_data.build_models(params)
 
-            site_data.send(:minimal_save_all, 'pages', 'content_types').should be_true
+            site_data.send(:minimal_save_model, 'pages').should be_true
+            site_data.send(:minimal_save_model, 'content_types').should be_true
             site_data.content_types.each do |ct|
               # Temporarily remove entries and do a full save of
               # content_types
@@ -265,7 +266,7 @@ module Locomotive
               ct.save!
               ct.entries = entries
             end
-            site_data.send(:minimal_save_all, 'content_entries').should be_true
+            site_data.send(:minimal_save_model, 'content_entries').should be_true
 
             content_type = site.content_types.where(:slug => 'employees').first
 
