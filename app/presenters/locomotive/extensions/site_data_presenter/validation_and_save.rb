@@ -10,10 +10,13 @@ module Locomotive
         def insert
           self.clear_errors!
           self.ordered_models.each do |model|
-            this_model_ok = minimal_save_model(model)
-            this_model_ok &&= model_valid?(model, :always_use_indices => true)
-            this_model_ok && save_model_without_validation(model)
+            prepare_for_insert(model) do
+              this_model_ok = minimal_save_model(model)
+              this_model_ok &&= model_valid?(model, :always_use_indices => true)
+              this_model_ok && save_model_without_validation(model)
+            end
           end
+
           save_ok = self.no_errors?
           cleanup! unless save_ok
           save_ok
@@ -48,6 +51,25 @@ module Locomotive
                 id = (obj.new_record? || always_use_indices) ? index : obj.id
                 yield obj, 'content_entries', content_type_slug, id
               end
+            end
+          end
+        end
+
+        def prepare_for_insert(model)
+          # If we're doing content_types, remove all entries as we insert
+          entries = {}
+          if model == 'content_types'
+            all_objects(false, model) do |obj|
+              entries[obj] = [] + obj.entries
+              obj.entries = []
+            end
+          end
+
+          yield
+
+          if model == 'content_types'
+            all_objects(false, model) do |obj|
+              obj.entries = entries[obj]
             end
           end
         end
