@@ -4,7 +4,7 @@ module Locomotive
   module Extensions
     module SiteDataPresenter
       module ValidationAndSave
-        describe ContentTypes do
+        describe 'content_types' do
 
           let(:site) { FactoryGirl.create(:site) }
 

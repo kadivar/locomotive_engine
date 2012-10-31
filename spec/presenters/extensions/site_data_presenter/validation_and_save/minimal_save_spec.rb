@@ -246,8 +246,8 @@ module Locomotive
 
               site_data.errors.should == {
                 'content_entries' => {
-                'clients' => [ 'content type does not exist' ]
-              }
+                  'clients' => [ 'content type does not exist' ]
+                }
               }
             end
 

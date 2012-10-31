@@ -4,7 +4,7 @@ module Locomotive
   module Extensions
     module SiteDataPresenter
       module ValidationAndSave
-        describe ContentEntries do
+        describe 'content_entries' do
 
           let(:site) { Locomotive::Site.first || FactoryGirl.create(:site) }
 

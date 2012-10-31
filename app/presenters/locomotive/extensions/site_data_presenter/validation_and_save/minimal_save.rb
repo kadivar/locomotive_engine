@@ -155,6 +155,22 @@ module Locomotive
             nil
           end
 
+          def remove_specific_attributes_for_model(obj, model)
+            custom_fields = []
+            if model == 'content_types'
+              obj.entries_custom_fields.each do |field|
+                custom_fields << field.clone
+              end
+              obj.entries_custom_fields = nil
+            end
+
+            yield
+
+            if model == 'content_types'
+              obj.entries_custom_fields = custom_fields
+            end
+          end
+
           def without_extra_attributes(obj, model)
             attributes_removed = {}
 
@@ -170,20 +186,8 @@ module Locomotive
               obj.send(:"#{meth}=", removal_value(model, meth))
             end
 
-            # TODO: cleanup
-            if model == 'content_types'
-              arr = []
-              obj.entries_custom_fields.each do |field|
-                arr << field.clone
-              end
-              attributes_removed[:entries_custom_fields] = arr
-              obj.entries_custom_fields = nil
-            end
-
-            yield
-
-            if model == 'content_types'
-              obj.entries_custom_fields = attributes_removed.delete(:entries_custom_fields)
+            remove_specific_attributes_for_model(obj, model) do
+              yield
             end
 
             attributes_removed.each do |meth, val|
