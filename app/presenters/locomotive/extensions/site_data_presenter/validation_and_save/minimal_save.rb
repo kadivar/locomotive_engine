@@ -11,9 +11,11 @@ module Locomotive
           end
 
           # Minimally save all new records
-          def minimal_save_all
+          def minimal_save_all(*models)
             self.errors.clear
             models_for_minimal_save.each do |model|
+              next unless models.include?(model) || models.empty?
+
               without_callbacks_and_validations(model) do
                 _all_objects(false, model) do |obj, model, *path|
                   without_extra_attributes(obj, model) do

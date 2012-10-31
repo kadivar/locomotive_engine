@@ -210,6 +210,7 @@ module Locomotive
               content_type.entries[1]._slug.should == 'project-2'
             end
 
+            # TODO: by the time I get here, the tests are running rather slowly...
             it 'should save when object has required relationship fields' do
               add_required_relationship_to_projects!
               params = {
@@ -230,6 +231,7 @@ module Locomotive
 
           end
 
+          # TODO: this test should go elsewhere
           it 'should minimally save content types and content entries together' do
             params = {
               :content_types => [
@@ -253,7 +255,17 @@ module Locomotive
             }.with_indifferent_access
 
             site_data.build_models(params)
-            site_data.send(:minimal_save_all).should be_true
+
+            site_data.send(:minimal_save_all, 'pages', 'content_types').should be_true
+            site_data.content_types.each do |ct|
+              # Temporarily remove entries and do a full save of
+              # content_types
+              entries = [] + ct.entries
+              ct.entries = []
+              ct.save!
+              ct.entries = entries
+            end
+            site_data.send(:minimal_save_all, 'content_entries').should be_true
 
             content_type = site.content_types.where(:slug => 'employees').first
 
