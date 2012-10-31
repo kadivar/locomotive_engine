@@ -54,7 +54,7 @@ module Locomotive
 
         def save_model_without_validation(model)
           result = true
-          all_objects do |obj|
+          all_objects(false, model) do |obj|
             presenter = presenter_for(obj)
             result = presenter.save(validate: false) && result
           end
@@ -64,14 +64,9 @@ module Locomotive
         def model_valid?(model, options = {})
           self.clear_errors!(model)
           all_objects(options[:always_use_indices], model) do |obj, model, *path|
-            if model == 'content_entries' && !obj.content_type
-              content_type_slug, index = *path
-              set_errors('content type does not exist', model, content_type_slug)
-            else
-              presenter = presenter_for(obj)
-              unless presenter.valid?
-                set_errors(presenter, model, *path)
-              end
+            presenter = presenter_for(obj)
+            unless presenter.valid?
+              set_errors(presenter, model, *path)
             end
           end
           self.no_errors?(model)

@@ -229,49 +229,28 @@ module Locomotive
               project.employees.should be_empty
             end
 
-          end
-
-          # TODO: this test should go elsewhere
-          it 'should minimally save content types and content entries together' do
-            params = {
-              :content_types => [
-                {
-                  :name => 'Employees',
-                  :entries_custom_fields => [
-                    {
-                      :label => 'Name',
-                      :type => 'string'
-                    }
+            it 'should not save if the content_type slug is invalid' do
+              params = {
+                :content_entries => {
+                  :clients => [
+                    new_project_attributes
                   ]
                 }
-              ],
-              :content_entries => {
-                :employees => [
-                  {
-                    :name => 'John Smith'
-                  }
-                ]
+              }.with_indifferent_access
+
+              site_data.build_models(params)
+              site_data.insert.should be_false
+
+              site.reload
+              site.content_types.collect(&:entries).flatten.count.should == 0
+
+              site_data.errors.should == {
+                'content_entries' => {
+                'clients' => [ 'content type does not exist' ]
               }
-            }.with_indifferent_access
-
-            site_data.build_models(params)
-
-            site_data.send(:minimal_save_model, 'pages').should be_true
-            site_data.send(:minimal_save_model, 'content_types').should be_true
-            site_data.content_types.each do |ct|
-              # Temporarily remove entries and do a full save of
-              # content_types
-              entries = [] + ct.entries
-              ct.entries = []
-              ct.save!
-              ct.entries = entries
+              }
             end
-            site_data.send(:minimal_save_model, 'content_entries').should be_true
 
-            content_type = site.content_types.where(:slug => 'employees').first
-
-            content_type.entries_custom_fields[0].name.should == 'name'
-            content_type.entries[0]._label.should == 'John Smith'
           end
 
           it 'should only skip callbacks and validations for the current_site'

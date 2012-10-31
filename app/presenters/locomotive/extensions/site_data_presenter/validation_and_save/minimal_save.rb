@@ -15,11 +15,16 @@ module Locomotive
               without_callbacks_and_validations(model) do
                 all_objects(false, model) do |obj, model, *path|
                   if obj.new_record?
-                    without_extra_attributes(obj, model) do
-                      if obj.valid?
-                        obj.save(validate: false)
-                      else
-                        set_errors(obj, model, *path)
+                    if model == 'content_entries' && !obj.content_type
+                      content_type_slug = path[0]
+                      set_errors('content type does not exist', model, content_type_slug)
+                    else
+                      without_extra_attributes(obj, model) do
+                        if obj.valid?
+                          obj.save(validate: false)
+                        else
+                          set_errors(obj, model, *path)
+                        end
                       end
                     end
                   end
@@ -165,6 +170,7 @@ module Locomotive
               obj.send(:"#{meth}=", removal_value(model, meth))
             end
 
+            # TODO: cleanup
             if model == 'content_types'
               arr = []
               obj.entries_custom_fields.each do |field|

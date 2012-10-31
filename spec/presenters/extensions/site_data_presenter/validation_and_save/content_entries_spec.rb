@@ -49,9 +49,33 @@ module Locomotive
             joe.projects.should include(ecommerce)
           end
 
-          it 'should not save if the relationship fields are invalid'
+          it 'should not save if the relationship fields are invalid' do
+            params = {
+              :content_entries => {
+                :projects => projects_params_without_relationships,
+                :employees => employees_params
+              }
+            }.with_indifferent_access
 
-          it 'should not save if the content_type slug is invalid'
+            site_data.build_models(params)
+            site_data.insert.should be_false
+
+            site.reload
+            site.content_types.collect(&:entries).flatten.count.should == 0
+
+            site_data.errors.should == {
+              'content_entries' => {
+                'projects' => {
+                  0 => {
+                    :employees => [ 'is too short (minimum is 1 characters)' ]
+                  },
+                  1 => {
+                    :employees => [ 'is too short (minimum is 1 characters)' ]
+                  }
+                }
+              }
+            }
+          end
 
           protected
 
@@ -90,6 +114,17 @@ module Locomotive
               {
                 :title => 'E-commerce App',
                 :employees => [ 'joe' ]
+              }
+            ]
+          end
+
+          def projects_params_without_relationships
+            [
+              {
+                :title => 'Website'
+              },
+              {
+                :title => 'E-commerce App'
               }
             ]
           end
