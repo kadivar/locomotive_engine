@@ -68,7 +68,7 @@ class Locomotive::BasePresenter
     methods ||= self.included_methods
     {}.tap do |hash|
       methods.each do |meth|
-        hash[meth] = self.send(meth.to_sym) rescue nil
+        hash[meth] = json_value_for_attribute(meth.to_s)
       end
     end
   end
@@ -106,6 +106,14 @@ class Locomotive::BasePresenter
       result = self.source.save
     end
     result
+  end
+
+  protected
+
+  # Subclasses can override this method to specify the value for a particular
+  # key in the hash returned by as_json
+  def json_value_for_attribute(attr)
+    self.send(:"#{attr}") rescue nil
   end
 
 end

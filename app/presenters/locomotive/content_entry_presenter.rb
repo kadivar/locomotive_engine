@@ -69,26 +69,26 @@ module Locomotive
       super + %w(_slug _position seo_title meta_keywords meta_description formatted_created_at formatted_updated_at) + self.available_custom_field_names
     end
 
-    def as_json(methods = nil)
-      methods ||= self.included_methods
-      {}.tap do |hash|
-        methods.each do |meth|
-          hash[meth]= (if self.source.custom_fields_methods.include?(meth.to_s) \
-                       || self.additional_custom_fields_methods.include?(meth.to_s)
-            if self.source.is_a_custom_field_many_relationship?(meth.to_s)
-              # go deeper
-              self.source.send(meth).ordered.map { |entry| entry.to_presenter(:depth => self.depth + 1) }
-            else
-              self.source.send(meth) rescue nil
-            end
-          else
-            self.send(meth.to_sym) rescue nil
-          end)
+    protected
+
+    def json_value_for_attribute(attr)
+      # Deal with custom fields
+      if (self.source.custom_fields_methods.include?(attr) \
+        || self.additional_custom_fields_methods.include?(attr))
+        if self.source.is_a_custom_field_many_relationship?(attr)
+          # go deeper
+          self.source.send(:"#{attr}").ordered.map { |entry| entry.to_presenter(:depth => self.depth + 1) }
+        else
+          self.source.send(:"#{attr}") rescue nil
         end
+      elsif attr == 'errors'
+        # Make sure we have all the source errors as well
+        self.valid?
+        self.errors.to_hash.stringify_keys
+      else
+        super
       end
     end
-
-    protected
 
     def resolve_relationships
       relationship_field_methods.each do |meth, args|
