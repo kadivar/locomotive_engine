@@ -117,26 +117,21 @@ module Locomotive
           end
 
           def without_callbacks(obj, model)
-            klasses = classes_for_model(model)
-            klasses.each do |klass|
-              klass.class_eval do
-                def run_callbacks(kind, *args, &block)
-                  if block_given?
-                    yield
-                  else
-                    true
-                  end
+            obj.instance_eval do
+              def run_callbacks(kind, *args, &block)
+                if block_given?
+                  yield
+                else
+                  true
                 end
               end
             end
 
             yield
 
-            klasses.each do |klass|
-              klass.class_eval do
-                def run_callbacks(kind, *args, &block)
-                  super
-                end
+            obj.instance_eval do
+              def run_callbacks(kind, *args, &block)
+                super
               end
             end
           end

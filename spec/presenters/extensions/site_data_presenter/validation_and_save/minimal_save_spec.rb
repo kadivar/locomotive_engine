@@ -231,7 +231,28 @@ module Locomotive
 
           end
 
-          it 'should only skip callbacks and validations for the current_site'
+          it 'should only skip callbacks and validations for the current_site' do
+            other_site = FactoryGirl.create(:site, :subdomain => 'other')
+
+            presenter = site.content_types.build.to_presenter
+            other_presenter = other_site.content_types.build.to_presenter
+
+            [presenter, other_presenter].each do |p|
+              p.assign_attributes(new_content_type_attributes_without_custom_fields)
+            end
+
+            site_data.send(:without_callbacks_and_validations, presenter.source,
+                           'content_types') do
+              begin
+                presenter.source.save.should be_true
+                other_presenter.source.save.should be_false
+              rescue
+                puts "Errors: #{presenter.source.errors.messages}"
+                puts "Other errors: #{other_presenter.source.errors.messages}"
+                raise
+              end
+            end
+          end
 
           protected
 
@@ -269,6 +290,14 @@ module Locomotive
                   :type => 'has_many'
                 }
               ]
+            }
+          end
+
+          def new_content_type_attributes_without_custom_fields
+            {
+              :slug => 'projects',
+              :name => 'Projects',
+              :description => 'Projects that the company does'
             }
           end
 
