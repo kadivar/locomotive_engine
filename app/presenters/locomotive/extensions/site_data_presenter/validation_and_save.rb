@@ -55,14 +55,41 @@ module Locomotive
           end
         end
 
+        def depth_of_page(page)
+          @page_depth ||= {}
+
+          presenter = presenter_for(page)
+          level_0_slug = ->(slug) { %w{index 404}.include?(slug) }
+
+          @page_depth[page] ||= (if level_0_slug.call(page.slug)
+              0
+            elsif page.depth > 0
+              page.depth
+            elsif presenter.parent_fullpath
+              if level_0_slug.call(presenter.parent_fullpath)
+                1
+              else
+                presenter.parent_fullpath.split('/').size + 1
+              end
+            else
+              1
+            end)
+        end
+
         def prepare_for_insert(model)
-          # If we're doing content_types, remove all entries as we insert
           entries = {}
-          if model == 'content_types'
+
+          case model
+          # If we're doing content_types, remove all entries as we insert
+          when 'content_types'
             all_objects(false, model) do |obj|
               entries[obj] = [] + obj.entries
               obj.entries = []
             end
+          # If we're doing pages, sort them by depth
+          when 'pages'
+            self.pages.sort_by! { |p| depth_of_page(p) }
+            self.pages.each { |p| presenter_for(p).set_parent }
           end
 
           yield

@@ -79,7 +79,7 @@ module Locomotive
 
             filters_to_keep = Hash.new { |hash, key| hash[key] = [] }
             filters_to_keep.merge!({
-              'pages' => %w{normalize_slug},
+              'pages' => %w{normalize_slug build_fullpath},
               'content_types' => %w{normalize_slug},
               'content_entries' => %w{set_slug}
             })
@@ -147,7 +147,7 @@ module Locomotive
             attributes_to_keep_for_model = Hash.new { |hash, key| hash[key] = [] }
 
             attributes_to_keep_for_model.merge!({
-              'pages' => %w{title parent_id},
+              'pages' => %w{title parent_id fullpath},
               'content_types' => %w{name},
               'content_entries' => %w{content_type_id custom_fields_recipe}
             })

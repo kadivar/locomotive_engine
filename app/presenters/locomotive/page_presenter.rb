@@ -1,7 +1,8 @@
 module Locomotive
   class PagePresenter < BasePresenter
 
-    before_save :set_editable_elements
+    before_source_validation :set_editable_elements
+    before_source_validation :set_parent
 
     delegate :title, :slug, :fullpath, :seo_title, :meta_keywords, :meta_description, :handle, :position, :raw_template, :published, :listed, :templatized, :templatized_from_parent, :target_klass_slug, :redirect, :redirect_url, :template_changed, :cache_strategy, :response_type, :depth, :position, :translated_in, :to => :source
 
@@ -37,12 +38,18 @@ module Locomotive
     end
 
     def parent_fullpath
-      self.source.parent.fullpath
+      @parent_fullpath || self.source.parent.fullpath
     end
 
     def parent_fullpath=(parent_fullpath)
-      current_site = self.source.site
-      self.source.parent = current_site.pages.where(:fullpath => parent_fullpath).first
+      @parent_fullpath = parent_fullpath
+    end
+
+    def set_parent
+      if @parent_fullpath
+        current_site = self.source.site
+        self.source.parent = current_site.pages.where(:fullpath => parent_fullpath).first
+      end
     end
 
     def target_entry_name=(target_entry_name)
