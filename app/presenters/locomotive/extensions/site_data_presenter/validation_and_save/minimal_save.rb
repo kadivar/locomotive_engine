@@ -12,16 +12,17 @@ module Locomotive
           # save
           def minimal_save_model(model)
             if should_minimally_save_model?(model)
-              without_callbacks_and_validations(model) do
-                all_objects(false, model) do |obj, model, *path|
-                  if obj.new_record?
-                    if model == 'content_entries' && !obj.content_type
-                      content_type_slug = path[0]
-                      set_errors('content type does not exist', model, content_type_slug)
-                    else
+              all_objects(false, model) do |obj, model, *path|
+                if obj.new_record?
+                  if model == 'content_entries' && !obj.content_type
+                    content_type_slug = path[0]
+                    set_errors('content type does not exist', model, content_type_slug)
+                  else
+                    without_callbacks_and_validations(obj, model) do
                       without_extra_attributes(obj, model) do
-                        if obj.valid?
-                          obj.save(validate: false)
+                        do_minimal_callbacks_and_validation(obj, model)
+                        if obj.errors.empty?
+                          obj.save
                         else
                           set_errors(obj, model, *path)
                         end
@@ -87,46 +88,55 @@ module Locomotive
             !filters_to_keep[model].include?(filter.to_s)
           end
 
-          def without_callbacks(model)
-            callbacks = {}
+          def classes_for_model(model)
+            [].tap do |klasses|
+              if model == 'content_entries'
+                content_type_klasses = self.site.content_types.collect do |ct|
+                  ct.klass_with_custom_fields(:entries)
+                end
+              end
+              klasses.push(*content_type_klasses)
+              klasses.push(model_class(model))
+            end
+          end
 
-            # Get all classes for this model
-            klasses = []
-            if model == 'content_entries'
-              klasses += self.site.content_types.collect do |ct|
-                ct.klass_with_custom_fields(:entries)
+          def do_minimal_callbacks_and_validation(obj, model)
+            callback_names.each do |callback_name|
+              classes_for_model(model).each do |klass|
+                klass.send(:"_#{callback_name}_callbacks").each do |callback|
+                  unless should_skip_callback(model, callback)
+                    if callback.raw_filter.class == Symbol
+                      obj.send(callback.raw_filter)
+                    else
+                      callback.raw_filter.send(:"#{callback_name}", obj)
+                    end
+                  end
+                end
               end
             end
-            klasses << model_class(model)
+          end
 
-            # Skip callbacks on each klass
+          def without_callbacks(obj, model)
+            klasses = classes_for_model(model)
             klasses.each do |klass|
-              # Collect the callbacks which should be skipped
-              callbacks[klass] = []
-              callback_names.each do |callback_name|
-                klass.send(:"_#{callback_name}_callbacks").each do |callback|
-                  if should_skip_callback(model, callback)
-                    callbacks[klass] << callback
+              klass.class_eval do
+                def run_callbacks(kind, *args, &block)
+                  if block_given?
+                    yield
+                  else
+                    true
                   end
                 end
               end
             end
 
-            klasses.each do |klass|
-              callbacks[klass].each do |callback|
-                # TODO: only skip the callback for this site
-                klass.skip_callback(callback.name, callback.kind,
-                  callback.filter, callback.options)
-              end
-            end
-
             yield
 
-            # Set all callbacks
             klasses.each do |klass|
-              callbacks[klass].each do |callback|
-                klass.set_callback(callback.name, callback.kind,
-                  callback.filter, callback.options)
+              klass.class_eval do
+                def run_callbacks(kind, *args, &block)
+                  super
+                end
               end
             end
           end

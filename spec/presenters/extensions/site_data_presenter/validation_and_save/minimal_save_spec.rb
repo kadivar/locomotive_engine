@@ -232,7 +232,6 @@ module Locomotive
               content_type.entries[1]._slug.should == 'project-2'
             end
 
-            # TODO: by the time I get here, the tests are running rather slowly...
             it 'should save when object has required relationship fields' do
               add_required_relationship_to_projects!
               params = {
