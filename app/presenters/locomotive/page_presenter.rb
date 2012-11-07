@@ -59,7 +59,7 @@ module Locomotive
     end
 
     def included_methods
-      super + %w(title slug fullpath handle seo_title meta_keywords meta_description position raw_template published listed templatized templatized_from_parent target_klass_slug redirect redirect_url cache_strategy response_type depth position template_changed editable_elements localized_fullpaths translated_in)
+      super + %w(title slug fullpath handle seo_title meta_keywords meta_description position raw_template published listed templatized templatized_from_parent target_klass_slug redirect redirect_url cache_strategy response_type depth position template_changed editable_elements localized_fullpaths translated_in parent_fullpath)
     end
 
     def included_setters
