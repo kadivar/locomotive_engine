@@ -63,7 +63,19 @@ module Locomotive
     end
 
     def entries_custom_fields
-      self.source.ordered_entries_custom_fields.collect(&:as_json)
+      #self.source.ordered_entries_custom_fields.collect(&:as_json)
+      self.source.ordered_entries_custom_fields.collect do |field|
+        hash = field.as_json
+
+        hash['content_type_slug'] = nil
+        if field['class_name']
+          content_type_id = field['class_name'].sub(/^Locomotive::Entry(.*)$/, '\1')
+          content_type = self.source.site.content_types.find(content_type_id)
+          hash['content_type_slug'] = content_type.slug
+        end
+
+        hash
+      end
     end
 
     def entries_custom_fields=(entries_custom_fields)
