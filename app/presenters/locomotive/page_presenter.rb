@@ -3,12 +3,13 @@ module Locomotive
 
     before_source_validation :set_editable_elements
     before_source_validation :set_parent
+    before_source_validation :set_target_klass_name
 
     delegate :title, :slug, :fullpath, :seo_title, :meta_keywords, :meta_description, :handle, :position, :raw_template, :published, :listed, :templatized, :templatized_from_parent, :target_klass_slug, :redirect, :redirect_url, :template_changed, :cache_strategy, :response_type, :depth, :position, :translated_in, :to => :source
 
     delegate :title=, :slug=, :fullpath=, :seo_title=, :meta_keywords=, :meta_description=, :handle=, :raw_template=, :published=, :listed=, :templatized=, :templatized_from_parent=, :target_klass_name=, :redirect=, :redirect_url=, :cache_strategy=, :response_type=, :position=, :to => :source
 
-    attr_writer :editable_elements
+    attr_writer :editable_elements, :target_klass_slug
 
     def escaped_raw_template
       h(self.source.raw_template)
@@ -52,10 +53,21 @@ module Locomotive
       end
     end
 
+    # DEPRECATED: use target_klass_slug instead
     def target_entry_name=(target_entry_name)
-      current_site = self.source.site
-      self.source.target_klass_name = current_site.content_types.where(
-        :slug => target_entry_name).first.klass_with_custom_fields(:entries).to_s
+      Locomotive.log :warn, "[API] the target_entry_name field for pages has been deprecated and replaced by target_klass_slug"
+      self.target_klass_slug = target_entry_name
+    end
+
+    def set_target_klass_name
+      if @target_klass_slug
+        content_type = self.source.site.content_types.where(
+          :slug => @target_klass_slug).first
+        if content_type
+          self.source.target_klass_name = content_type.klass_with_custom_fields(
+            :entries).to_s
+        end
+      end
     end
 
     def included_methods
@@ -63,7 +75,8 @@ module Locomotive
     end
 
     def included_setters
-      super + %w(title slug fullpath seo_title meta_keywords meta_description handle raw_template published listed templatized templatized_from_parent target_klass_name redirect redirect_url cache_strategy response_type position editable_elements parent_fullpath target_entry_name)
+      super + %w(title slug fullpath seo_title meta_keywords meta_description handle raw_template published listed templatized templatized_from_parent target_klass_name redirect redirect_url cache_strategy response_type position editable_elements parent_fullpath target_klass_slug) \
+        + ['target_entry_name'] # DEPRECATED
     end
 
     def localized_fullpaths

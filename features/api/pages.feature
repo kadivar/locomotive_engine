@@ -40,7 +40,7 @@ Feature: Pages
         "title": "My Templatized Page",
         "templatized": "true",
         "templatized_from_parent": "false",
-        "target_entry_name": "projects",
+        "target_klass_slug": "projects",
         "parent_fullpath": "index"
       }
     }
