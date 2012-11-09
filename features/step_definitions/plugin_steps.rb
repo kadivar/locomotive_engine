@@ -64,6 +64,13 @@ Then /^the plugin "(.*)" should be enabled$/ do |plugin_id|
 end
 
 Then /^the plugin config for "(.*)" should be:$/ do |plugin_id, table|
-  plugin = @site.reload.enabled_plugin_objects_by_id[plugin_id]
+  @site.reload
+
+  # Force site to recreate plugin objects
+  @site.instance_variable_set(:@all_plugin_objects_by_id, nil)
+  @site.instance_variable_set(:@enabled_plugin_objects_by_id, nil)
+  @site.instance_variable_set(:@plugin_data_by_id, nil)
+
+  plugin = @site.all_plugin_objects_by_id[plugin_id]
   plugin.config.should == table.rows_hash
 end

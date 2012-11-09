@@ -45,6 +45,10 @@ module Locomotive
               data_obj.config = plugin_hash[:plugin_config]
               data_obj.enabled = !!plugin_hash[:plugin_enabled]
             end
+
+            # Clear cached data
+            @all_plugin_objects_by_id = nil
+            @enabled_plugin_objects_by_id = nil
           end
 
           # Hash of instantiated plugin object for each enabled plugin
