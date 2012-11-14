@@ -172,18 +172,18 @@ module Locomotive
         has_one :visit_counter, VisitCounter
         before_filter :increment_count
 
+        def initialize_plugin
+          build_visit_counter unless visit_counter
+        end
+
         def count
-          get_visit_counter.count
+          visit_counter.count
         end
 
         protected
 
         def increment_count
-          get_visit_counter.count += 1
-        end
-
-        def get_visit_counter
-          visit_counter || build_visit_counter
+          visit_counter.count += 1
         end
 
       end
