@@ -5,6 +5,7 @@ module Locomotive
 
       attr_accessor :plugin_drops_container
 
+      # An around_filter to work with plugins
       def process_plugins
         plugin_drops_container_hash = {}
         current_site.enabled_plugin_objects_by_id.each do |plugin_id, plugin|
@@ -21,6 +22,12 @@ module Locomotive
         end
 
         self.plugin_drops_container = DropContainer.new(plugin_drops_container_hash)
+
+        yield
+
+        current_site.enabled_plugin_objects_by_id.each do |plugin_id, plugin|
+          plugin.save_db_model_container
+        end
       end
 
       # All enabled plugin objects for this site. These are put in a liquid

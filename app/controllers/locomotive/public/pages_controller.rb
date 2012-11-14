@@ -17,7 +17,7 @@ module Locomotive
 
       before_filter :set_locale, :only => [:show, :edit]
 
-      before_filter :process_plugins, :only => [:show, :edit]
+      around_filter :process_plugins, :only => [:show, :edit]
 
       def show_toolbar
         render :layout => false

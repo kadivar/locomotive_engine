@@ -202,9 +202,11 @@ GEM
     locomotive-tinymce-rails (3.4.7.2)
       actionpack (~> 3.0)
     locomotive_liquid (2.2.3)
-    locomotive_plugins (0.1.1)
+    locomotive_plugins (0.2.0)
+      bson_ext
       haml (~> 3.1)
       locomotive_liquid (~> 2.2.2)
+      mongoid (~> 2.4.12)
     mail (2.4.4)
       i18n (>= 0.4.0)
       mime-types (~> 1.16)

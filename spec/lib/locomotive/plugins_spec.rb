@@ -5,11 +5,10 @@ module Locomotive
     describe Processor do
 
       before(:each) do
+        @site = FactoryGirl.create(:site)
+
         register_and_enable_plugin(MobileDetectionPlugin)
         register_plugin(LanguagePlugin)
-
-        @site = FactoryGirl.build(:site)
-        @site.stubs(:plugin_data).returns(@plugin_data)
 
         Locomotive::TestController.send(:include, Locomotive::Plugins::Processor)
         @controller = Locomotive::TestController.new
@@ -21,17 +20,17 @@ module Locomotive
 
         it 'should run all before_filters for enabled plugins' do
           MobileDetectionPlugin.any_instance.expects(:determine_device)
-          @controller.process_plugins
+          process_plugins
         end
 
         it 'should not run any before_filters for disabled plugins' do
           LanguagePlugin.any_instance.expects(:get_language).never
-          @controller.process_plugins
+          process_plugins
         end
 
         it 'should be able to access the controller from the before_filter' do
           @controller.expects(:params).returns({})
-          @controller.process_plugins
+          process_plugins
         end
 
       end
@@ -40,7 +39,7 @@ module Locomotive
 
         before(:each) do
           register_and_enable_plugin(UselessPlugin)
-          @controller.process_plugins
+          process_plugins
         end
 
         it 'should supply the enabled plugins' do
@@ -68,6 +67,25 @@ module Locomotive
 
       end
 
+      context 'db_models' do
+
+        before(:each) do
+          register_and_enable_plugin(VisitCountPlugin)
+        end
+
+        it 'should persist data between requests' do
+          plugin = @site.enabled_plugin_objects_by_id['visit_count_plugin']
+          plugin.count.should == 0
+
+          process_plugins
+          @site.reload
+
+          plugin = @site.enabled_plugin_objects_by_id['visit_count_plugin']
+          plugin.count.should == 1
+        end
+
+      end
+
       protected
 
       def register_plugin(plugin_class)
@@ -75,16 +93,19 @@ module Locomotive
       end
 
       def enable_plugin(plugin_id)
-        @plugin_data ||= []
-        @plugin_data << FactoryGirl.create(:plugin_data,
-                                           :plugin_id => plugin_id,
-                                           :enabled => true)
+        FactoryGirl.create(:plugin_data, :site => @site,
+          :plugin_id => plugin_id, :enabled => true)
       end
 
       def register_and_enable_plugin(plugin_class)
         plugin_id = LocomotivePlugins.default_id(plugin_class)
-        enable_plugin(plugin_id)
         register_plugin(plugin_class)
+        enable_plugin(plugin_id)
+      end
+
+      def process_plugins
+        @controller.process_plugins do
+        end
       end
 
       ## Classes ##
@@ -138,6 +159,33 @@ module Locomotive
       end
 
       class LanguageDrop < ::Liquid::Drop
+      end
+
+      class VisitCountPlugin
+
+        include Locomotive::Plugin
+
+        class VisitCounter < Locomotive::Plugin::DBModel
+          field :count, default: 0
+        end
+
+        has_one :visit_counter, VisitCounter
+        before_filter :increment_count
+
+        def count
+          get_visit_counter.count
+        end
+
+        protected
+
+        def increment_count
+          get_visit_counter.count += 1
+        end
+
+        def get_visit_counter
+          visit_counter || build_visit_counter
+        end
+
       end
 
     end

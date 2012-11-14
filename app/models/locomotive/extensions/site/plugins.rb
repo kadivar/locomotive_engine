@@ -46,7 +46,7 @@ module Locomotive
               data_obj.enabled = !!plugin_hash[:plugin_enabled]
             end
 
-            # Clear cached data
+            # Clear cached plugin objects
             @all_plugin_objects_by_id = nil
             @enabled_plugin_objects_by_id = nil
           end
@@ -77,27 +77,29 @@ module Locomotive
             end
           end
 
+          # Clear cached data on reload
+          def reload(*args, &block)
+            clear_cached_plugin_data!
+            super
+          end
+
           protected
 
-          def plugin_data_by_id
-            @plugin_data_by_id ||= self.plugin_data.inject({}) do |h, plugin_data|
-              plugin_id = plugin_data.plugin_id
-              h[plugin_id] = plugin_data
-              h
-            end
+          def clear_cached_plugin_data!
+            @enabled_plugin_objects_by_id = nil
+            @all_plugin_objects_by_id = nil
           end
 
           def fetch_or_build_plugin_data(plugin_id)
-            existing_plugin = plugin_data_by_id[plugin_id]
+            existing_plugin = self.plugin_data.where(plugin_id: plugin_id).first
             if existing_plugin
               existing_plugin
             else
-              plugin_data_by_id[plugin_id] = self.plugin_data.build(:plugin_id => plugin_id)
+              self.plugin_data.build(plugin_id: plugin_id)
             end
           end
 
           def construct_plugin_object_for_data(plugin_data)
-            plugin_id = plugin_data.plugin_id
             config = plugin_data.config
             plugin_data.plugin_class.new(config)
           end
