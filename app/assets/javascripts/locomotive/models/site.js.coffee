@@ -29,7 +29,8 @@ class Locomotive.Models.Site extends Backbone.Model
       delete hash.domains
       hash.domains = _.map(@get('domains'), (domain) -> domain.get('name'))
       delete hash.plugins
-      hash.plugins = @get('plugins').toJSON()
+      plugins_json = @get('plugins').toJSON()
+      hash.plugins = plugins_json unless plugins_json.length == 0
 
 class Locomotive.Models.CurrentSite extends Locomotive.Models.Site
 
