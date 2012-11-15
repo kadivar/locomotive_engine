@@ -13,6 +13,7 @@ Feature: View output from plugins on public pages
     {% else %}
     Goodbye, World!
     {% endif %}
+    {{ 'google.com' | my_plugin_add_http_prefix }}
     """
 
   Scenario: Plugin is enabled
@@ -22,12 +23,20 @@ Feature: View output from plugins on public pages
     """
     Hello, World!
     """
+    And the rendered output should look like:
+    """
+    http://google.com
+    """
 
   Scenario: Plugin is not enabled
     When I view the rendered page at "/plugin-page"
     Then the rendered output should look like:
     """
     Goodbye, World!
+    """
+    And the rendered output should look like:
+    """
+    google.com
     """
 
   Scenario: Plugin is enabled and then disabled

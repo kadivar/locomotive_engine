@@ -2,6 +2,20 @@
 class PluginClass
   include Locomotive::Plugin
 
+  class Drop < ::Liquid::Drop
+    attr_accessor :greeting
+  end
+
+  module Filters
+    def add_http_prefix(input)
+      if input.start_with?('http://')
+        input
+      else
+        "http://#{input}"
+      end
+    end
+  end
+
   before_filter :set_greeting
 
   def to_liquid
@@ -15,12 +29,12 @@ class PluginClass
     engine_root.join('spec', 'fixtures', 'assets', 'plugin_config_template.html.haml')
   end
 
-  def set_greeting
-    self.drop.greeting = 'Hello, World!'
+  def liquid_filters
+    Filters
   end
 
-  class Drop < ::Liquid::Drop
-    attr_accessor :greeting
+  def set_greeting
+    self.drop.greeting = 'Hello, World!'
   end
 
 end

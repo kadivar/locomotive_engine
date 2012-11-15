@@ -46,9 +46,15 @@ module Locomotive
               data_obj.enabled = !!plugin_hash[:plugin_enabled]
             end
 
-            # Clear cached plugin objects
-            @all_plugin_objects_by_id = nil
-            @enabled_plugin_objects_by_id = nil
+            clear_cached_plugin_data!
+          end
+
+          def plugin_filters
+            @plugin_filters ||= [].tap do |arr|
+              self.enabled_plugin_objects_by_id.each do |plugin_id, plugin_obj|
+                arr << plugin_obj.prefixed_liquid_filter_module(plugin_id)
+              end
+            end
           end
 
           # Hash of instantiated plugin object for each enabled plugin
@@ -88,6 +94,7 @@ module Locomotive
           def clear_cached_plugin_data!
             @enabled_plugin_objects_by_id = nil
             @all_plugin_objects_by_id = nil
+            @plugin_filters = nil
           end
 
           def fetch_or_build_plugin_data(plugin_id)

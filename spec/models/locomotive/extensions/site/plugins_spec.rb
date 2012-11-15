@@ -98,6 +98,20 @@ describe Locomotive::Extensions::Site::Plugins do
 
   end
 
+  describe '#plugin_filters' do
+
+    it 'should return a list of prefixed filter modules for enabled plugins' do
+      mods = site.plugin_filters
+
+      mods.count.should == 1
+      mod = mods.first
+
+      mod.public_instance_methods.should include(:mobile_detection_add_http_prefix)
+      mod.public_instance_methods.should_not include(:language_detection_upcase)
+    end
+
+  end
+
   it 'allows only one plugin wrapper with a given ID on each site' do
     site2 = FactoryGirl.create(:site, :subdomain => 'test2')
 
@@ -124,10 +138,36 @@ describe Locomotive::Extensions::Site::Plugins do
 
   class MobileDetection
     include Locomotive::Plugin
+
+    module Filters
+      def add_http_prefix(input)
+        if input.start_with?('http://')
+          input
+        else
+          "http://#{input}"
+        end
+      end
+    end
+
+    def liquid_filters
+      Filters
+    end
+
   end
 
   class LanguageDetection
     include Locomotive::Plugin
+
+    module Filters
+      def upcase(input)
+        input.upcase
+      end
+    end
+
+    def liquid_filters
+      Filters
+    end
+
   end
 
   def add_plugins
