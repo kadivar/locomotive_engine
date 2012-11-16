@@ -117,12 +117,12 @@ module Locomotive
         end
       end
 
-      plugin_filters = current_site.plugin_filters
+      plugin_liquid_filters = current_site.plugin_liquid_filters
 
       # Tip: switch from false to true to enable the re-thrown exception flag
       context = ::Liquid::Context.new({}, assigns, self.locomotive_default_registers, false)
 
-      context.add_filters(plugin_filters)
+      context.add_filters(plugin_liquid_filters)
 
       context
     end

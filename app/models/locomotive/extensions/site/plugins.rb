@@ -49,8 +49,8 @@ module Locomotive
             clear_cached_plugin_data!
           end
 
-          def plugin_filters
-            @plugin_filters ||= [].tap do |arr|
+          def plugin_liquid_filters
+            @plugin_liquid_filters ||= [].tap do |arr|
               self.enabled_plugin_objects_by_id.each do |plugin_id, plugin_obj|
                 arr << plugin_obj.prefixed_liquid_filter_module(plugin_id)
               end
@@ -94,7 +94,7 @@ module Locomotive
           def clear_cached_plugin_data!
             @enabled_plugin_objects_by_id = nil
             @all_plugin_objects_by_id = nil
-            @plugin_filters = nil
+            @plugin_liquid_filters = nil
           end
 
           def fetch_or_build_plugin_data(plugin_id)
