@@ -14,6 +14,8 @@ Feature: View output from plugins on public pages
     Goodbye, World!
     {% endif %}
     {{ 'google.com' | my_plugin_add_http_prefix }}
+    {% my_plugin_paragraph %}My Text{% endmy_plugin_paragraph %}
+    My Text{% my_plugin_newline %}
     """
 
   Scenario: Plugin is enabled
@@ -22,10 +24,10 @@ Feature: View output from plugins on public pages
     Then the rendered output should look like:
     """
     Hello, World!
-    """
-    And the rendered output should look like:
-    """
+
     http://google.com
+    <p>My Text</p>
+    My Text<br />
     """
 
   Scenario: Plugin is not enabled
@@ -33,10 +35,10 @@ Feature: View output from plugins on public pages
     Then the rendered output should look like:
     """
     Goodbye, World!
-    """
-    And the rendered output should look like:
-    """
+
     google.com
+    My Text
+    My Text
     """
 
   Scenario: Plugin is enabled and then disabled
@@ -46,4 +48,8 @@ Feature: View output from plugins on public pages
     Then the rendered output should look like:
     """
     Goodbye, World!
+
+    google.com
+    My Text
+    My Text
     """

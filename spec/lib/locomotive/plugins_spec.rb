@@ -40,29 +40,41 @@ module Locomotive
         before(:each) do
           register_and_enable_plugin(UselessPlugin)
           process_plugins
+          @context = ::Liquid::Context.new
+          @controller.send(:add_plugin_data_to_liquid_context, @context)
         end
 
-        it 'should supply the enabled plugins' do
-          @controller.plugins.collect(&:class).should == \
-            [ MobileDetectionPlugin, UselessPlugin ]
+        it 'should add enabled plugins to a register' do
+          @context.registers[:plugins].count.should == 2
+          [MobileDetectionPlugin, UselessPlugin].each do |klass|
+            @context.registers[:plugins].collect(&:class).should include(klass)
+          end
         end
 
-        it 'should build a container for the plugin liquid drops' do
-          container = @controller.plugin_drops_container
+        it 'should add a container for the plugin liquid drops' do
+          container = @context['plugins']
           container_liquid = container.to_liquid
           container_liquid.kind_of?(::Liquid::Drop).should be_true
         end
 
-        it 'should retrieve the liquid drops for enabled plugins with drops' do
-          @first_enabled_plugin = @controller.plugins.first
-          container = @controller.plugin_drops_container
+        it 'should add the liquid drops for enabled plugins with drops' do
+          @first_enabled_plugin = @site.enabled_plugin_objects_by_id.values.first
+          container = @context['plugins']
           container['mobile_detection_plugin'].class.should == @first_enabled_plugin.to_liquid.class
           container['useless_plugin'].should be_nil
+          container['language_plugin'].should be_nil
         end
 
-        it 'should not retrieve the liquid drops for disabled plugins' do
-          container = @controller.plugin_drops_container
-          container['language_plugin'].should be_nil
+        it 'should add a set of enabled liquid tags' do
+          @context.registers[:enabled_plugin_tags].size.should == 1
+          @context.registers[:enabled_plugin_tags].should include(MobileDetectionPlugin::Tag::TagSubclass)
+        end
+
+        it 'should add filters for enabled plugins' do
+          @context.strainer.mobile_detection_plugin_filter('input').should == 'input'
+          expect do
+            @context.strainer.language_plugin_filter('input')
+          end.to raise_error
         end
 
       end
@@ -104,7 +116,7 @@ module Locomotive
       end
 
       def process_plugins
-        @controller.process_plugins do
+        @controller.send(:process_plugins) do
         end
       end
 
@@ -131,6 +143,23 @@ module Locomotive
           end
         end
 
+        module Filter
+          def filter(input)
+            input
+          end
+        end
+
+        def self.liquid_filters
+          Filter
+        end
+
+        class Tag
+        end
+
+        def self.liquid_tags
+          { :tag => Tag }
+        end
+
       end
 
       class UselessPlugin
@@ -151,6 +180,23 @@ module Locomotive
 
         def to_liquid
           @my_drop ||= LanguageDrop.new
+        end
+
+        module Filter
+          def filter(input)
+            input
+          end
+        end
+
+        def self.liquid_filters
+          Filter
+        end
+
+        class Tag
+        end
+
+        def self.liquid_tags
+          { :tag => Tag }
         end
 
       end

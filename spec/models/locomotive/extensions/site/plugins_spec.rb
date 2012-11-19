@@ -101,7 +101,7 @@ describe Locomotive::Extensions::Site::Plugins do
   describe '#plugin_filters' do
 
     it 'should return a list of prefixed filter modules for enabled plugins' do
-      mods = site.plugin_filters
+      mods = site.plugin_liquid_filters
 
       mods.count.should == 1
       mod = mods.first
@@ -149,7 +149,7 @@ describe Locomotive::Extensions::Site::Plugins do
       end
     end
 
-    def liquid_filters
+    def self.liquid_filters
       Filters
     end
 
@@ -164,7 +164,7 @@ describe Locomotive::Extensions::Site::Plugins do
       end
     end
 
-    def liquid_filters
+    def self.liquid_filters
       Filters
     end
 

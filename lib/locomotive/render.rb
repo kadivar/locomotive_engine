@@ -117,12 +117,12 @@ module Locomotive
         end
       end
 
-      plugin_liquid_filters = current_site.plugin_liquid_filters
-
       # Tip: switch from false to true to enable the re-thrown exception flag
       context = ::Liquid::Context.new({}, assigns, self.locomotive_default_registers, false)
 
-      context.add_filters(plugin_liquid_filters)
+      if self.respond_to?(:add_plugin_data_to_liquid_context)
+        self.add_plugin_data_to_liquid_context(context)
+      end
 
       context
     end
@@ -148,7 +148,6 @@ module Locomotive
         'default_locale'    => current_site.default_locale.to_s,
         'locales'           => current_site.locales,
         'current_user'      => Locomotive::Liquid::Drops::CurrentUser.new(current_locomotive_account),
-        'plugins'           => self.respond_to?(:plugin_drops_container) ? self.plugin_drops_container : nil
       }
     end
 
@@ -161,7 +160,6 @@ module Locomotive
         :controller     => self,
         :site           => current_site,
         :page           => @page,
-        :plugins        => self.respond_to?(:plugins) ? self.plugins : [],
         :inline_editor  => self.editing_page?,
         :current_locomotive_account => current_locomotive_account
       }

@@ -16,6 +16,22 @@ class PluginClass
     end
   end
 
+  class Paragraph < ::Liquid::Block
+    def render(context)
+      "<p>#{render_all(@nodelist, context).join}</p>"
+    end
+
+    def render_disabled(context)
+      render_all(@nodelist, context)
+    end
+  end
+
+  class Newline < ::Liquid::Tag
+    def render(context)
+      "<br />"
+    end
+  end
+
   before_filter :set_greeting
 
   def to_liquid
@@ -29,8 +45,15 @@ class PluginClass
     engine_root.join('spec', 'fixtures', 'assets', 'plugin_config_template.html.haml')
   end
 
-  def liquid_filters
+  def self.liquid_filters
     Filters
+  end
+
+  def self.liquid_tags
+    {
+      :paragraph => Paragraph,
+      :newline => Newline
+    }
   end
 
   def set_greeting
@@ -41,6 +64,7 @@ end
 
 Given /^I have registered the plugin "(.*)"$/ do |plugin_id|
   LocomotivePlugins.register_plugin(PluginClass, plugin_id)
+  Locomotive::Plugins::LiquidTagLoader.load
 end
 
 Given /^the plugin "(.*)" is enabled$/ do |plugin_id|

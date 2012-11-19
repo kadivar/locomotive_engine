@@ -3,6 +3,8 @@ module Locomotive
   module Plugins
     module Processor
 
+      protected
+
       attr_accessor :plugin_drops_container
 
       # An around_filter to work with plugins
@@ -30,10 +32,25 @@ module Locomotive
         end
       end
 
-      # All enabled plugin objects for this site. These are put in a liquid
-      # register
-      def plugins
-        current_site.enabled_plugin_objects_by_id.values
+      # Add all plugin data to the liquid context object
+      def add_plugin_data_to_liquid_context(context)
+        enabled_plugin_tags = Set.new.tap do |set|
+          current_site.enabled_plugin_objects_by_id.each do |plugin_id, plugin_object|
+            set.merge(plugin_object.class.prefixed_liquid_tags(plugin_id).values)
+          end
+        end
+
+        # Add registers
+        context.registers.merge!({
+          :plugins => current_site.enabled_plugin_objects_by_id.values,
+          :enabled_plugin_tags => enabled_plugin_tags
+        })
+
+        # Add drops
+        context['plugins'] = self.plugin_drops_container
+
+        # Add filters
+        context.add_filters(current_site.plugin_liquid_filters)
       end
 
     end
