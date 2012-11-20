@@ -44,13 +44,6 @@ module Locomotive
           @controller.send(:add_plugin_data_to_liquid_context, @context)
         end
 
-        it 'should add enabled plugins to a register' do
-          @context.registers[:plugins].count.should == 2
-          [MobileDetectionPlugin, UselessPlugin].each do |klass|
-            @context.registers[:plugins].collect(&:class).should include(klass)
-          end
-        end
-
         it 'should add a container for the plugin liquid drops' do
           container = @context['plugins']
           container_liquid = container.to_liquid

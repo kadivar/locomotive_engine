@@ -40,11 +40,8 @@ module Locomotive
           end
         end
 
-        # Add registers
-        context.registers.merge!({
-          :plugins => current_site.enabled_plugin_objects_by_id.values,
-          :enabled_plugin_tags => enabled_plugin_tags
-        })
+        # Add tags
+        context.registers[:enabled_plugin_tags] = enabled_plugin_tags
 
         # Add drops
         context['plugins'] = self.plugin_drops_container
