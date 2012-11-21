@@ -1,0 +1,57 @@
+@import "compass/css3/border-radius";
+@import "compass/css3/images";
+@import "compass/css3/text-shadow";
+@import "locomotive/shared/helpers";
+
+form.formtastic {
+
+  li#plugins_input {
+
+    padding-top: 17px;
+
+    li.plugin {
+      height: auto;
+      clear: both;
+
+      & > .col {
+        float: left;
+        margin-right: 20px;
+      }
+
+    }
+
+  }
+
+  .plugin ol.nested > li {
+
+    height: auto;
+    padding-bottom: 5px;
+    padding-left: 29px;
+    background: transparent;
+    border-top: 1px solid #CCC;
+    @include border-radius(0);
+    @include box-shadow(transparent 0 0 0 0);
+
+    label {
+      width: 174px;
+      padding-top: 2px;
+      line-height: 28px;
+    }
+
+    input[type=text], input[type=password] {
+      @include default-input-style;
+      width: 623px;
+    }
+
+    input[type=text], input[type=password], select {
+      margin-top: 8px;
+    }
+
+    p.inline-hints {
+      margin-top: 0px;
+      margin-left: 174px;
+    }
+
+  }
+
+}
