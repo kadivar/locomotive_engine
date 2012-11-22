@@ -45,7 +45,7 @@ PATH
     locomotive_plugins (1.0.0.beta)
       bson_ext
       haml (~> 3.1)
-      locomotive_liquid (~> 2.2.2)
+      locomotive_liquid (~> 2.4)
       mongoid (~> 2.4.12)
 
 GEM
