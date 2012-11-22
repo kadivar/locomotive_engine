@@ -65,8 +65,6 @@ def wait_for_ajax(&block)
     begin
       block.call
       break
-    rescue RSpec::Expectations::ExpectationNotMetError => e
-      raise e
     rescue
       # Try again
     end

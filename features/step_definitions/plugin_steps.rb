@@ -18,7 +18,7 @@ class PluginClass
 
   class Paragraph < ::Liquid::Block
     def render(context)
-      "<p>#{render_all(@nodelist, context).join}</p>"
+      "<p>#{render_all(@nodelist, context)}</p>"
     end
 
     def render_disabled(context)
