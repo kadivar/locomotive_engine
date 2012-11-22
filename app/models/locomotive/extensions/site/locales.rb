@@ -19,6 +19,14 @@ module Locomotive
 
         end
 
+        # Tell if the site serves other locales than the default one.
+        #
+        # @return [ Boolean ] True if the number of locales is greater than 1
+        #
+        def localized?
+          self.locales.size > 1
+        end
+
         # Returns the fullpath of a page in the context of the current locale (I18n.locale)
         # or the one passed in parameter. It also depends on the default site locale.
         #
@@ -41,7 +49,13 @@ module Locomotive
           locale = (locale || I18n.locale).to_s
           fullpath = page.fullpath_translations[locale] || page.fullpath_translations[self.default_locale]
 
-          locale == self.default_locale ? fullpath : File.join(locale, fullpath)
+          if locale == self.default_locale.to_s # no need to specify the locale
+            page.index? ? '' : fullpath
+          elsif page.index? # avoid /en/index or /fr/index, prefer /en or /fr instead
+            locale
+          else
+            File.join(locale, fullpath)
+          end
         end
 
         def locales=(array)
@@ -75,13 +89,15 @@ module Locomotive
         def verify_localized_default_pages_integrity
           if self.persisted? && self.locales_changed?
             self.pages.where(:"slug.#{self.default_locale_was}".in => %w(index 404), :depth => 0).each do |page|
-              modifications = { 'title' => {}, 'slug' => {} }
+              modifications = { 'title' => {}, 'slug' => {}, 'fullpath' => {}, 'locales' => self.locales }
 
               self.locales.each do |locale|
-                slug = page.attributes['slug'][self.default_locale_was]
+                slug  = page.attributes['slug'][self.default_locale_was]
+                title = page.attributes['title'][locale] || ::I18n.t("attributes.defaults.pages.#{slug}.title", :locale => locale)
 
-                modifications['slug'][locale]  = slug
-                modifications['title'][locale] = page.attributes['title'][locale] || ::I18n.t("attributes.defaults.pages.#{slug}.title", :locale => locale)
+                modifications['slug'][locale]     = slug
+                modifications['fullpath'][locale] = slug
+                modifications['title'][locale]    = title
               end
 
               page.collection.update({ :_id => page._id }, { '$set' => modifications })

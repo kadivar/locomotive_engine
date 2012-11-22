@@ -50,7 +50,8 @@ module Locomotive
 
     def local_path(short = false)
       if short
-        self.read_attribute(:local_path).gsub(/^#{self.content_type.to_s.pluralize}\//, '')
+        # self.read_attribute(:local_path).gsub(/^#{self.content_type.to_s.pluralize}\//, '')
+        self.read_attribute(:local_path).split('/')[1..-1].join('/')
       else
         self.read_attribute(:local_path)
       end
@@ -107,8 +108,12 @@ module Locomotive
       { :url => self.source.url }.merge(self.attributes).stringify_keys
     end
 
+    def to_presenter(options = {})
+      Locomotive::ThemeAssetPresenter.new(self, options)
+    end
+
     def as_json(options = {})
-      Locomotive::ThemeAssetPresenter.new(self, options).as_json
+      self.to_presenter(options).as_json
     end
 
     def self.all_grouped_by_folder(site)

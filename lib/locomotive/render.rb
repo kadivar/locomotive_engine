@@ -14,7 +14,9 @@ module Locomotive
       else
         @page = locomotive_page
 
-        redirect_to(@page.redirect_url, :status => 301) and return if @page.present? && @page.redirect?
+        if @page.present? && @page.redirect?
+          self.redirect_to_locomotive_page and return
+        end
 
         render_no_page_error and return if @page.nil?
 
@@ -22,6 +24,18 @@ module Locomotive
 
         self.prepare_and_set_response(output)
       end
+    end
+
+    # Redirect to the url given by the redirect_url field of the
+    # Locomotive page. If we are in the editing mode, the "_edit" prefix
+    # will be added as well.
+    #
+    def redirect_to_locomotive_page
+      redirect_url = @page.redirect_url
+
+      redirect_url = "#{redirect_url}/_edit" if self.editing_page?
+
+      redirect_to(redirect_url, :status => @page.redirect_type)
     end
 
     # Render the page which tells that no page exists.
@@ -110,7 +124,7 @@ module Locomotive
 
       assigns.merge!(flash.to_hash.stringify_keys) # data from public submissions
 
-      if @page.templatized? # add instance from content type
+      if defined?(@page) && @page.templatized? # add instance from content type
         content_entry = @page.content_entry.to_liquid
         ['content_entry', 'entry', @page.target_entry_name].each do |key|
           assigns[key] = content_entry

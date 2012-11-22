@@ -14,12 +14,14 @@ fr:
       en: Anglais
       de: Allemand
       fr: Français
+      pl: Polonais
       pt-BR: "Portugais"
       it: "Italien"
       nl: "Hollandais"
       nb: "Norvégien"
       es: Espagnol
       ru: Russe
+      et: Estonien
 
     buttons:
       login: Se connecter
@@ -46,6 +48,7 @@ fr:
         settings: Paramètres
         pages: Pages
         snippets: Snippets
+        translations: Traductions
         account: Mon compte
         site: Site
         theme_assets: Fichiers Thème
@@ -62,8 +65,8 @@ fr:
 
     notifications:
       new_content_entry:
-        subject: "[%{type}] nouveau"
-        title: "Bonjour %{name}, nous voulions vous faire savoir qu'une nouvelle instance a été créée le %{date}"
+        subject: "%{domain}[%{type}] nouveau"
+        title: "Bonjour %{name}, nous voulions vous faire savoir qu'une nouvelle instance a été créée le %{date} pour le site <b>%{domain}</b>"
         type: "Modèle: %{type}"
 
     sites_picker:
@@ -105,7 +108,7 @@ fr:
       edit:
         title: Changer mon mot de passe
         link: "&rarr; Retour page de connexion"
-        password: "Votre email"
+        password: "Entrez un nouveau mot de passe"
         password_confirmation: "Confirmation nouveau mot de passe"
 
     pages:
@@ -136,6 +139,9 @@ fr:
           day: 1 jour
           week: 1 semaine
           month: 1 mois
+        redirect_type:
+          permanent: "Permanent (301)"
+          temporary: "Temporaire (302)"
 
     snippets:
       index:
@@ -152,6 +158,18 @@ fr:
         help: "Utilisez votre snippet dans le template d'une page avec le code Liquid suivant : <span class='code'>{% include '%{slug}' %}</span>."
       snippet:
         updated_at: Mis à jour le
+
+    translations:
+      untranslated: "Non traduit pour les langues: %{list}"
+      index:
+        title: Traductions
+        new: nouvelle traduction
+      new:
+        title: "Nouvelle traduction"
+        help: "Les pages/snippets peuvent avoir le même template dans toutes les langues. Seuls diffèrent de courts bouts de texte peuvent être traduits d'une langue à une autre grâce au tag liquid <b>translate</b>."
+      edit:
+        title: "Edition %{key}"
+        help: "Vous pouvez utiliser cette clé de traduction en utilisant le code liquid suivant: <span class='code'>{{ '%{key}' | translate }}</span>."
 
     sites:
       new:

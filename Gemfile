@@ -12,6 +12,7 @@ group :development do
   # gem 'custom_fields', :git => 'git://github.com/locomotivecms/custom_fields.git', :branch => '2.0.0.rc' # Branch on Github
 
   # gem 'locomotive-aloha-rails', :path => '../gems/aloha-rails' # for Developers
+  # gem 'locomotive-tinymce-rails', '~> 3.4.7.4', :path => '../gems/tinymce-rails' # for Developers
   # gem 'locomotive_liquid', :path => '../gems/liquid' # for Developers
 
   gem 'locomotive_plugins', :path => '../locomotive_plugins' # For Developers
@@ -20,6 +21,7 @@ group :development do
   gem 'rspec-cells'
 
   gem 'unicorn' # Using unicorn_rails instead of webrick (default server)
+
 end
 
 group :assets do
@@ -38,7 +40,7 @@ group :test do
   # gem 'growl-glue'
 
   gem 'cucumber-rails',     :require => false
-  gem 'poltergeist',        '~> 0.7.0'
+  gem 'poltergeist',        '~> 1.0.2'
   gem 'rspec-rails',        '~> 2.8.0'
   gem 'shoulda-matchers'
 
@@ -46,7 +48,7 @@ group :test do
   gem 'pickle'
   gem 'mocha',              '0.9.12' # :git => 'git://github.com/floehopper/mocha.git'
 
-  gem 'capybara'
+  gem 'capybara',           '~> 1.1'
 
   gem 'xpath',              '~> 0.1.4'
 

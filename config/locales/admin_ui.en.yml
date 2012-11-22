@@ -13,12 +13,14 @@ en:
       en: English
       de: German
       fr: French
+      pl: Polish
       pt-BR: "Brazilian Portuguese"
       it: Italian
       nl: Dutch
       nb: Norwegian
       es: Spanish
       ru: Russian
+      et: Estonian
 
     messages:
       confirm: Are you sure ?
@@ -40,6 +42,7 @@ en:
         account: My account
         site: Site
         theme_assets: Theme files
+        translations: Translations
       form:
         change_file: change
         delete_file: delete
@@ -67,8 +70,8 @@ en:
 
     notifications:
       new_content_entry:
-        subject: "[%{type}] new"
-        title: "Hi %{name}, just to let you know that a new instance has been created on %{date}"
+        subject: "[%{domain}][%{type}] new entry"
+        title: "Hi %{name}, just to let you know that a new instance has been created on %{date} for the site <b>%{domain}</b>"
         type: "Model: %{type}"
 
     sites_picker:
@@ -141,6 +144,9 @@ en:
           day: 1 day
           week: 1 week
           month: 1 month
+        redirect_type:
+          permanent: "Permanent (301)"
+          temporary: "Temporary (302)"
 
     snippets:
       index:
@@ -224,6 +230,18 @@ en:
         no_items: "There are no images for now."
         upload: "Upload theme images"
 
+    translations:
+      untranslated: "Untranslated locales: %{list}"
+      index:
+        title: Translations
+        new: new translation
+      new:
+        title: "New translation"
+        help: "Pages/snippets can share the same template for all the locales except for some labels which can be handled by the <b>translate</b> liquid tag."
+      edit:
+        title: "Editing %{key}"
+        help: "You can use that translation key with the following liquid code : <span class='code'>{{ '%{key}' | translate }}</span>."
+
     content_assets:
       picker:
         title: "Insert media"
@@ -272,8 +290,9 @@ en:
         has_many:
           new_entry: New entry
 
-    image_picker:
-      link: Insert an image into the code
+    code_editing:
+      image_picker: Insert an image into the code
+      copy_template: Copy template from main locale
 
     cross_domain_sessions:
       new:

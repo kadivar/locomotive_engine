@@ -14,12 +14,14 @@ de:
       en: Englisch
       de: Deutsch
       fr: Französisch
+      pl: Polnisch
       pt-BR: "Bras. Portugiesisch"
       it: Italienisch
       nl: Niederländisch
       nb: Norwegisch
       es: Spanisch
       ru: Russisch
+      et: Estnisch
 
     buttons:
       login: Einloggen
@@ -67,7 +69,7 @@ de:
 
     notifications:
       new_content_entry:
-        subject: "[%{type}] neu"
+        subject: "[%{domain}][%{type}] neu"
         title: "Hi %{name}, nur damit Sie Bescheid wissen, am %{date} wurde eine neue Instanz erstellt."
         type: "Model: %{type}"
 

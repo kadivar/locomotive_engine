@@ -2,14 +2,20 @@ module Locomotive
   module PagesHelper
 
     def css_for_page(page)
-      %w(index not_found templatized redirect).inject([]) do |memo, state|
+      %w(index not_found templatized redirect unpublished).inject([]) do |memo, state|
         memo << state.dasherize if page.send(:"#{state}?")
         memo
       end.join(' ')
     end
 
     def page_toggler(page)
-      image_tag("locomotive/list/icons/node_#{(cookies["folder-#{page._id}"] != 'none') ? 'open' : 'closed'}.png", :class => 'toggler')
+      icon_class = cookies["folder-#{page._id}"] != 'none' ? 'icon-caret-down' : 'icon-caret-right'
+      content_tag :i, '',
+        :class  => "#{icon_class} toggler",
+        :data   => {
+          :open   => 'icon-caret-down',
+          :closed => 'icon-caret-right'
+        }
     end
 
     def parent_pages_options
@@ -59,8 +65,30 @@ module Locomotive
       ]
     end
 
+    def options_for_page_redirect_type
+      [
+        [t('.redirect_type.permanent'), 301],
+        [t('.redirect_type.temporary'), 302]
+      ]
+    end
+
     def page_response_type_to_string(page)
       options_for_page_response_type.detect { |t| t.last == page.response_type }.try(:first) || '&mdash;'
+    end
+
+    # Give the path to the template of the page for the main locale ONLY IF
+    # the user does not already edit the page in the main locale.
+    #
+    # @param [ Object ] page The page
+    #
+    # @return [ String ] The path or nil if the main locale is enabled
+    #
+    def page_main_template_path(page)
+      if not_the_default_current_locale?
+        page_path(page, :content_locale => current_site.default_locale, :format => :json)
+      else
+        nil
+      end
     end
 
   end

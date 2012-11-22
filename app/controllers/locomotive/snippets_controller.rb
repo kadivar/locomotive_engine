@@ -7,15 +7,22 @@ module Locomotive
 
     before_filter :back_to_default_site_locale, :only => %w(new create)
 
-    respond_to :json, :only => [:create, :update, :destroy]
+    respond_to    :json, :only => [:show, :create, :update, :destroy]
 
     def new
       @snippet = current_site.snippets.new
       respond_with @snippet
     end
 
+    def show
+      @snippet = current_site.snippets.find(params[:id])
+      respond_with @snippet
+    end
+
     def create
-      @snippet = current_site.snippets.create(params[:snippet])
+      @snippet = current_site.snippets.new
+      @snippet_presenter = @snippet.to_presenter
+      @snippet_presenter.update_attributes(params[:snippet])
       respond_with @snippet, :location => edit_snippet_url(@snippet._id)
     end
 

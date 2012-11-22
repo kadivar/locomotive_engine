@@ -46,7 +46,7 @@ pt-BR:
 
     notifications:
       new_content_entry:
-        subject: " Novo [%{type}] "
+        subject: "[%{domain}] Novo [%{type}] "
         title: "Olá %{name}, apenas informando que uma nova instância foi criada em %{date}"
         type: "Modelo: %{type}"
 
@@ -149,12 +149,14 @@ pt-BR:
         en: Inglês
         de: Alemão
         fr: Francês
+        pl: Polonês
         pt-BR: "Português do Brasil"
         it: Italiano
         nl: Holandês
         nb: Norueguês
         es: Espanhol
         ru: Russo
+        et: Estoniano
         ask_for_name: "Por favor preencha o novo nome"
 
     theme_assets:

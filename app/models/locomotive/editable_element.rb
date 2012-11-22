@@ -31,6 +31,10 @@ module Locomotive
       !!self.disabled # the original method does not work quite well with the localization
     end
 
+    def disabled_in_all_translations?
+      self.disabled_translations.all? { |_, v| v == true }
+    end
+
     # Determines if the current element can be edited in the back-office
     #
     def editable?
@@ -66,6 +70,13 @@ module Locomotive
       self.from_parent  = true
     end
 
+    # Set the default content from an existing editable element coming
+    # from the parent page. Each editable element may or not
+    # override this method. The source element is an existing record.
+    def set_default_content_from(el)
+      self.add_current_locale
+    end
+
     # Make sure the current locale is added to the list
     # of locales for the current element so that we know
     # in which languages the element was translated.
@@ -73,6 +84,10 @@ module Locomotive
     def add_current_locale
       locale = ::Mongoid::Fields::I18n.locale.to_s
       self.locales << locale unless self.locales.include?(locale)
+    end
+
+    def as_json
+      self.to_presenter.as_json
     end
 
     # Set the content of the editable element with a default value
@@ -93,7 +108,7 @@ module Locomotive
         "template_dependencies.#{locale}" => { '$in' => [self.page._id] },
         'editable_elements.fixed'         => true,
         'editable_elements.block'         => self.block,
-        'editable_elements.slug'          => self.slug
+        'editable_elements.slug'          => self.slug,
       }
     end
 

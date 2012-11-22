@@ -13,12 +13,14 @@ nb:
       en: Engelsk
       de: Tysk
       fr: Fransk
+      pl: Polsk
       pt-BR: "Brazilian Portuguese"
       it: Italiensk
       nl: Nederlandsk
       nb: Norsk
       es: Spansk
       ru: Russisk
+      et: Estisk
 
     messages:
       confirm: Er du sikker?
@@ -67,7 +69,7 @@ nb:
 
     notifications:
       new_content_entry:
-        subject: "[%{type}] ny"
+        subject: "[%{domain}][%{type}] ny"
         title: "Hei %{name}, varsler om at en ny instanse ble opprettet %{date}"
         type: "Modell: %{type}"
 

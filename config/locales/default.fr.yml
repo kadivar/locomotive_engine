@@ -95,6 +95,8 @@ fr:
         body: Code
         slug: Raccourci
         name: Nom
+      locomotive/translation:
+        key: Clé de traduction
       locomotive/theme_asset:
         content_type: Type du fichier
       locomotive/site:
@@ -113,9 +115,12 @@ fr:
         localized: Localisé ?
         select_options: Options
 
-  pagination:
-    previous: "&laquo; Précédent"
-    next: "Suivant &raquo;"
+  date_picker:
+    close_text: Fermer
+    prev_text: '&#x3c;Préc'
+    next_text: 'Suiv&#x3e;'
+    current_text: 'Courant'
+
   date:
     formats:
       default: "%d/%m/%Y"

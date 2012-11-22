@@ -9,8 +9,8 @@ Locomotive::Engine.routes.draw do
     :controllers  => { :sessions => 'locomotive/sessions', :passwords => 'locomotive/passwords' }
 
   devise_scope :locomotive_account do
-      match '/'         => 'sessions#new'
-      delete 'signout'  => 'sessions#destroy', :as => :destroy_locomotive_session
+    match '/'         => 'sessions#new'
+    delete 'signout'  => 'sessions#destroy', :as => :destroy_locomotive_session
   end
 
   root :to => 'pages#index'
@@ -35,6 +35,8 @@ Locomotive::Engine.routes.draw do
   resources :theme_assets do
     get :all, :action => 'index', :on => :collection, :defaults => { :all => true }
   end
+  
+  resources :translations
 
   resources :content_assets
 
@@ -59,6 +61,8 @@ Rails.application.routes.draw do
       resources :tokens, :only => [:create, :destroy]
 
       resources :theme_assets
+      
+      resources :translations
 
       resources :content_assets
 
@@ -74,7 +78,11 @@ Rails.application.routes.draw do
 
       resources :memberships
 
+      resources :accounts
+
       resource  :current_site, :controller => 'current_site'
+
+      resource  :my_account, :controller => 'my_account'
 
     end
   end
