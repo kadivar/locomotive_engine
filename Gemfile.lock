@@ -25,7 +25,7 @@ PATH
       locomotive-mongoid-tree (~> 0.6.2)
       locomotive-tinymce-rails (~> 3.4.7.2)
       locomotive_liquid (~> 2.2.3)
-      locomotive_plugins (~> 0.2.2.alpha)
+      locomotive_plugins (~> 1.0.0.beta)
       mimetype-fu (~> 0.1.2)
       mongo (~> 1.5.2)
       mongoid (~> 2.4.12)
@@ -42,7 +42,7 @@ PATH
 PATH
   remote: ../locomotive_plugins
   specs:
-    locomotive_plugins (0.2.2.alpha)
+    locomotive_plugins (1.0.0.beta)
       bson_ext
       haml (~> 3.1)
       locomotive_liquid (~> 2.2.2)
@@ -208,7 +208,7 @@ GEM
       actionpack (~> 3.2.1)
     locomotive-mongoid-tree (0.6.2)
       mongoid (~> 2.0)
-    locomotive-tinymce-rails (3.4.7.3)
+    locomotive-tinymce-rails (3.4.7.4)
       actionpack (~> 3.2)
     locomotive_liquid (2.2.3)
     mail (2.4.4)
