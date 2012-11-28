@@ -9,6 +9,14 @@ Feature: Add, view, and configure plugins
     And I have a designer and an author
     And I have registered the plugin "my_plugin"
 
+  Scenario: Plugin UI only appears when plugins are registered
+    Given I am an authenticated "admin"
+    When I go to site settings
+    Then I should see "Plugins"
+    When I clear all registered plugins
+    And I go to site settings
+    Then I should not see "Plugins"
+
   Scenario: Adding a plugin to a site
     Given I am an authenticated "admin"
     When I go to site settings
