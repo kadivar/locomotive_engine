@@ -129,4 +129,22 @@ describe Locomotive::Ability do
 
   end
 
+  context 'plugins' do
+
+    subject { Locomotive::PluginData }
+
+    it 'should allow only admins to enable plugins' do
+      should     allow_permission_from :enable, @admin
+      should_not allow_permission_from :enable, @designer
+      should_not allow_permission_from :enable, @author
+    end
+
+    it 'should allow only designers and admins to configure plugins' do
+      should     allow_permission_from :configure, @admin
+      should     allow_permission_from :configure, @designer
+      should_not allow_permission_from :configure, @author
+    end
+
+  end
+
 end

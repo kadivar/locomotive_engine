@@ -36,6 +36,21 @@ module Locomotive
       unless can?(:manage, Locomotive::Membership)
         params[:site].delete(:memberships_attributes) if params[:site]
       end
+
+      filter_plugin_params
+    end
+
+    def filter_plugin_params
+      unless can?(:enable, Locomotive::PluginData)
+        params[:site][:plugins].each do |index, plugin_hash|
+          plugin_hash.delete(:plugin_enabled)
+        end
+      end
+      unless can?(:configure, Locomotive::PluginData)
+        params[:site][:plugins].each do |index, plugin_hash|
+          plugin_hash.delete(:plugin_config)
+        end
+      end
     end
 
     def new_host_if_subdomain_changed

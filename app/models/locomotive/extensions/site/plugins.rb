@@ -42,8 +42,13 @@ module Locomotive
                 plugin_hash[:plugin_enabled] = false
               end
 
-              data_obj.config = plugin_hash[:plugin_config]
-              data_obj.enabled = !!plugin_hash[:plugin_enabled]
+              if plugin_hash.has_key?(:plugin_enabled)
+                data_obj.enabled = !!plugin_hash[:plugin_enabled]
+              end
+
+              if plugin_hash.has_key?(:plugin_config)
+                data_obj.config = plugin_hash[:plugin_config]
+              end
             end
 
             clear_cached_plugin_data!

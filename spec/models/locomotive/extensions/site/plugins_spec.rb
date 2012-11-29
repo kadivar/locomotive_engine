@@ -76,11 +76,18 @@ describe Locomotive::Extensions::Site::Plugins do
     it 'leaves plugins as they were if there is no change' do
       old_plugins = site.plugins
       plugins_array = site.plugins.clone
-      site_plugins = plugins_array
+
+      plugins_indexed_hash = {}.tap do |h|
+        plugins_array.each_with_index do |plugin_hash, index|
+          h[index.to_s] = plugin_hash
+        end
+      end
+
+      site.plugins = plugins_indexed_hash
       site.plugins.should == old_plugins
     end
 
-    it 'sets config parameters on enabled plugins' do
+    it 'sets config parameters on plugins' do
       site.plugins = {
         '0' => {
           :plugin_id => 'mobile_detection',
@@ -89,11 +96,30 @@ describe Locomotive::Extensions::Site::Plugins do
         },
         '1' => {
           :plugin_id => 'language_detection',
-          :plugin_enabled => 'false'
+          :plugin_enabled => 'false',
+          :plugin_config => { 'key2' => 'value2' }
         }
       }
 
       site.plugins.first[:plugin_config].should == { 'key' => 'value' }
+      site.plugins.last[:plugin_config].should == { 'key2' => 'value2' }
+    end
+
+    it 'should ignore attributes which are not in the params' do
+      site.plugins = {
+        '0' => {
+          :plugin_id => 'mobile_detection',
+        },
+        '1' => {
+          :plugin_id => 'language_detection',
+        }
+      }
+
+      site.plugins.first[:plugin_enabled].should be_true
+      site.plugins.first[:plugin_config].should == { :key => 'value' }
+
+      site.plugins.last[:plugin_enabled].should be_false
+      site.plugins.last[:plugin_config].should == {}
     end
 
   end

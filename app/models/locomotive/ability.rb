@@ -76,6 +76,8 @@ module Locomotive
         @membership.account_id == membership.account_id || # can not edit myself
         membership.admin? # can not modify an administrator
       end
+
+      can :configure, PluginData
     end
 
     def setup_admin_permissions!
