@@ -7,6 +7,7 @@ describe 'Plugin Authorization' do
     create_accounts!
     create_memberships!
 
+    stub_i18n_fallbacks
     set_current_site
     register_and_enable_plugins
   end
@@ -84,6 +85,11 @@ describe 'Plugin Authorization' do
 
   def controller_class
     Locomotive::CurrentSiteController
+  end
+
+  def stub_i18n_fallbacks
+    # For some reason this method is making other specs fail. Stub it out
+    controller_class.any_instance.stubs(:setup_i18n_fallbacks).returns(true)
   end
 
   def set_current_site
