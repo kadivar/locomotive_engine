@@ -6,7 +6,7 @@
 
 - content_for :backbone_view_data do
   :plain
-    site:   #{j @site.to_json(:current_account => current_locomotive_account, :current_site => current_site).html_safe},
+    site:   #{j @site.to_json(:current_account => current_locomotive_account, :current_site => current_site, :ability => current_ability).html_safe},
     errors: #{@site.errors.to_json}
 
 = f.inputs :name => :information  do
@@ -28,7 +28,7 @@
   = f.input :meta_description
 
 = f.inputs :name => :plugins, :class => "inputs foldable folded" do
-  = f.input :enabled_plugins, :as => '::Locomotive::Empty', :label => false, :wrapper_html => { :id => 'plugins_input' }
+  = f.input :plugins, :as => '::Locomotive::Empty', :label => false, :wrapper_html => { :id => 'plugins_input' }
 
 - if can?(:index, Locomotive::Membership)
 

@@ -59,21 +59,11 @@ Then /^the "(.*?)" dropdown should contain "(.*?)"$/ do |name, text|
   page.should have_xpath(xpath)
 end
 
-Then /^the ([^ ]+) field "([^"]+)" should( not)? be readonly$/ do |type, name, negate|
-  field = find("input[type=#{type}][name=#{name}]")
-  if negate
-    field['readonly'].should be_nil
-  else
-    field['readonly'].should_not be_nil
-  end
-end
-
 Then /^I should( not)? see the element "([^"]+)"$/ do |negate, selector|
-  field = find(selector)
   if negate
-    field.should be_nil
+    page.should_not have_selector(selector)
   else
-    field.should_not be_nil
+    page.should have_selector(selector)
   end
 end
 

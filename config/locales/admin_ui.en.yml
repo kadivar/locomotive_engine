@@ -167,7 +167,7 @@ en:
       new:
         title: New site
         help: "Fill in the form below to create your new site."
-      enabled_plugins:
+      plugins:
         empty: "No plugins available"
       domains:
         empty: "There are no domains tied this site yet. Simply add your domains just below. <b>Do not forget to upgrade your DNS.</b>"

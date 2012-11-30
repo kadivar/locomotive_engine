@@ -21,7 +21,7 @@ describe 'Plugin Authorization' do
     },
     designer: {
       enable: false,
-      configure: true
+      configure: :only_enabled
     },
     author: {
       enable: false,
@@ -44,17 +44,27 @@ describe 'Plugin Authorization' do
     end
 
     # Configuring plugins
-    can_configure = rules[:configure]
-    it "should#{can_configure ? '' : ' not'} allow #{role}s to configure plugins" do
+    can_configure = !!rules[:configure]
+    only_enabled = rules[:configure] == :only_enabled
+    it "should#{can_configure ? '' : ' not'} allow #{role}s to configure#{only_enabled ? ' enabled' : ''} plugins" do
       set_current_account_from_string(role)
 
       config = do_configure_plugins
       expected_first_config = { 'first_plugin_key' => 'first_plugin_value' }
       expected_second_config = { 'second_plugin_key' => 'second_plugin_value' }
 
-      should_or_should_not = can_configure ? :should : :should_not
-      config['first_plugin'].send(should_or_should_not) == expected_first_config
-      config['second_plugin'].send(should_or_should_not) == expected_second_config
+      # Check to see if we've configured what we're allowed to configure
+      if can_configure
+        config['first_plugin'].should == expected_first_config
+        if only_enabled
+          config['second_plugin'].should_not == expected_second_config
+        else
+          config['second_plugin'].should == expected_second_config
+        end
+      else
+        config['first_plugin'].should_not == expected_first_config
+        config['second_plugin'].should_not == expected_second_config
+      end
     end
 
   end
