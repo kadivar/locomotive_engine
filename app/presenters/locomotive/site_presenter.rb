@@ -27,12 +27,8 @@ module Locomotive
     end
 
     def as_json(options = nil)
-      if self.ability?
-        plugins = self.source.plugins do |plugin_data|
-          self.ability.can?(:read, plugin_data)
-        end
-      else
-        plugins = self.source.plugins
+      plugins = self.source.plugins do |plugin_data|
+        self.ability.try(:can?, :read, plugin_data)
       end
 
       super.merge({

@@ -22,8 +22,8 @@ module Locomotive
                 data_obj = fetch_or_build_plugin_data(plugin_id)
 
                 # If a block is given, only include the hash if the block
-                # returns true
-                if block_given? && yield(data_obj)
+                # returns true. Otherwise include them all
+                if !block_given? || yield(data_obj)
                   arr << {
                     :plugin_id => plugin_id,
                     :plugin_name => data_obj.name,
