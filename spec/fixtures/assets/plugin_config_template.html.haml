@@ -6,3 +6,6 @@
   {{#each content_types}}
   %option{ :value => '{{ this.slug }}' } {{ this.name }}
   {{/each}}
+
+%label{ :name => 'my_boolean_field' } My Boolean Field
+%input{ :type => 'checkbox', :name => 'my_boolean_field' }
