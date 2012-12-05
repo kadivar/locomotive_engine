@@ -105,6 +105,26 @@ describe Locomotive::Extensions::Site::Plugins do
       site.plugins.last[:plugin_config].should == { 'key2' => 'value2' }
     end
 
+    it 'should store boolean fields properly' do
+      site.plugins = {
+        '0' => {
+          :plugin_id => 'mobile_detection',
+          :plugin_enabled => 'true',
+          :plugin_config => { 'boolean_key' => 'true' },
+          :plugin_config_boolean_fields => [ 'boolean_key' ]
+        },
+        '1' => {
+          :plugin_id => 'language_detection',
+          :plugin_enabled => 'false',
+          :plugin_config => { 'boolean_key2' => 'false' },
+          :plugin_config_boolean_fields => [ 'boolean_key2' ]
+        }
+      }
+
+      site.plugins.first[:plugin_config].should == { 'boolean_key' => true }
+      site.plugins.last[:plugin_config].should == { 'boolean_key2' => false }
+    end
+
     it 'should ignore attributes which are not in the params' do
       site.plugins = {
         '0' => {

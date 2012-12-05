@@ -55,6 +55,13 @@ module Locomotive
               end
 
               if plugin_hash.has_key?(:plugin_config)
+                config = plugin_hash[:plugin_config]
+                plugin_hash[:plugin_config_boolean_fields].try(:each) do |boolean_field|
+                  if config.has_key?(boolean_field)
+                    val = config[boolean_field]
+                    config[boolean_field] = val == 'false' ? false : !!val
+                  end
+                end
                 data_obj.config = plugin_hash[:plugin_config]
               end
             end
