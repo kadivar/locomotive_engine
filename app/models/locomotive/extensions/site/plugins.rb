@@ -13,17 +13,25 @@ module Locomotive
 
           ## Getter and setter virtual attributes ##
 
+          # Takes an optional block which will be called for each plugin to
+          # determine whether it should be included. This is needed because
+          # some users can only view some plugins
           def plugins
-            LocomotivePlugins.registered_plugins.keys.collect do |plugin_id|
-              data_obj = fetch_or_build_plugin_data(plugin_id)
+            [].tap do |arr|
+              LocomotivePlugins.registered_plugins.keys.collect do |plugin_id|
+                data_obj = fetch_or_build_plugin_data(plugin_id)
 
-              # Return hash
-              {
-                :plugin_id => plugin_id,
-                :plugin_name => data_obj.name,
-                :plugin_enabled => data_obj.enabled,
-                :plugin_config => data_obj.config
-              }
+                # If a block is given, only include the hash if the block
+                # returns true. Otherwise include them all
+                if !block_given? || yield(data_obj)
+                  arr << {
+                    :plugin_id => plugin_id,
+                    :plugin_name => data_obj.name,
+                    :plugin_enabled => data_obj.enabled,
+                    :plugin_config => data_obj.config
+                  }
+                end
+              end
             end
           end
 
@@ -42,8 +50,20 @@ module Locomotive
                 plugin_hash[:plugin_enabled] = false
               end
 
-              data_obj.config = plugin_hash[:plugin_config]
-              data_obj.enabled = !!plugin_hash[:plugin_enabled]
+              if plugin_hash.has_key?(:plugin_enabled)
+                data_obj.enabled = !!plugin_hash[:plugin_enabled]
+              end
+
+              if plugin_hash.has_key?(:plugin_config)
+                config = plugin_hash[:plugin_config]
+                plugin_hash[:plugin_config_boolean_fields].try(:each) do |boolean_field|
+                  if config.has_key?(boolean_field)
+                    val = config[boolean_field]
+                    config[boolean_field] = val == 'false' ? false : !!val
+                  end
+                end
+                data_obj.config = plugin_hash[:plugin_config]
+              end
             end
 
             clear_cached_plugin_data!

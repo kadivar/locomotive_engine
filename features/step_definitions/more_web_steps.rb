@@ -59,6 +59,14 @@ Then /^the "(.*?)" dropdown should contain "(.*?)"$/ do |name, text|
   page.should have_xpath(xpath)
 end
 
+Then /^I should( not)? see the element "([^"]+)"$/ do |negate, selector|
+  if negate
+    page.should_not have_selector(selector)
+  else
+    page.should have_selector(selector)
+  end
+end
+
 def wait_for_ajax(&block)
   start_time = Time.now
   while Time.now < start_time + Capybara.default_wait_time

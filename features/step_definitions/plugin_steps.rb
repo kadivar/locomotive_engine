@@ -94,6 +94,10 @@ Given /^the plugin "(.*)" is disabled$/ do |plugin_id|
   end
 end
 
+When /^I clear all registered plugins$/ do
+  LocomotivePlugins.clear_registered_plugins
+end
+
 Then /^the plugin "(.*)" should be enabled$/ do |plugin_id|
   enabled_plugin_ids = @site.reload.plugin_data.select do |plugin_data|
     plugin_data.enabled

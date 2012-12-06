@@ -1,21 +1,4 @@
 PATH
-  remote: ../custom_fields
-  specs:
-    custom_fields (2.0.0.rc12)
-      activesupport (~> 3.2.1)
-      carrierwave-mongoid (~> 0.2.1)
-      mongoid (~> 2.4.9)
-
-PATH
-  remote: ../locomotive_plugins
-  specs:
-    locomotive_plugins (1.0.0.beta2)
-      bson_ext
-      haml (~> 3.1)
-      locomotive_liquid (~> 2.4)
-      mongoid (~> 2.4.12)
-
-PATH
   remote: .
   specs:
     locomotive_cms (2.0.0.rc12)
@@ -54,6 +37,23 @@ PATH
       rmagick (~> 2.12.2)
       sanitize (~> 2.0.3)
       unidecoder (~> 1.1.1)
+
+PATH
+  remote: ../custom_fields
+  specs:
+    custom_fields (2.0.0.rc12)
+      activesupport (~> 3.2.1)
+      carrierwave-mongoid (~> 0.2.1)
+      mongoid (~> 2.4.9)
+
+PATH
+  remote: ../locomotive_plugins
+  specs:
+    locomotive_plugins (1.0.0.beta2)
+      bson_ext
+      haml (~> 3.1)
+      locomotive_liquid (~> 2.4)
+      mongoid (~> 2.4.12)
 
 GEM
   remote: http://rubygems.org/

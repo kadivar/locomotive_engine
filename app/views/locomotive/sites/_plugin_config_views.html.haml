@@ -3,8 +3,9 @@
   :plain
     Locomotive.content_types = #{current_site.content_types.to_json}
 
-- @plugins.each do |plugin_id, plugin|
-  - str = plugin.config_template_string
-  - if str
-    %script{ :type => 'text/html', :id => "#{plugin_id}_config_view" }
-      != str
+- @plugin_objects_by_id.each do |plugin_id, plugin|
+  - if can?(:configure, @plugin_data_by_id[plugin_id])
+    - str = plugin.config_template_string
+    - if str
+      %script{ :type => 'text/html', :id => "#{plugin_id}_config_view" }
+        != str

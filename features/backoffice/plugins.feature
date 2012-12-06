@@ -24,12 +24,19 @@ Feature: Add, view, and configure plugins
     And I unfold all folded inputs
     And I follow "toggle" within "#plugin_list"
     And I fill in "my_plugin_config" with "A Value"
+    And I check "my_boolean_field"
     And I press "Save"
     Then after the AJAX finishes, the plugin config for "my_plugin" should be:
         | my_plugin_config  | A Value   |
+        | my_boolean_field  | true      |
+    When I go to site settings
+    And I unfold all folded inputs
+    And I follow "toggle" within "#plugin_list"
+    Then I should see "A Value"
+    And the "my_boolean_field" checkbox should be checked
 
   Scenario: Configuring disabled plugins
-    Given I am an authenticated "designer"
+    Given I am an authenticated "admin"
     When I go to site settings
     And I unfold all folded inputs
     And I follow "toggle" within "#plugin_list"

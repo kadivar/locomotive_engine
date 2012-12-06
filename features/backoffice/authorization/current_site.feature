@@ -5,6 +5,9 @@ Feature: Site Settings
 
 Background:
   Given I have the site: "test site" set up
+  And I have registered the plugin "first_plugin"
+  And I have registered the plugin "second_plugin"
+  And the plugin "first_plugin" is enabled
   And I have a designer and an author
 
   Scenario: As an unauthenticated user
@@ -25,6 +28,7 @@ Background:
     And I should not see delete on myself
     And I should see delete on the "designer"
     And I should see delete on the "author"
+    And I should see "Plugins"
 
   @javascript
   Scenario: Accessing site settings as a Designer
@@ -39,6 +43,7 @@ Background:
     And I should not see delete on the "admin"
     And I should not see delete on myself
     And I should see delete on the "author"
+    And I should see "Plugins"
 
   @javascript
   Scenario: Accessing site settings as an Author
@@ -51,3 +56,4 @@ Background:
     # Paranoid Checks
     And I should not see any role dropdowns
     And I should not see any delete buttons
+    And I should see "Plugins"

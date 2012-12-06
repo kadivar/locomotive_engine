@@ -55,6 +55,16 @@ FactoryGirl.define do
       email 'admin@locomotiveapp.org'
     end
 
+    factory 'designer user' do
+      name 'Designer'
+      email 'designer@locomotiveapp.org'
+    end
+
+    factory 'author user' do
+      name 'Author'
+      email 'author@locomotiveapp.org'
+    end
+
     factory 'frenchy user' do
       name 'Jean Claude'
       email 'jean@frenchy.fr'
