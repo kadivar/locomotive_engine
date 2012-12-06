@@ -8,7 +8,8 @@ class PluginClass
 
   class Drop < ::Liquid::Drop
     def greeting
-      @context.registers[:plugin_object].greeting
+      #@context.registers[:plugin_object].greeting
+      'TODO'
     end
   end
 
@@ -25,8 +26,9 @@ class PluginClass
 
   class Paragraph < ::Liquid::Block
     def render(context)
-      obj = @context.register[:plugin_object]
-      obj.surround_with_paragraph(render_all(@nodelist, context))
+      #obj = @context.register[:plugin_object]
+      #obj.surround_with_paragraph(render_all(@nodelist, context))
+      'TODO'
     end
 
     def render_disabled(context)
