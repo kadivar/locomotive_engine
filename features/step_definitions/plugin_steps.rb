@@ -2,23 +2,31 @@
 class PluginClass
   include Locomotive::Plugin
 
+  attr_accessor :greeting
+  def http_prefix ; 'http://' ; end
+  def surround_with_paragraph(str) ; "<p>#{str}</p>" ; end
+
   class Drop < ::Liquid::Drop
-    attr_accessor :greeting
+    def greeting
+      @context.registers[:plugin_object].greeting
+    end
   end
 
   module Filters
     def add_http_prefix(input)
-      if input.start_with?('http://')
+      prefix = @context.registers[:plugin_object].http_prefix
+      if input.start_with?(prefix)
         input
       else
-        "http://#{input}"
+        "#{prefix}#{input}"
       end
     end
   end
 
   class Paragraph < ::Liquid::Block
     def render(context)
-      "<p>#{render_all(@nodelist, context)}</p>"
+      obj = @context.register[:plugin_object]
+      obj.surround_with_paragraph(render_all(@nodelist, context))
     end
 
     def render_disabled(context)
@@ -57,7 +65,7 @@ class PluginClass
   end
 
   def set_greeting
-    self.drop.greeting = 'Hello, World!'
+    self.greeting = 'Hello, World!'
   end
 
 end
