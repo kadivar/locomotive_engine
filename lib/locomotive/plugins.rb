@@ -1,4 +1,4 @@
 
-%w{processor drop_container liquid_tag_loader}.each do |f|
-  require File.join(File.dirname(__FILE__), 'plugins', f)
+Dir.glob(File.join(File.dirname(__FILE__), 'plugins', '**', '*.rb')) do |f|
+  require f
 end
