@@ -70,6 +70,22 @@ module Locomotive
           end.to raise_error
         end
 
+        it 'should add the plugin object to the context when invoking drops' do
+          obj = ::Liquid::Drop.new
+          obj.extend(Locomotive::Plugins::DropExtension)
+          class << obj
+            attr_accessor :context
+          end
+          obj.context = @context
+          obj.set_plugin_id('mobile_detection_plugin')
+
+          helper = Locomotive::Plugins::LiquidContextHelpers
+          helper.expects(:add_plugin_object_to_context).with(
+            'mobile_detection_plugin', @context)
+
+          obj.send(:invoke_drop, 'method')
+        end
+
         it 'should add the plugin object to the context when calling filters' do
           obj = Object.new
           obj.extend(Locomotive::Plugin::Liquid::PrefixedFilterModule)

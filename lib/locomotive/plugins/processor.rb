@@ -20,7 +20,11 @@ module Locomotive
 
           # Add the drop to the container
           drop = plugin.to_liquid
-          plugin_drops_container_hash[plugin_id] = drop if drop
+          if drop
+            drop.extend(DropExtension)
+            drop.set_plugin_id(plugin_id)
+            plugin_drops_container_hash[plugin_id] = drop
+          end
         end
 
         self.plugin_drops_container = DropContainer.new(plugin_drops_container_hash)
