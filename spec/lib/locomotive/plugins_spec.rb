@@ -40,7 +40,7 @@ module Locomotive
         before(:each) do
           register_and_enable_plugin(UselessPlugin)
           process_plugins
-          @context = ::Liquid::Context.new
+          @context = ::Liquid::Context.new({}, {}, {site: @site}, true)
           @controller.send(:add_plugin_data_to_liquid_context, @context)
         end
 
@@ -68,6 +68,67 @@ module Locomotive
           expect do
             @context.strainer.language_plugin_filter('input')
           end.to raise_error
+        end
+
+        it 'should add the plugin object to the context when calling filters' do
+          obj = Object.new
+          obj.extend(Locomotive::Plugin::Liquid::PrefixedFilterModule)
+          class << obj
+            attr_accessor :context
+          end
+          obj.context = @context
+
+          helper = Locomotive::Plugins::LiquidContextHelpers
+          helper.expects(:add_plugin_object_to_context).with(
+            'mobile_detection_plugin', @context)
+
+          obj.send(:filter_method_called, 'mobile_detection_plugin', 'method') do
+          end
+        end
+
+        it 'should add the plugin object to the context when rendering tags' do
+          obj = Object.new
+          obj.extend(Locomotive::Plugin::Liquid::TagSubclassMethods)
+
+          helper = Locomotive::Plugins::LiquidContextHelpers
+          helper.expects(:add_plugin_object_to_context).with(
+            'mobile_detection_plugin', @context)
+
+          obj.send(:rendering_tag, 'mobile_detection_plugin', true, @context) do
+          end
+        end
+
+        context 'add_plugin_object_to_context' do
+
+          before(:each) do
+            @helper = Locomotive::Plugins::LiquidContextHelpers
+          end
+
+          it 'should add the object to the context' do
+            did_yield = false
+            @helper.send(:add_plugin_object_to_context,
+                'mobile_detection_plugin', @context) do
+              did_yield = true
+              @context.registers[:plugin_object].class.should == MobileDetectionPlugin
+            end
+            did_yield.should be_true
+            @context.registers[:plugin_object].should be_nil
+          end
+
+          it 'should reset the context object' do
+            initial_object = 'initial'
+            @context.registers[:plugin_object] = initial_object
+
+            did_yield = false
+            @helper.send(:add_plugin_object_to_context,
+                'mobile_detection_plugin', @context) do
+              did_yield = true
+              @context.registers[:plugin_object].class.should == MobileDetectionPlugin
+            end
+            did_yield.should be_true
+            @context.registers[:plugin_object].should == initial_object
+          end
+
         end
 
       end

@@ -26,9 +26,8 @@ class PluginClass
 
   class Paragraph < ::Liquid::Block
     def render(context)
-      #obj = @context.register[:plugin_object]
-      #obj.surround_with_paragraph(render_all(@nodelist, context))
-      'TODO'
+      obj = context.registers[:plugin_object]
+      obj.surround_with_paragraph(render_all(@nodelist, context))
     end
 
     def render_disabled(context)
