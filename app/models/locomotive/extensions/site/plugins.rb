@@ -128,7 +128,11 @@ module Locomotive
 
           def construct_plugin_object_for_data(plugin_data)
             config = plugin_data.config
-            plugin_data.plugin_class.new(config)
+            plugin_data.plugin_class.new(config) do |plugin_obj|
+              # Use the site_id as the db_model_container name for this plugin
+              # object
+              plugin_obj.use_db_model_container(self.id.to_s)
+            end
           end
 
         end
