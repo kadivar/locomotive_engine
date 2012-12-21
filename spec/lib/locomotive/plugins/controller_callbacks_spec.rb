@@ -2,7 +2,7 @@ require 'spec_helper'
 
 module Locomotive
   module Plugins
-    describe Processor do
+    describe ControllerCallbacks do
 
       before(:each) do
         @site = FactoryGirl.create(:site)
@@ -10,7 +10,9 @@ module Locomotive
         register_and_enable_plugin(MobileDetectionPlugin)
         register_plugin(LanguagePlugin)
 
-        Locomotive::TestController.send(:include, Locomotive::Plugins::Processor)
+        Locomotive::TestController.send(:include,
+          Locomotive::Plugins::ControllerCallbacks)
+
         @controller = Locomotive::TestController.new
         @controller.stubs(:current_site).returns(@site)
         @controller.stubs(:params).returns({})
@@ -19,18 +21,20 @@ module Locomotive
       context 'before_filters' do
 
         it 'should run all before_filters for enabled plugins' do
+          enable_plugin('language_plugin')
           MobileDetectionPlugin.any_instance.expects(:determine_device)
-          process_plugins
+          LanguagePlugin.any_instance.expects(:get_language)
+          prepare_plugins_for_request
         end
 
         it 'should not run any before_filters for disabled plugins' do
           LanguagePlugin.any_instance.expects(:get_language).never
-          process_plugins
+          prepare_plugins_for_request
         end
 
         it 'should be able to access the controller from the before_filter' do
           @controller.expects(:params).returns({})
-          process_plugins
+          prepare_plugins_for_request
         end
 
       end
@@ -38,117 +42,26 @@ module Locomotive
       context 'liquid' do
 
         before(:each) do
-          register_and_enable_plugin(UselessPlugin)
-          process_plugins
           @context = ::Liquid::Context.new({}, {}, {site: @site}, true)
-          @controller.send(:add_plugin_data_to_liquid_context, @context)
+          @controller.instance_variable_set(:@liquid_context, @context)
         end
 
-        it 'should add a container for the plugin liquid drops' do
-          container = @context['plugins']
-          container_liquid = container.to_liquid
-          container_liquid.kind_of?(::Liquid::Drop).should be_true
+        it 'should call setup_liquid_context on enabled plugin objects' do
+          enable_plugin('language_plugin')
+          MobileDetectionPlugin.any_instance.expects(:setup_liquid_context)
+          LanguagePlugin.any_instance.expects(:setup_liquid_context)
+          prepare_plugins_for_render
         end
 
-        it 'should add the liquid drops for enabled plugins with drops' do
-          @first_enabled_plugin = @site.enabled_plugin_objects_by_id.values.first
-          container = @context['plugins']
-          container['mobile_detection_plugin'].class.should == @first_enabled_plugin.to_liquid.class
-          container['useless_plugin'].should be_nil
-          container['language_plugin'].should be_nil
-        end
-
-        it 'should add a set of enabled liquid tags' do
-          @context.registers[:enabled_plugin_tags].size.should == 1
-          @context.registers[:enabled_plugin_tags].should include(MobileDetectionPlugin::Tag::TagSubclass)
-        end
-
-        it 'should add filters for enabled plugins' do
-          @context.strainer.mobile_detection_plugin_filter('input').should == 'input'
-          expect do
-            @context.strainer.language_plugin_filter('input')
-          end.to raise_error
-        end
-
-        it 'should add the plugin object to the context when invoking drops' do
-          obj = ::Liquid::Drop.new
-          obj.extend(Locomotive::Plugins::DropExtension)
-          class << obj
-            attr_accessor :context
-          end
-          obj.context = @context
-          obj.set_plugin_id('mobile_detection_plugin')
-
-          helper = Locomotive::Plugins::LiquidContextHelpers
-          helper.expects(:add_plugin_object_to_context).with(
-            'mobile_detection_plugin', @context)
-
-          obj.send(:invoke_drop, 'method')
-        end
-
-        it 'should add the plugin object to the context when calling filters' do
-          obj = Object.new
-          obj.extend(Locomotive::Plugin::Liquid::PrefixedFilterModule)
-          class << obj
-            attr_accessor :context
-          end
-          obj.context = @context
-
-          helper = Locomotive::Plugins::LiquidContextHelpers
-          helper.expects(:add_plugin_object_to_context).with(
-            'mobile_detection_plugin', @context)
-
-          obj.send(:filter_method_called, 'mobile_detection_plugin', 'method') do
-          end
-        end
-
-        it 'should add the plugin object to the context when rendering tags' do
-          obj = Object.new
-          obj.extend(Locomotive::Plugin::Liquid::TagSubclassMethods)
-
-          helper = Locomotive::Plugins::LiquidContextHelpers
-          helper.expects(:add_plugin_object_to_context).with(
-            'mobile_detection_plugin', @context)
-
-          obj.send(:rendering_tag, 'mobile_detection_plugin', true, @context) do
-          end
-        end
-
-        context 'add_plugin_object_to_context' do
-
-          before(:each) do
-            @helper = Locomotive::Plugins::LiquidContextHelpers
-          end
-
-          it 'should add the object to the context' do
-            did_yield = false
-            @helper.send(:add_plugin_object_to_context,
-                'mobile_detection_plugin', @context) do
-              did_yield = true
-              @context.registers[:plugin_object].class.should == MobileDetectionPlugin
-            end
-            did_yield.should be_true
-            @context.registers[:plugin_object].should be_nil
-          end
-
-          it 'should reset the context object' do
-            initial_object = 'initial'
-            @context.registers[:plugin_object] = initial_object
-
-            did_yield = false
-            @helper.send(:add_plugin_object_to_context,
-                'mobile_detection_plugin', @context) do
-              did_yield = true
-              @context.registers[:plugin_object].class.should == MobileDetectionPlugin
-            end
-            did_yield.should be_true
-            @context.registers[:plugin_object].should == initial_object
-          end
-
+        it 'should not call setup_liquid_context on disabled plugin objects' do
+          LanguagePlugin.any_instance.expects(:setup_liquid_context).never
+          prepare_plugins_for_render
         end
 
       end
 
+      # TODO: remove all of this
+=begin
       context 'db_models' do
 
         before(:each) do
@@ -195,6 +108,7 @@ module Locomotive
         end
 
       end
+=end
 
       protected
 
@@ -213,11 +127,11 @@ module Locomotive
         enable_plugin(plugin_id)
       end
 
-      def process_plugins(controller = nil)
-        controller ||= @controller
-        controller.send(:process_plugins) do
-          if block_given?
-            yield
+      %w{request render}.each do |type|
+        define_method(:"prepare_plugins_for_#{type}") do |controller = nil|
+          controller ||= @controller
+          controller.send(:"prepare_plugins_for_#{type}") do
+            yield if block_given?
           end
         end
       end
