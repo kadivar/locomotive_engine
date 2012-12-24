@@ -60,56 +60,6 @@ module Locomotive
 
       end
 
-      # TODO: remove all of this
-=begin
-      context 'db_models' do
-
-        before(:each) do
-          register_and_enable_plugin(VisitCountPlugin)
-        end
-
-        it 'should persist data between requests' do
-          plugin = @site.enabled_plugin_objects_by_id['visit_count_plugin']
-          plugin.count.should == 0
-
-          process_plugins
-          @site.reload
-
-          plugin = @site.enabled_plugin_objects_by_id['visit_count_plugin']
-          plugin.count.should == 1
-        end
-
-        it 'should use a different container on each site' do
-          @old_site = @site
-          @old_controller = @controller
-
-          @site = FactoryGirl.create(:site, subdomain: 'new-subdomain')
-          register_and_enable_plugin(VisitCountPlugin)
-
-          @controller = Locomotive::TestController.new
-          @controller.stubs(:current_site).returns(@site)
-          @controller.stubs(:params).returns({})
-
-          old_container_id = nil
-          process_plugins(@old_controller) do
-            old_plugin = @old_site.enabled_plugin_objects_by_id[
-              'visit_count_plugin']
-            old_container_id = old_plugin.db_model_container.id
-          end
-
-          container_id = nil
-          process_plugins(@controller) do
-            plugin = @site.enabled_plugin_objects_by_id[
-              'visit_count_plugin']
-            container_id = plugin.db_model_container.id
-          end
-
-          container_id.should_not == old_container_id
-        end
-
-      end
-=end
-
       protected
 
       def register_plugin(plugin_class)

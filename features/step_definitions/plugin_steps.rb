@@ -72,7 +72,7 @@ end
 
 Given /^I have registered the plugin "(.*)"$/ do |plugin_id|
   LocomotivePlugins.register_plugin(PluginClass, plugin_id)
-  Locomotive::Plugins::LiquidTagLoader.load
+  Locomotive::Plugin::Liquid::TagLoader.load!
 end
 
 Given /^the plugin "(.*)" is enabled$/ do |plugin_id|

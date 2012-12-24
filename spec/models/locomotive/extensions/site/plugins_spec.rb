@@ -144,20 +144,6 @@ describe Locomotive::Extensions::Site::Plugins do
 
   end
 
-  describe '#plugin_filters' do
-
-    it 'should return a list of prefixed filter modules for enabled plugins' do
-      mods = site.plugin_liquid_filters
-
-      mods.count.should == 1
-      mod = mods.first
-
-      mod.public_instance_methods.should include(:mobile_detection_add_http_prefix)
-      mod.public_instance_methods.should_not include(:language_detection_upcase)
-    end
-
-  end
-
   it 'allows only one plugin wrapper with a given ID on each site' do
     site2 = FactoryGirl.create(:site, :subdomain => 'test2')
 

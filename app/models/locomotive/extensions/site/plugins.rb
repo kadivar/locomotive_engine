@@ -69,14 +69,6 @@ module Locomotive
             clear_cached_plugin_data!
           end
 
-          def plugin_liquid_filters
-            @plugin_liquid_filters ||= [].tap do |arr|
-              self.enabled_plugin_objects_by_id.each do |plugin_id, plugin_obj|
-                arr << plugin_obj.prefixed_liquid_filter_module(plugin_id)
-              end
-            end
-          end
-
           # Get the plugin object for a given ID. This is required by the
           # locomotive_plugins gem in order to populate the liquid context
           # properly. See Locomotive::Plugin::Liquid::ContextHelpers
