@@ -33,7 +33,7 @@ RSpec.configure do |config|
 
   config.before(:each) do
     DatabaseCleaner.clean
-    LocomotivePlugins.clear_registered_plugins
+    LocomotivePlugins.clear_registered_plugins!
   end
 
   config.after(:suite) do

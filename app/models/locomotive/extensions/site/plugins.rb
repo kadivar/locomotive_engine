@@ -77,6 +77,13 @@ module Locomotive
             end
           end
 
+          # Get the plugin object for a given ID. This is required by the
+          # locomotive_plugins gem in order to populate the liquid context
+          # properly. See Locomotive::Plugin::Liquid::ContextHelpers
+          def plugin_object_for_id(plugin_id)
+            self.all_plugin_objects_by_id[plugin_id]
+          end
+
           # Hash of instantiated plugin object for each enabled plugin
           def enabled_plugin_objects_by_id
             @enabled_plugin_objects_by_id ||= (self.plugin_data.select do |plugin_data|

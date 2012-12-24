@@ -180,6 +180,11 @@ describe Locomotive::Extensions::Site::Plugins do
     end.should raise_error
   end
 
+  it 'supplies the plugin object for a given ID (needed for the liquid context)' do
+    site.plugin_object_for_id('mobile_detection').class.should == MobileDetection
+    site.plugin_object_for_id('language_detection').class.should == LanguageDetection
+  end
+
   protected
 
   class MobileDetection
