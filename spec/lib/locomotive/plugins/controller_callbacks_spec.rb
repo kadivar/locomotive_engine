@@ -10,10 +10,8 @@ module Locomotive
         register_and_enable_plugin(MobileDetectionPlugin)
         register_plugin(LanguagePlugin)
 
-        Locomotive::TestController.send(:include,
-          Locomotive::Plugins::ControllerCallbacks)
-
         @controller = Locomotive::TestController.new
+        @controller.extend(Locomotive::Plugins::ControllerCallbacks)
         @controller.stubs(:current_site).returns(@site)
         @controller.stubs(:params).returns({})
       end
@@ -171,33 +169,6 @@ module Locomotive
       end
 
       class LanguageDrop < ::Liquid::Drop
-      end
-
-      class VisitCountPlugin
-
-        include Locomotive::Plugin
-
-        class VisitCounter < Locomotive::Plugin::DBModel
-          field :count, default: 0
-        end
-
-        has_one :visit_counter, VisitCounter
-        before_filter :increment_count
-
-        def initialize_plugin
-          build_visit_counter unless visit_counter
-        end
-
-        def count
-          visit_counter.count
-        end
-
-        protected
-
-        def increment_count
-          visit_counter.count += 1
-        end
-
       end
 
     end
