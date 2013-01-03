@@ -14,8 +14,6 @@ module Locomotive
           load 'my_plugin.rb'
         end
 
-        Plugins.register_plugins!
-
         Plugins.registered_plugins.count.should == 1
         Plugins.registered_plugins['my_plugin'].should == MyPlugin
       end

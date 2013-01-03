@@ -15,7 +15,7 @@ module LocomotivePluginsSpecHelpers
 
   def self.setup_load_path!
     $LOAD_PATH.unshift(File.join(File.dirname(__FILE__), '..', 'lib',
-      'locomotive', 'plugins', 'loader_spec_files'))
+      'locomotive', 'plugins', 'plugins_spec_files'))
   end
 
 end
