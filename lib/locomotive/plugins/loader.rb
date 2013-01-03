@@ -1,16 +1,9 @@
 
 module Locomotive
-
-  def self.init_plugins(*args, &block)
-    Locomotive::Plugins::Loader.init_plugins(*args, &block)
-  end
-
   module Plugins
     module Loader
 
-      @valid_plugin_classes = []
-
-      def self.init_plugins
+      def init_plugins
         initialize! unless @initialized
 
         if block_given?
@@ -20,19 +13,15 @@ module Locomotive
         end
       end
 
-      def self.in_init_block?
-        !!@in_init_block
-      end
-
-      def self.bundler_require
-        self.init_plugins do
+      def bundler_require
+        init_plugins do
           Bundler.require(:locomotive_plugins)
         end
       end
 
       protected
 
-      def self.initialize!
+      def initialize!
         # Set up plugin class tracker
         Locomotive::Plugin.add_plugin_class_tracker do |plugin_class|
           added_plugin_class(plugin_class)
@@ -46,27 +35,35 @@ module Locomotive
         @initialized = true
       end
 
-      def self.log_load_warning(plugin_class)
+      def in_init_block?
+        !!@in_init_block
+      end
+
+      def log_load_warning(plugin_class)
         Locomotive::Logger.warn("Plugin #{plugin_class} was loaded outside " +
           "the init_plugins block. It will not registered")
       end
 
-      def self.added_plugin_class(plugin_class)
+      def valid_plugin_classes
+        @valid_plugin_classes ||= Set.new
+      end
+
+      def added_plugin_class(plugin_class)
         if in_init_block?
-          @valid_plugin_classes << plugin_class
+          valid_plugin_classes << plugin_class
         else
-          self.log_load_warning(plugin_class)
+          log_load_warning(plugin_class)
         end
       end
 
       # Override this to do custom initialization around init block. Always
       # call super so that other classes and modules may override as well
-      def self.surround_init_block
+      def surround_init_block
         yield
       end
 
-      def self._in_init_block
-        self.surround_init_block do
+      def _in_init_block
+        surround_init_block do
           begin
             @in_init_block = true
             yield
