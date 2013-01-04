@@ -6,7 +6,7 @@ module Locomotive
     describe Registration do
 
       before(:each) do
-        LocomotivePluginsSpecHelpers.before_each
+        Locomotive::Plugins::SpecHelpers.before_each
       end
 
       it 'should register valid plugins' do
@@ -15,7 +15,7 @@ module Locomotive
         end
 
         Plugins.registered_plugins.count.should == 1
-        Plugins.registered_plugins['my_plugin'].should == MyPlugin
+        Plugins.registered_plugins['my_plugin'].should == ::MyPlugin
       end
 
       it 'should not register invalid plugins'

@@ -7,8 +7,9 @@ module Locomotive
       before(:each) do
         @site = FactoryGirl.create(:site)
 
-        register_and_enable_plugin(MobileDetectionPlugin)
-        register_plugin(LanguagePlugin)
+        Locomotive::Plugins::SpecHelpers.stub_registered_plugins(
+          MobileDetectionPlugin, LanguagePlugin)
+        enable_plugin(MobileDetectionPlugin)
 
         @controller = Locomotive::TestController.new
         @controller.extend(Locomotive::Plugins::ControllerCallbacks)
@@ -19,7 +20,7 @@ module Locomotive
       context 'before_filters' do
 
         it 'should run all before_filters for enabled plugins' do
-          enable_plugin('language_plugin')
+          enable_plugin(LanguagePlugin)
           MobileDetectionPlugin.any_instance.expects(:determine_device)
           LanguagePlugin.any_instance.expects(:get_language)
           prepare_plugins_for_request
@@ -45,7 +46,7 @@ module Locomotive
         end
 
         it 'should call setup_liquid_context on enabled plugin objects' do
-          enable_plugin('language_plugin')
+          enable_plugin(LanguagePlugin)
           MobileDetectionPlugin.any_instance.expects(:setup_liquid_context)
           LanguagePlugin.any_instance.expects(:setup_liquid_context)
           prepare_plugins_for_render
@@ -60,19 +61,9 @@ module Locomotive
 
       protected
 
-      def register_plugin(plugin_class)
-        LocomotivePlugins.register_plugin(plugin_class)
-      end
-
-      def enable_plugin(plugin_id)
+      def enable_plugin(plugin_class)
         FactoryGirl.create(:plugin_data, :site => @site,
-          :plugin_id => plugin_id, :enabled => true)
-      end
-
-      def register_and_enable_plugin(plugin_class)
-        plugin_id = LocomotivePlugins.default_id(plugin_class)
-        register_plugin(plugin_class)
-        enable_plugin(plugin_id)
+          :plugin_id => plugin_class.default_plugin_id, :enabled => true)
       end
 
       %w{request render}.each do |type|
@@ -86,89 +77,91 @@ module Locomotive
 
       ## Classes ##
 
-      class MobileDetectionPlugin
+      Locomotive::Plugins.init_plugins do
+        class MobileDetectionPlugin
 
-        include Locomotive::Plugin
+          include Locomotive::Plugin
 
-        attr_accessor :mobile
+          attr_accessor :mobile
 
-        before_filter :determine_device
+          before_filter :determine_device
 
-        def to_liquid
-          @my_drop ||= MobileDetectionDrop.new
-        end
-
-        def determine_device
-          # Access params
-          if self.controller.params[:mobile]
-            self.mobile = true
-          else
-            self.mobile = false
+          def to_liquid
+            @my_drop ||= MobileDetectionDrop.new
           end
-        end
 
-        module Filter
-          def filter(input)
-            input
+          def determine_device
+            # Access params
+            if self.controller.params[:mobile]
+              self.mobile = true
+            else
+              self.mobile = false
+            end
           end
-        end
 
-        def self.liquid_filters
-          Filter
-        end
-
-        class Tag
-        end
-
-        def self.liquid_tags
-          { :tag => Tag }
-        end
-
-      end
-
-      class UselessPlugin
-        include Locomotive::Plugin
-      end
-
-      class LanguagePlugin
-
-        include Locomotive::Plugin
-
-        attr_accessor :language
-
-        before_filter :get_language
-
-        def get_language
-          self.language = 'en'
-        end
-
-        def to_liquid
-          @my_drop ||= LanguageDrop.new
-        end
-
-        module Filter
-          def filter(input)
-            input
+          module Filter
+            def filter(input)
+              input
+            end
           end
+
+          def self.liquid_filters
+            Filter
+          end
+
+          class Tag
+          end
+
+          def self.liquid_tags
+            { :tag => Tag }
+          end
+
         end
 
-        def self.liquid_filters
-          Filter
+        class UselessPlugin
+          include Locomotive::Plugin
         end
 
-        class Tag
+        class LanguagePlugin
+
+          include Locomotive::Plugin
+
+          attr_accessor :language
+
+          before_filter :get_language
+
+          def get_language
+            self.language = 'en'
+          end
+
+          def to_liquid
+            @my_drop ||= LanguageDrop.new
+          end
+
+          module Filter
+            def filter(input)
+              input
+            end
+          end
+
+          def self.liquid_filters
+            Filter
+          end
+
+          class Tag
+          end
+
+          def self.liquid_tags
+            { :tag => Tag }
+          end
+
         end
 
-        def self.liquid_tags
-          { :tag => Tag }
+        class MobileDetectionDrop < ::Liquid::Drop
         end
 
-      end
-
-      class MobileDetectionDrop < ::Liquid::Drop
-      end
-
-      class LanguageDrop < ::Liquid::Drop
+        class LanguageDrop < ::Liquid::Drop
+        end
       end
 
     end

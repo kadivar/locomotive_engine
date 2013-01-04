@@ -5,7 +5,9 @@ describe Locomotive::Extensions::Site::Plugins do
   let(:site) { FactoryGirl.create(:site, :subdomain => 'test') }
 
   before(:each) do
-    add_plugins
+    Locomotive::Plugins::SpecHelpers.stub_registered_plugins(MobileDetection,
+      LanguageDetection)
+    enable_plugins
   end
 
   describe '#plugins' do
@@ -173,48 +175,40 @@ describe Locomotive::Extensions::Site::Plugins do
 
   protected
 
-  class MobileDetection
-    include Locomotive::Plugin
+  Locomotive::Plugins.init_plugins do
+    class MobileDetection
+      include Locomotive::Plugin
 
-    module Filters
-      def add_http_prefix(input)
-        if input.start_with?('http://')
-          input
-        else
-          "http://#{input}"
+      module Filters
+        def add_http_prefix(input)
+          if input.start_with?('http://')
+            input
+          else
+            "http://#{input}"
+          end
         end
       end
-    end
 
-    def self.liquid_filters
-      Filters
-    end
-
-  end
-
-  class LanguageDetection
-    include Locomotive::Plugin
-
-    module Filters
-      def upcase(input)
-        input.upcase
+      def self.liquid_filters
+        Filters
       end
+
     end
 
-    def self.liquid_filters
-      Filters
+    class LanguageDetection
+      include Locomotive::Plugin
+
+      module Filters
+        def upcase(input)
+          input.upcase
+        end
+      end
+
+      def self.liquid_filters
+        Filters
+      end
+
     end
-
-  end
-
-  def add_plugins
-    register_plugins
-    enable_plugins
-  end
-
-  def register_plugins
-    LocomotivePlugins.register_plugin(MobileDetection)
-    LocomotivePlugins.register_plugin(LanguageDetection)
   end
 
   def enable_plugins

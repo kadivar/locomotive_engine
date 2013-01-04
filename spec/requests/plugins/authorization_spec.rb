@@ -9,7 +9,9 @@ describe 'Plugin Authorization' do
 
     stub_i18n_fallbacks
     set_current_site
-    register_and_enable_plugins
+    Locomotive::Plugins::SpecHelpers.stub_registered_plugins(FirstPlugin,
+      SecondPlugin)
+    enable_plugins
   end
 
   # Specifies whether each role should be allowed to enable/disable or
@@ -119,10 +121,7 @@ describe 'Plugin Authorization' do
     end
   end
 
-  def register_and_enable_plugins
-    LocomotivePlugins.register_plugin(MyPlugin, 'first_plugin')
-    LocomotivePlugins.register_plugin(MyPlugin, 'second_plugin')
-
+  def enable_plugins
     Factory.create(:plugin_data, plugin_id: 'first_plugin', enabled: true,
       site: site)
     Factory.create(:plugin_data, plugin_id: 'second_plugin', enabled: false,
@@ -181,8 +180,14 @@ describe 'Plugin Authorization' do
     end
   end
 
-  class MyPlugin
-    include Locomotive::Plugin
+  Locomotive::Plugins.init_plugins do
+    class FirstPlugin
+      include Locomotive::Plugin
+    end
+
+    class SecondPlugin
+      include Locomotive::Plugin
+    end
   end
 
 end
