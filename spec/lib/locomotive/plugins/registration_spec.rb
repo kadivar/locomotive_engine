@@ -18,6 +18,8 @@ module Locomotive
         Plugins.registered_plugins['my_plugin'].should == ::MyPlugin
       end
 
+      it 'should return the plugin id which was used'
+
       it 'should not register invalid plugins'
 
       it 'should use the underscored class name as the default id'

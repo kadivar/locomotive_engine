@@ -76,7 +76,19 @@ module Locomotive
       end
     end
 
-    it 'should include load tags for loaded plugins'
+    it 'should be able to load liquid tags' do
+      require 'my_plugin'
+      MyPlugin.expects(:register_tags).with('my_plugin')
+      Plugins.send(:load_tags!, 'my_plugin', MyPlugin)
+    end
+
+    it 'should load liquid tags for loaded plugins' do
+      require 'my_plugin'
+      Plugins.expects(:load_tags!).with('my_plugin', MyPlugin)
+      Plugins.init_plugins do
+        load 'my_plugin.rb'
+      end
+    end
 
   end
 end

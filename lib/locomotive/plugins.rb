@@ -51,8 +51,14 @@ module Locomotive
         "the init_plugins block. It will not registered")
     end
 
+    # Register tags
+    def self.load_tags!(plugin_id, plugin_class)
+      plugin_class.register_tags(plugin_id)
+    end
+
     def self.handle_added_plugin_class(plugin_class)
-      register_plugin!(plugin_class)
+      plugin_id = register_plugin!(plugin_class)
+      load_tags!(plugin_id, plugin_class)
     end
 
     def self._added_plugin_class(plugin_class)
