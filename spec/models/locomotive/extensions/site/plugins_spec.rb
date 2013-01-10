@@ -5,8 +5,7 @@ describe Locomotive::Extensions::Site::Plugins do
   let(:site) { FactoryGirl.create(:site, :subdomain => 'test') }
 
   before(:each) do
-    Locomotive::Plugins::SpecHelpers.stub_registered_plugins(MobileDetection,
-      LanguageDetection)
+    Locomotive::Plugins::SpecHelpers.before_each(__FILE__)
     enable_plugins
   end
 
@@ -175,7 +174,7 @@ describe Locomotive::Extensions::Site::Plugins do
 
   protected
 
-  Locomotive::Plugins.init_plugins do
+  Locomotive::Plugins::SpecHelpers.define_plugins(__FILE__) do
     class MobileDetection
       include Locomotive::Plugin
 

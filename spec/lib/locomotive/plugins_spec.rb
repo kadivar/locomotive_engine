@@ -61,9 +61,7 @@ module Locomotive
       Object.const_defined?(:MyOtherPlugin).should be_true
     end
 
-    it 'should register valid plugins'
-
-    it 'should set up database collection prefix handling'
+    it 'should not allow an init_plugins block inside another'
 
   end
 end
