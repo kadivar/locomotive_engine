@@ -5,8 +5,6 @@ Feature: Plugin Settings
 
 Background:
   Given I have the site: "test site" set up
-  And I have registered the plugin "first_plugin"
-  And I have registered the plugin "second_plugin"
   And the plugin "first_plugin" is enabled
   And I have a designer and an author
 
