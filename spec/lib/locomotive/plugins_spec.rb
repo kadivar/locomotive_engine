@@ -69,7 +69,12 @@ module Locomotive
       end
     end
 
-    it 'should register loaded plugins'
+    it 'should register loaded plugins' do
+      Plugins.expects(:register_plugin!)
+      Plugins.init_plugins do
+        load 'my_plugin.rb'
+      end
+    end
 
     it 'should include load tags for loaded plugins'
 
