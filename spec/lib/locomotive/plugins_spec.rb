@@ -61,7 +61,17 @@ module Locomotive
       Object.const_defined?(:MyOtherPlugin).should be_true
     end
 
-    it 'should not allow an init_plugins block inside another'
+    it 'should not allow an init_plugins block inside another' do
+      Plugins.init_plugins do
+        lambda do
+          Plugins.init_plugins
+        end.should raise_error
+      end
+    end
+
+    it 'should register loaded plugins'
+
+    it 'should include load tags for loaded plugins'
 
   end
 end

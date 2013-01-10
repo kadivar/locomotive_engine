@@ -9,6 +9,8 @@ module Locomotive
     extend Registration
 
     def self.init_plugins
+      raise 'Cannot nest init_plugins block' if in_init_block?
+
       initialize! unless @initialized
 
       if block_given?
