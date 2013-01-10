@@ -63,7 +63,7 @@ module Locomotive
 
     def self._added_plugin_class(plugin_class)
       if in_init_block?
-        handle_added_plugin_class(plugin_class)
+        @defined_plugins << plugin_class
       else
         log_load_warning(plugin_class)
       end
@@ -72,9 +72,14 @@ module Locomotive
     def self._in_init_block
       begin
         @in_init_block = true
+        @defined_plugins = []
         yield
+        @defined_plugins.each do |plugin_class|
+          handle_added_plugin_class(plugin_class)
+        end
       ensure
         @in_init_block = false
+        @defined_plugins = nil
       end
     end
 
