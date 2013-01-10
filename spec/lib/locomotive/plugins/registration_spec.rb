@@ -18,7 +18,11 @@ module Locomotive
         Plugins.registered_plugins['my_plugin'].should == ::MyPlugin
       end
 
-      it 'should return the plugin id which was used'
+      it 'should return the plugin id which was used' do
+        load 'my_plugin.rb'
+        plugin_id = Plugins.register_plugin!(MyPlugin)
+        plugin_id.should == 'my_plugin'
+      end
 
       it 'should not register invalid plugins'
 

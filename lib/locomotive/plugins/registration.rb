@@ -8,7 +8,9 @@ module Locomotive
       end
 
       def register_plugin!(plugin_class)
-        registered_plugins[plugin_class.default_plugin_id] = plugin_class
+        plugin_id = plugin_class.default_plugin_id
+        registered_plugins[plugin_id] = plugin_class
+        plugin_id
       end
 
     end
