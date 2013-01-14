@@ -90,5 +90,16 @@ module Locomotive
       end
     end
 
+    it 'should ensure that only Mongoid models in the init_plugins block use the collection prefix' do
+      PluginModel.use_collection_name_prefix?.should be_true
+      OtherModel.use_collection_name_prefix?.should be_false
+    end
+
+    protected
+
+    class OtherModel
+      include Mongoid::Document
+    end
+
   end
 end
