@@ -26,7 +26,7 @@ module Mongoid
 
       alias :_old_method__collection :collection
       def collection
-        if prefix_changed?
+        if use_collection_name_prefix? && prefix_changed?
           self._collection = nil
           update_prefix
         end
