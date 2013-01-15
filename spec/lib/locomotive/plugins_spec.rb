@@ -84,7 +84,7 @@ module Locomotive
 
     it 'should load liquid tags for loaded plugins' do
       load 'my_plugin.rb'
-      Plugins.expects(:load_tags!).with('my_plugin', MyPlugin)
+      Plugins.expects(:load_tags!).with('my_plugin', ::MyPlugin)
       Plugins.init_plugins do
         load 'my_plugin.rb'
       end

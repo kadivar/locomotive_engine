@@ -5,6 +5,8 @@ describe 'Plugin Database Isolation' do
   let(:site) { FactoryGirl.create(:site) }
 
   before(:each) do
+    stub_i18n_fallbacks
+
     Locomotive::Public::PagesController.any_instance.stubs(:current_site).returns(site)
     Locomotive::Middlewares::Plugins.any_instance.stubs(:fetch_site_id).returns(site.id)
 
@@ -48,6 +50,11 @@ describe 'Plugin Database Isolation' do
     ::Mongoid::Collections.with_collection_name_prefix(name) do
       yield
     end
+  end
+
+  def stub_i18n_fallbacks
+    # For some reason this method is making other specs fail. Stub it out
+    Locomotive::Public::PagesController.any_instance.stubs(:setup_i18n_fallbacks).returns(true)
   end
 
   # Plugin class
