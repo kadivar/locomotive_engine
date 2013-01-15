@@ -6,8 +6,9 @@ describe 'Plugin Database Isolation' do
 
   before(:each) do
     Locomotive::Public::PagesController.any_instance.stubs(:current_site).returns(site)
+    Locomotive::Middlewares::Plugins.any_instance.stubs(:current_site).returns(site)
+
     Locomotive::Plugins::SpecHelpers.before_each(__FILE__)
-    reset_collection(MyPlugin::Model)
     FactoryGirl.create(:plugin_data, plugin_id: 'my_plugin', enabled: true,
       site: site)
   end
@@ -15,17 +16,19 @@ describe 'Plugin Database Isolation' do
   it 'should access a collection prefixed with the current site id' do
     get('/')
 
-    set_collection(MyPlugin::Model, "#{site.id}__my_plugin_model")
-    MyPlugin::Model.count.should == 1
+    with_collection("#{site.id}__") do
+      MyPlugin::Model.collection.name.should == "#{site.id}__my_plugin_models"
+      MyPlugin::Model.count.should == 1
+    end
   end
 
   it 'should not access the default collection' do
-    MyPlugin::Model.collection_name.should == 'my_plugin_models'
+    MyPlugin::Model.collection.name.should == 'my_plugin_models'
     MyPlugin::Model.count.should == 0
 
     get('/')
 
-    MyPlugin::Model.collection_name.should == 'my_plugin_models'
+    MyPlugin::Model.collection.name.should == 'my_plugin_models'
     MyPlugin::Model.count.should == 0
   end
 
@@ -33,14 +36,10 @@ describe 'Plugin Database Isolation' do
 
   protected
 
-  def set_collection(model_class, name)
-    model_class.collection_name = name
-    model_class.send(:set_collection)
-  end
-
-  def reset_collection(model_class)
-    model_class.collection_name = model_class.name.collectionize
-    model_class.send(:_collection=, nil)
+  def with_collection(name)
+    ::Mongoid::Collections.with_collection_name_prefix(name) do
+      yield
+    end
   end
 
   # Plugin class

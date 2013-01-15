@@ -82,6 +82,8 @@ module Locomotive
     self.app_middleware.use '::Locomotive::Middlewares::SeoTrailingSlash'
 
     self.app_middleware.use '::Locomotive::Middlewares::InlineEditor'
+
+    self.app_middleware.use '::Locomotive::Middlewares::Plugins'
   end
 
   def self.configure_multi_sites
