@@ -13,18 +13,13 @@ module Locomotive
         FactoryGirl.create(:site, subdomain: 'my-subdomain')
       end
 
-      after(:each) do
-        # Reset config
-        Locomotive.config = nil
-      end
-
       it 'should fetch the correct site id' do
         middleware = Plugins.new(app)
 
-        Locomotive.config.multi_sites = true
+        Locomotive.config.stubs(:multi_sites).returns(true)
         middleware.fetch_site_id(site.domains.first).should == site.id
 
-        Locomotive.config.multi_sites = false
+        Locomotive.config.stubs(:multi_sites).returns(false)
         middleware.fetch_site_id(site.domains.first).should ==
           Locomotive::Site.first.id
 
@@ -34,7 +29,7 @@ module Locomotive
       it 'should get a nil site id for a subdomain which doesn\'t exist' do
         middleware = Plugins.new(app)
 
-        Locomotive.config.multi_sites = true
+        Locomotive.config.stubs(:multi_sites).returns(true)
         middleware.fetch_site_id('unknown-subdomain').should be_nil
       end
 

@@ -11,16 +11,11 @@ module Locomotive
         FactoryGirl.create(:site, subdomain: 'my-subdomain')
       end
 
-      after(:each) do
-        # Reset config
-        Locomotive.config = nil
-      end
-
       it 'should fetch the correct site' do
-        Locomotive.config.multi_sites = true
+        Locomotive.config.stubs(:multi_sites).returns(true)
         RackAppPassthrough.fetch_site(site.domains.first).should == site
 
-        Locomotive.config.multi_sites = false
+        Locomotive.config.stubs(:multi_sites).returns(false)
         RackAppPassthrough.fetch_site(site.domains.first).should ==
           Locomotive::Site.first
 
@@ -28,7 +23,7 @@ module Locomotive
       end
 
       it 'should get a nil site for a subdomain which doesn\'t exist' do
-        Locomotive.config.multi_sites = true
+        Locomotive.config.stubs(:multi_sites).returns(true)
         RackAppPassthrough.fetch_site('unknown-subdomain').should be_nil
       end
 
