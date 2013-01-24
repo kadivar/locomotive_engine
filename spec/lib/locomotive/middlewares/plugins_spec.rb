@@ -13,6 +13,11 @@ module Locomotive
         FactoryGirl.create(:site, subdomain: 'my-subdomain')
       end
 
+      after(:each) do
+        # Reset config
+        Locomotive.config = nil
+      end
+
       it 'should fetch the correct site id' do
         middleware = Plugins.new(app)
 
