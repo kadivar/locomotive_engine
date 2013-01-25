@@ -105,3 +105,6 @@ module Locomotive
 
   end
 end
+
+# After we're all done, require our plugins
+Locomotive::Plugins.bundler_require
