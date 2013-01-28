@@ -11,7 +11,11 @@ module Locomotive
         plugin_data = site.plugin_data.where(plugin_id: plugin_id).first
         app = plugin_data.plugin_class.rack_app if plugin_data
 
+        puts "Got plugin data: #{plugin_data}"
+        puts "Got plugin app: #{plugin_data}"
+
         if app && plugin_data.enabled
+          env[:plugin_object] = site.plugin_object_for_id(plugin_id)
           app.call(env)
         else
           [404, {'X-Cascade' => 'pass'}, []]
