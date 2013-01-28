@@ -70,6 +70,22 @@ module Locomotive
           end.to raise_error
         end
 
+        it 'should add the plugin object to the context when invoking drops' do
+          obj = ::Liquid::Drop.new
+          obj.extend(Locomotive::Plugins::DropExtension)
+          class << obj
+            attr_accessor :context
+          end
+          obj.context = @context
+          obj.set_plugin_id('mobile_detection_plugin')
+
+          helper = Locomotive::Plugins::LiquidContextHelpers
+          helper.expects(:add_plugin_object_to_context).with(
+            'mobile_detection_plugin', @context)
+
+          obj.send(:invoke_drop, 'method')
+        end
+
         it 'should add the plugin object to the context when calling filters' do
           obj = Object.new
           obj.extend(Locomotive::Plugin::Liquid::PrefixedFilterModule)
@@ -150,6 +166,34 @@ module Locomotive
           plugin.count.should == 1
         end
 
+        it 'should use a different container on each site' do
+          @old_site = @site
+          @old_controller = @controller
+
+          @site = FactoryGirl.create(:site, subdomain: 'new-subdomain')
+          register_and_enable_plugin(VisitCountPlugin)
+
+          @controller = Locomotive::TestController.new
+          @controller.stubs(:current_site).returns(@site)
+          @controller.stubs(:params).returns({})
+
+          old_container_id = nil
+          process_plugins(@old_controller) do
+            old_plugin = @old_site.enabled_plugin_objects_by_id[
+              'visit_count_plugin']
+            old_container_id = old_plugin.db_model_container.id
+          end
+
+          container_id = nil
+          process_plugins(@controller) do
+            plugin = @site.enabled_plugin_objects_by_id[
+              'visit_count_plugin']
+            container_id = plugin.db_model_container.id
+          end
+
+          container_id.should_not == old_container_id
+        end
+
       end
 
       protected
@@ -169,8 +213,12 @@ module Locomotive
         enable_plugin(plugin_id)
       end
 
-      def process_plugins
-        @controller.send(:process_plugins) do
+      def process_plugins(controller = nil)
+        controller ||= @controller
+        controller.send(:process_plugins) do
+          if block_given?
+            yield
+          end
         end
       end
 

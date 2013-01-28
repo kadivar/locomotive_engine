@@ -8,8 +8,7 @@ class PluginClass
 
   class Drop < ::Liquid::Drop
     def greeting
-      #@context.registers[:plugin_object].greeting
-      'TODO'
+      obj = @context.registers[:plugin_object].greeting
     end
   end
 
