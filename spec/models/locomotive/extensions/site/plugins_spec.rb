@@ -5,7 +5,8 @@ describe Locomotive::Extensions::Site::Plugins do
   let(:site) { FactoryGirl.create(:site, :subdomain => 'test') }
 
   before(:each) do
-    add_plugins
+    Locomotive::Plugins::SpecHelpers.before_each(__FILE__)
+    enable_plugins
   end
 
   describe '#plugins' do
@@ -144,20 +145,6 @@ describe Locomotive::Extensions::Site::Plugins do
 
   end
 
-  describe '#plugin_filters' do
-
-    it 'should return a list of prefixed filter modules for enabled plugins' do
-      mods = site.plugin_liquid_filters
-
-      mods.count.should == 1
-      mod = mods.first
-
-      mod.public_instance_methods.should include(:mobile_detection_add_http_prefix)
-      mod.public_instance_methods.should_not include(:language_detection_upcase)
-    end
-
-  end
-
   it 'allows only one plugin wrapper with a given ID on each site' do
     site2 = FactoryGirl.create(:site, :subdomain => 'test2')
 
@@ -180,50 +167,47 @@ describe Locomotive::Extensions::Site::Plugins do
     end.should raise_error
   end
 
+  it 'supplies the plugin object for a given ID (needed for the liquid context)' do
+    site.plugin_object_for_id('mobile_detection').class.should == MobileDetection
+    site.plugin_object_for_id('language_detection').class.should == LanguageDetection
+  end
+
   protected
 
-  class MobileDetection
-    include Locomotive::Plugin
+  Locomotive::Plugins::SpecHelpers.define_plugins(__FILE__) do
+    class MobileDetection
+      include Locomotive::Plugin
 
-    module Filters
-      def add_http_prefix(input)
-        if input.start_with?('http://')
-          input
-        else
-          "http://#{input}"
+      module Filters
+        def add_http_prefix(input)
+          if input.start_with?('http://')
+            input
+          else
+            "http://#{input}"
+          end
         end
       end
-    end
 
-    def self.liquid_filters
-      Filters
-    end
-
-  end
-
-  class LanguageDetection
-    include Locomotive::Plugin
-
-    module Filters
-      def upcase(input)
-        input.upcase
+      def self.liquid_filters
+        Filters
       end
+
     end
 
-    def self.liquid_filters
-      Filters
+    class LanguageDetection
+      include Locomotive::Plugin
+
+      module Filters
+        def upcase(input)
+          input.upcase
+        end
+      end
+
+      def self.liquid_filters
+        Filters
+      end
+
     end
-
-  end
-
-  def add_plugins
-    register_plugins
-    enable_plugins
-  end
-
-  def register_plugins
-    LocomotivePlugins.register_plugin(MobileDetection)
-    LocomotivePlugins.register_plugin(LanguageDetection)
   end
 
   def enable_plugins

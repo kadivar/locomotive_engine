@@ -18,7 +18,7 @@ module Locomotive
           # some users can only view some plugins
           def plugins
             [].tap do |arr|
-              LocomotivePlugins.registered_plugins.keys.collect do |plugin_id|
+              Locomotive::Plugins.registered_plugins.keys.collect do |plugin_id|
                 data_obj = fetch_or_build_plugin_data(plugin_id)
 
                 # If a block is given, only include the hash if the block
@@ -43,7 +43,7 @@ module Locomotive
             end
 
             # Update plugin data objects
-            LocomotivePlugins.registered_plugins.keys.each do |plugin_id|
+            Locomotive::Plugins.registered_plugins.keys.each do |plugin_id|
               data_obj = fetch_or_build_plugin_data(plugin_id)
               plugin_hash = plugin_hashes_by_id[plugin_id] || {}
               if plugin_hash[:plugin_enabled] == 'false'
@@ -69,12 +69,11 @@ module Locomotive
             clear_cached_plugin_data!
           end
 
-          def plugin_liquid_filters
-            @plugin_liquid_filters ||= [].tap do |arr|
-              self.enabled_plugin_objects_by_id.each do |plugin_id, plugin_obj|
-                arr << plugin_obj.prefixed_liquid_filter_module(plugin_id)
-              end
-            end
+          # Get the plugin object for a given ID. This is required by the
+          # locomotive_plugins gem in order to populate the liquid context
+          # properly. See Locomotive::Plugin::Liquid::ContextHelpers
+          def plugin_object_for_id(plugin_id)
+            self.all_plugin_objects_by_id[plugin_id]
           end
 
           # Hash of instantiated plugin object for each enabled plugin
@@ -91,7 +90,7 @@ module Locomotive
           # Hash of instantiated plugin object for each registered plugin. This
           # will create plugin_data objects for registered plugins if needed
           def all_plugin_objects_by_id
-            @all_plugin_objects_by_id ||= LocomotivePlugins.registered_plugins.keys.inject({}) do |h, plugin_id|
+            @all_plugin_objects_by_id ||= Locomotive::Plugins.registered_plugins.keys.inject({}) do |h, plugin_id|
               plugin_obj = enabled_plugin_objects_by_id[plugin_id]
               if plugin_obj
                 h[plugin_id] = plugin_obj
@@ -128,11 +127,7 @@ module Locomotive
 
           def construct_plugin_object_for_data(plugin_data)
             config = plugin_data.config
-            plugin_data.plugin_class.new(config) do |plugin_obj|
-              # Use the site_id as the db_model_container name for this plugin
-              # object
-              plugin_obj.use_db_model_container(self.id.to_s)
-            end
+            plugin_data.plugin_class.new(config)
           end
 
         end

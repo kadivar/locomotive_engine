@@ -5,7 +5,7 @@ module Locomotive
       include Locomotive::Routing::SiteDispatcher
       include Locomotive::Render
       include Locomotive::ActionController::LocaleHelpers
-      include Locomotive::Plugins::Processor
+      include Locomotive::Plugins::ControllerCallbacks
 
       before_filter :require_site
 
@@ -17,7 +17,9 @@ module Locomotive
 
       before_filter :set_locale, :only => [:show, :edit]
 
-      around_filter :process_plugins, :only => [:show, :edit]
+      around_filter :prepare_plugins_for_request, :only => [:show, :edit]
+
+      before_liquid_render :prepare_plugins_for_render, :only => [:show, :edit]
 
       helper Locomotive::BaseHelper
 

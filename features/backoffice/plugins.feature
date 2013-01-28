@@ -7,7 +7,6 @@ Feature: Add, view, and configure plugins
   Background:
     Given I have a site set up
     And I have a designer and an author
-    And I have registered the plugin "my_plugin"
 
   Scenario: Adding a plugin to a site
     Given I am an authenticated "admin"

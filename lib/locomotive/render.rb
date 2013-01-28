@@ -3,6 +3,13 @@ module Locomotive
 
     extend ActiveSupport::Concern
 
+    def self.included(base)
+      base.class_eval do
+        extend ActiveModel::Callbacks
+        define_model_callbacks :liquid_render
+      end
+    end
+
     protected
 
     # Render a Locomotive page from the request fullpath and the current site.
@@ -20,7 +27,12 @@ module Locomotive
 
         render_no_page_error and return if @page.nil?
 
-        output = @page.render(locomotive_context)
+        @liquid_context = locomotive_context
+
+        output = nil
+        run_callbacks(:liquid_render) do
+          output = @page.render(@liquid_context)
+        end
 
         self.prepare_and_set_response(output)
       end
@@ -133,10 +145,6 @@ module Locomotive
 
       # Tip: switch from false to true to enable the re-thrown exception flag
       context = ::Liquid::Context.new({}, assigns, self.locomotive_default_registers, false)
-
-      if self.respond_to?(:add_plugin_data_to_liquid_context)
-        self.add_plugin_data_to_liquid_context(context)
-      end
 
       context
     end

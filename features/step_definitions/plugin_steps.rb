@@ -1,78 +1,95 @@
 
-class PluginClass
-  include Locomotive::Plugin
+Locomotive::Plugins.init_plugins do
+  class MyPlugin
+    include Locomotive::Plugin
 
-  attr_accessor :greeting
-  def http_prefix ; 'http://' ; end
-  def surround_with_paragraph(str) ; "<p>#{str}</p>" ; end
+    attr_accessor :greeting
+    def http_prefix ; 'http://' ; end
+    def surround_with_paragraph(str) ; "<p>#{str}</p>" ; end
 
-  class Drop < ::Liquid::Drop
-    def greeting
-      obj = @context.registers[:plugin_object].greeting
-    end
-  end
-
-  module Filters
-    def add_http_prefix(input)
-      prefix = @context.registers[:plugin_object].http_prefix
-      if input.start_with?(prefix)
-        input
-      else
-        "#{prefix}#{input}"
+    class Drop < ::Liquid::Drop
+      def greeting
+        obj = @context.registers[:plugin_object].greeting
       end
     end
-  end
 
-  class Paragraph < ::Liquid::Block
-    def render(context)
-      obj = context.registers[:plugin_object]
-      obj.surround_with_paragraph(render_all(@nodelist, context))
+    module Filters
+      def add_http_prefix(input)
+        prefix = @context.registers[:plugin_object].http_prefix
+        if input.start_with?(prefix)
+          input
+        else
+          "#{prefix}#{input}"
+        end
+      end
     end
 
-    def render_disabled(context)
-      render_all(@nodelist, context)
+    class Paragraph < ::Liquid::Block
+      def render(context)
+        obj = context.registers[:plugin_object]
+        obj.surround_with_paragraph(render_all(@nodelist, context))
+      end
+
+      def render_disabled(context)
+        render_all(@nodelist, context)
+      end
+    end
+
+    class Newline < ::Liquid::Tag
+      def render(context)
+        "<br />"
+      end
+    end
+
+    before_filter :set_greeting
+
+    def to_liquid
+      @drop ||= Drop.new
+    end
+    alias :drop :to_liquid
+
+    def config_template_file
+      # Rails root is at spec/dummy
+      engine_root = Rails.root.join('..', '..')
+      engine_root.join('spec', 'fixtures', 'assets', 'plugin_config_template.html.haml')
+    end
+
+    def self.liquid_filters
+      Filters
+    end
+
+    def self.liquid_tags
+      {
+        :paragraph => Paragraph,
+        :newline => Newline
+      }
+    end
+
+    def set_greeting
+      self.greeting = 'Hello, World!'
+    end
+
+  end
+
+  class FirstPlugin
+    include Locomotive::Plugin
+
+    def config_template_file
+      # Rails root is at spec/dummy
+      engine_root = Rails.root.join('..', '..')
+      engine_root.join('spec', 'fixtures', 'assets', 'plugin_config_template.html.haml')
     end
   end
 
-  class Newline < ::Liquid::Tag
-    def render(context)
-      "<br />"
+  class SecondPlugin
+    include Locomotive::Plugin
+
+    def config_template_file
+      # Rails root is at spec/dummy
+      engine_root = Rails.root.join('..', '..')
+      engine_root.join('spec', 'fixtures', 'assets', 'plugin_config_template.html.haml')
     end
   end
-
-  before_filter :set_greeting
-
-  def to_liquid
-    @drop ||= Drop.new
-  end
-  alias :drop :to_liquid
-
-  def config_template_file
-    # Rails root is at spec/dummy
-    engine_root = Rails.root.join('..', '..')
-    engine_root.join('spec', 'fixtures', 'assets', 'plugin_config_template.html.haml')
-  end
-
-  def self.liquid_filters
-    Filters
-  end
-
-  def self.liquid_tags
-    {
-      :paragraph => Paragraph,
-      :newline => Newline
-    }
-  end
-
-  def set_greeting
-    self.greeting = 'Hello, World!'
-  end
-
-end
-
-Given /^I have registered the plugin "(.*)"$/ do |plugin_id|
-  LocomotivePlugins.register_plugin(PluginClass, plugin_id)
-  Locomotive::Plugins::LiquidTagLoader.load
 end
 
 Given /^the plugin "(.*)" is enabled$/ do |plugin_id|

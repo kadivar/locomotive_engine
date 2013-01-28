@@ -5,7 +5,6 @@ Feature: View output from plugins on public pages
 
   Background:
     Given I have a site set up
-    And I have registered the plugin "my_plugin"
     And a page named "plugin-page" with the template:
     """
     {% if plugins.my_plugin %}

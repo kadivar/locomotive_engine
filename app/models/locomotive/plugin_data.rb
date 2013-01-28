@@ -28,7 +28,7 @@ module Locomotive
     end
 
     def plugin_class
-      LocomotivePlugins.registered_plugins[self.plugin_id]
+      Locomotive::Plugins.registered_plugins[self.plugin_id]
     end
 
     def to_presenter(options)

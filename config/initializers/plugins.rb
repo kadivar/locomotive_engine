@@ -1,3 +1,3 @@
 
-# Load and register all liquid tags for plugins
-Locomotive::Plugins::LiquidTagLoader.load
+# Load plugins from bundler
+Locomotive::Plugins.bundler_require

@@ -6,10 +6,9 @@ module Locomotive
   describe PluginData do
 
     before(:each) do
-      LocomotivePlugins.register_plugin(MyPlugin)
-      plugin_id = LocomotivePlugins.default_id(MyPlugin)
+      Locomotive::Plugins::SpecHelpers.before_each(__FILE__)
       @plugin_data = FactoryGirl.create(:plugin_data,
-                                           :plugin_id => plugin_id)
+        :plugin_id => MyPlugin.default_plugin_id)
     end
 
     it 'should supply the plugin class' do
@@ -18,8 +17,10 @@ module Locomotive
 
     protected
 
-    class MyPlugin
-      include Locomotive::Plugin
+    Locomotive::Plugins::SpecHelpers.define_plugins(__FILE__) do
+      class MyPlugin
+        include Locomotive::Plugin
+      end
     end
 
   end

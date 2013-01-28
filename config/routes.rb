@@ -87,6 +87,10 @@ Rails.application.routes.draw do
     end
   end
 
+  # Plugin rack app passthrough
+  match '/locomotive/plugins/:plugin_id', anchor: false, format: false,
+    to: Locomotive::Plugins::RackAppPassthrough
+
   # sitemap
   match '/sitemap.xml'  => 'locomotive/public/sitemaps#show', :format => 'xml'
 
