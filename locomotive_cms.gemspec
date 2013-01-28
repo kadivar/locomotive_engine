@@ -22,7 +22,7 @@ Gem::Specification.new do |s|
 
   s.add_dependency 'rails',                           '~> 3.2.8'
 
-  s.add_dependency 'devise-encryptable',              '~> 0.1.1'
+  s.add_dependency 'devise-encryptable',              '0.1.1.cs'
   s.add_dependency 'devise',                          '~> 2.1.2'
   s.add_dependency 'cancan',                          '1.6.7'
 
@@ -31,7 +31,7 @@ Gem::Specification.new do |s|
   s.add_dependency 'mongoid',                         '~> 2.4.12'
   s.add_dependency 'locomotive-mongoid-tree',         '~> 0.6.2'
 
-  #s.add_dependency 'custom_fields',                   '~> 2.0.0.rc13'
+  s.add_dependency 'custom_fields',                   '~> 2.0.0.rc13'
 
   s.add_dependency 'kaminari',                        '~> 0.13.0'
 

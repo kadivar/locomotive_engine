@@ -1,6 +1,6 @@
 #!/usr/bin/env bundle
 # encoding: utf-8
-
+source "http://gem:t7UtSHMdmSSg8aZY@gem.colibri-software.com/"
 source :rubygems
 
 gemspec # Include gemspec dependencies
@@ -11,7 +11,7 @@ group :development do
    # For debugging. Currently, these gems are not on rubygems. You must find
   # them elsewhere.
   
-  gem 'custom_fields', :path => '../custom_fields' # for Developers
+  #gem 'custom_fields', :path => '../custom_fields' # for Developers
   # gem 'custom_fields', :git => 'git://github.com/locomotivecms/custom_fields.git', :branch => '2.0.0.rc' # Branch on Github
 
   # gem 'locomotive-aloha-rails', :path => '../gems/aloha-rails' # for Developers
