@@ -39,6 +39,15 @@ PATH
       sanitize (~> 2.0.3)
       unidecoder (~> 1.1.1)
 
+PATH
+  remote: ../locomotive_plugins
+  specs:
+    locomotive_plugins (1.0.0.beta7)
+      bson_ext
+      haml (~> 3.1)
+      locomotive_liquid (~> 2.4)
+      mongoid (~> 2.4.12)
+
 GEM
   remote: http://rubygems.org/
   specs:
@@ -202,11 +211,6 @@ GEM
     locomotive-tinymce-rails (3.4.7.4)
       actionpack (~> 3.2)
     locomotive_liquid (2.4.1)
-    locomotive_plugins (1.0.0.beta7)
-      bson_ext
-      haml (~> 3.1)
-      locomotive_liquid (~> 2.4)
-      mongoid (~> 2.4.12)
     mail (2.4.4)
       i18n (>= 0.4.0)
       mime-types (~> 1.16)
@@ -340,6 +344,7 @@ DEPENDENCIES
   json_spec
   launchy
   locomotive_cms!
+  locomotive_plugins!
   mocha (= 0.9.12)
   pickle
   poltergeist (~> 1.0.2)
