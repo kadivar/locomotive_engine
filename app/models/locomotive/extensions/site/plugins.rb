@@ -76,10 +76,11 @@ module Locomotive
             self.all_plugin_objects_by_id[plugin_id]
           end
 
-          # Hash of instantiated plugin object for each enabled plugin
+          # Hash of instantiated plugin object for each plugin which is
+          # registered and enabled
           def enabled_plugin_objects_by_id
             @enabled_plugin_objects_by_id ||= (self.plugin_data.select do |plugin_data|
-              plugin_data.enabled
+              plugin_registered?(plugin_data) && plugin_data.enabled
             end).inject({}) do |h, plugin_data|
               plugin_id = plugin_data.plugin_id
               h[plugin_id] = construct_plugin_object_for_data(plugin_data)
@@ -113,7 +114,11 @@ module Locomotive
           def clear_cached_plugin_data!
             @enabled_plugin_objects_by_id = nil
             @all_plugin_objects_by_id = nil
-            @plugin_liquid_filters = nil
+          end
+
+          def plugin_registered?(plugin_data)
+            Locomotive::Plugins.registered_plugins.has_key?(
+              plugin_data.plugin_id)
           end
 
           def fetch_or_build_plugin_data(plugin_id)

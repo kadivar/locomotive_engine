@@ -172,6 +172,16 @@ describe Locomotive::Extensions::Site::Plugins do
     site.plugin_object_for_id('language_detection').class.should == LanguageDetection
   end
 
+  it 'only supplies plugin objects for registered plugins' do
+    FactoryGirl.create(:plugin_data, plugin_id: 'visit_counter', enabled: true,
+      site: site)
+    FactoryGirl.create(:plugin_data, plugin_id: 'basic_auth', enabled: false,
+      site: site)
+
+    site.all_plugin_objects_by_id.keys.should_not include('visit_counter')
+    site.all_plugin_objects_by_id.keys.should_not include('basic_auth')
+  end
+
   protected
 
   Locomotive::Plugins::SpecHelpers.define_plugins(__FILE__) do
