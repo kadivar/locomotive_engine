@@ -132,7 +132,9 @@ module Locomotive
 
           def construct_plugin_object_for_data(plugin_data)
             config = plugin_data.config
-            plugin_data.plugin_class.new(config)
+            plugin_object = plugin_data.plugin_class.new
+            plugin_object.config = config
+            plugin_object
           end
 
         end
