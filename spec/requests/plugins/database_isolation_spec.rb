@@ -68,7 +68,7 @@ describe 'Plugin Database Isolation' do
         field :name
       end
 
-      before_filter :create_model_instance
+      before_page_render :create_model_instance
       def create_model_instance
         Model.create!(name: 'new')
       end

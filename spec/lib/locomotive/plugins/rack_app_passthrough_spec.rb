@@ -29,7 +29,7 @@ module Locomotive
         RackAppPassthrough.fetch_site('unknown-subdomain').should be_nil
       end
 
-      it 'should get the prepared Rack app wrapper, not the raw Rack app' do
+      it 'should get the prepared Rack app' do
         RackAppPassthrough.stubs(:fetch_site).returns(site)
 
         plugin = PluginWithRackApp.new
@@ -45,12 +45,7 @@ module Locomotive
         }
 
         app = RackAppPassthrough.get_app(env)
-        app.should_not == PluginWithRackApp::RackApp
-        app.class.should == plugin.prepared_rack_app.class
-
-        wrapped_app = app.instance_variable_get(:@app)
-        wrapped_app.should == PluginWithRackApp::RackApp
-        wrapped_app.plugin_object.should == plugin
+        app.should == PluginWithRackApp::RackApp
 
         plugin_data.enabled = false
         plugin_data.save!
@@ -66,7 +61,7 @@ module Locomotive
         class PluginWithRackApp
           include Locomotive::Plugin
 
-          def self.rack_app
+          def rack_app
             RackApp
           end
 

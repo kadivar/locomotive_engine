@@ -3,8 +3,10 @@ Locomotive::Plugins.init_plugins do
   class MyPlugin
     include Locomotive::Plugin
 
+    class << self
+      attr_accessor :http_prefix
+    end
     attr_accessor :greeting
-    def http_prefix ; 'http://' ; end
     def surround_with_paragraph(str) ; "<p>#{str}</p>" ; end
 
     class Drop < ::Liquid::Drop
@@ -15,7 +17,7 @@ Locomotive::Plugins.init_plugins do
 
     module Filters
       def add_http_prefix(input)
-        prefix = @context.registers[:plugin_object].http_prefix
+        prefix = @context.registers[:plugin_object].class.http_prefix
         if input.start_with?(prefix)
           input
         else
@@ -41,7 +43,11 @@ Locomotive::Plugins.init_plugins do
       end
     end
 
-    before_filter :set_greeting
+    before_page_render :set_greeting
+
+    def self.plugin_loaded
+      self.http_prefix = 'http://'
+    end
 
     def to_liquid
       @drop ||= Drop.new
@@ -91,6 +97,8 @@ Locomotive::Plugins.init_plugins do
     end
   end
 end
+
+Locomotive::Plugins.do_all_load_init
 
 Given /^the plugin "(.*)" is enabled$/ do |plugin_id|
   plugin_data = @site.reload.plugin_data.detect do |plugin_data|

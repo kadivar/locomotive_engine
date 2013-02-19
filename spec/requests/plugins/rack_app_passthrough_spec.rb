@@ -53,7 +53,7 @@ describe 'Rack App Passthrough' do
     class MyPlugin
       include Locomotive::Plugin
 
-      def self.rack_app
+      def rack_app
         Proc.new do |env|
           [200, {}, ['Rack app successful!']]
         end
