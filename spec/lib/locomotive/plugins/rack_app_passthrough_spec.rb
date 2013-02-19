@@ -32,7 +32,7 @@ module Locomotive
       it 'should get the prepared Rack app wrapper, not the raw Rack app' do
         RackAppPassthrough.stubs(:fetch_site).returns(site)
 
-        plugin = PluginWithRackApp.new({})
+        plugin = PluginWithRackApp.new
         plugin_id = plugin.class.default_plugin_id
 
         plugin_data = FactoryGirl.create(:plugin_data, plugin_id: plugin_id,
