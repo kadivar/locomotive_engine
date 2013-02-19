@@ -40,6 +40,15 @@ describe 'Rack App Passthrough' do
     response.body.should == 'Content of the 404 page'
   end
 
+  it 'should be able to access rack app paths and URLs from regular request' do
+    Locomotive::Middlewares::Plugins::Mountpoint.mountpoint = 'https://www.example.com:1234'
+    plugin_object = site.plugin_object_for_id('my_plugin')
+    plugin_object.rack_app_full_path('/my/path').should ==
+      '/locomotive/plugins/my_plugin/my/path'
+    plugin_object.rack_app_full_url('/my/path').should ==
+      'https://www.example.com:1234/locomotive/plugins/my_plugin/my/path'
+  end
+
   protected
 
   def stub_i18n_fallbacks

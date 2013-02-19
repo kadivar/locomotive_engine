@@ -8,7 +8,7 @@ describe 'Plugin Database Isolation' do
     stub_i18n_fallbacks
 
     Locomotive::Public::PagesController.any_instance.stubs(:current_site).returns(site)
-    Locomotive::Middlewares::Plugins.any_instance.stubs(:fetch_site_id).returns(site.id)
+    Locomotive::Middlewares::Plugins::CollectionPrefix.any_instance.stubs(:fetch_site_id).returns(site.id)
 
     Locomotive::Plugins::SpecHelpers.before_each(__FILE__)
     FactoryGirl.create(:plugin_data, plugin_id: 'my_plugin', enabled: true,

@@ -73,7 +73,10 @@ module Locomotive
           # locomotive_plugins gem in order to populate the liquid context
           # properly. See Locomotive::Plugin::Liquid::ContextHelpers
           def plugin_object_for_id(plugin_id)
-            self.all_plugin_objects_by_id[plugin_id]
+            # First try to get it from enabled plugins so that we don't load
+            # the rest if we don't need to
+            self.enabled_plugin_objects_by_id[plugin_id] ||
+              self.all_plugin_objects_by_id[plugin_id]
           end
 
           # Hash of instantiated plugin object for each plugin which is
@@ -83,7 +86,7 @@ module Locomotive
               plugin_registered?(plugin_data) && plugin_data.enabled
             end).inject({}) do |h, plugin_data|
               plugin_id = plugin_data.plugin_id
-              h[plugin_id] = construct_plugin_object_for_data(plugin_data)
+              h[plugin_id] = plugin_data.construct_plugin_object
               h
             end
           end
@@ -97,7 +100,7 @@ module Locomotive
                 h[plugin_id] = plugin_obj
               else
                 plugin_data = fetch_or_build_plugin_data(plugin_id)
-                h[plugin_id] = construct_plugin_object_for_data(plugin_data)
+                h[plugin_id] = plugin_data.construct_plugin_object
               end
               h
             end
@@ -128,13 +131,6 @@ module Locomotive
             else
               self.plugin_data.build(plugin_id: plugin_id)
             end
-          end
-
-          def construct_plugin_object_for_data(plugin_data)
-            config = plugin_data.config
-            plugin_object = plugin_data.plugin_class.new
-            plugin_object.config = config
-            plugin_object
           end
 
         end
