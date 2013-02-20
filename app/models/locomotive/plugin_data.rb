@@ -54,7 +54,7 @@ module Locomotive
     protected
 
     def mountpoint
-      Middlewares::Plugins::Mountpoint.mountpoint_for_plugin_id(plugin_id)
+      Plugins::Mountpoint.mountpoint_for_plugin_id(plugin_id)
     end
 
   end

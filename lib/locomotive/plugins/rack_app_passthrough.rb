@@ -3,7 +3,11 @@ module Locomotive
   module Plugins
     class RackAppPassthrough
 
-      def self.call(env)
+      def initialize(plugin_id_path_param)
+        @path_param = :"#{plugin_id_path_param}"
+      end
+
+      def call(env)
         app = get_app(env)
         if app
           app.call(env)
@@ -14,7 +18,7 @@ module Locomotive
 
       protected
 
-      def self.fetch_site(host)
+      def fetch_site(host)
         query = Locomotive::Site.all
 
         if Locomotive.config.multi_sites?
@@ -25,11 +29,11 @@ module Locomotive
       end
 
       # Returns nil if app should not be called
-      def self.get_app(env)
+      def get_app(env)
         request = Rack::Request.new(env)
         site = fetch_site(request.host)
 
-        plugin_id = env['action_dispatch.request.path_parameters'][:plugin_id]
+        plugin_id = env['action_dispatch.request.path_parameters'][@path_param]
         plugin_object = site.enabled_plugin_objects_by_id[plugin_id]
 
         plugin_object.try(:prepared_rack_app)

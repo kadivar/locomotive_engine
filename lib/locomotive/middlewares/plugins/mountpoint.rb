@@ -4,7 +4,7 @@ module Locomotive
     module Plugins
       class Mountpoint
 
-        cattr_accessor :mountpoint
+        cattr_accessor :mountpoint_host
 
         def initialize(app)
           @app = app
@@ -13,22 +13,12 @@ module Locomotive
         def call(env)
           request = Rack::Request.new(env)
 
-          old_mountpoint = self.mountpoint
-          self.mountpoint = "#{request.scheme}://#{request.host_with_port}"
+          old_mountpoint_host = self.mountpoint_host
+          self.mountpoint_host = "#{request.scheme}://#{request.host_with_port}"
           ret = @app.call(env)
-          self.mountpoint = old_mountpoint
+          self.mountpoint_host = old_mountpoint_host
 
           ret
-        end
-
-        def self.mountpoint_for_plugin_id(plugin_id)
-          "#{self.mountpoint}#{self.mount_path_for_plugin_id(plugin_id)}"
-        end
-
-        protected
-
-        def self.mount_path_for_plugin_id(plugin_id)
-          "/locomotive/plugins/#{plugin_id}"
         end
 
       end
