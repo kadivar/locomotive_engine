@@ -16,21 +16,21 @@ module Locomotive
         @controller.stubs(:params).returns({})
       end
 
-      context 'before_filters' do
+      context 'callbacks' do
 
-        it 'should run all before_filters for enabled plugins' do
+        it 'should run all page_render callbacks for enabled plugins' do
           enable_plugin(LanguagePlugin)
           MobileDetectionPlugin.any_instance.expects(:determine_device)
           LanguagePlugin.any_instance.expects(:get_language)
           prepare_plugins_for_request
         end
 
-        it 'should not run any before_filters for disabled plugins' do
+        it 'should not run any page_render callbacks for disabled plugins' do
           LanguagePlugin.any_instance.expects(:get_language).never
           prepare_plugins_for_request
         end
 
-        it 'should be able to access the controller from the before_filter' do
+        it 'should be able to access the controller from the page_render callbacks' do
           @controller.expects(:params).returns({})
           prepare_plugins_for_request
         end
@@ -83,7 +83,7 @@ module Locomotive
 
           attr_accessor :mobile
 
-          before_filter :determine_device
+          before_page_render :determine_device
 
           def to_liquid
             @my_drop ||= MobileDetectionDrop.new
@@ -127,7 +127,7 @@ module Locomotive
 
           attr_accessor :language
 
-          before_filter :get_language
+          before_page_render :get_language
 
           def get_language
             self.language = 'en'

@@ -13,12 +13,14 @@ module Locomotive
         FactoryGirl.create(:site, subdomain: 'my-subdomain')
       end
 
+      let(:passthrough) { RackAppPassthrough.new('plugin_id') }
+
       it 'should fetch the correct site' do
         Locomotive.config.stubs(:multi_sites).returns(true)
-        RackAppPassthrough.fetch_site(site.domains.first).should == site
+        passthrough.send(:fetch_site, site.domains.first).should == site
 
         Locomotive.config.stubs(:multi_sites).returns(false)
-        RackAppPassthrough.fetch_site(site.domains.first).should ==
+        passthrough.send(:fetch_site, site.domains.first).should ==
           Locomotive::Site.first
 
         Locomotive::Site.first.should_not == site
@@ -26,11 +28,11 @@ module Locomotive
 
       it 'should get a nil site for a subdomain which doesn\'t exist' do
         Locomotive.config.stubs(:multi_sites).returns(true)
-        RackAppPassthrough.fetch_site('unknown-subdomain').should be_nil
+        passthrough.send(:fetch_site, 'unknown-subdomain').should be_nil
       end
 
-      it 'should get the prepared Rack app wrapper, not the raw Rack app' do
-        RackAppPassthrough.stubs(:fetch_site).returns(site)
+      it 'should get the prepared Rack app' do
+        passthrough.stubs(:fetch_site).returns(site)
 
         plugin = PluginWithRackApp.new
         plugin_id = plugin.class.default_plugin_id
@@ -44,19 +46,14 @@ module Locomotive
           }
         }
 
-        app = RackAppPassthrough.get_app(env)
-        app.should_not == PluginWithRackApp::RackApp
-        app.class.should == plugin.prepared_rack_app.class
-
-        wrapped_app = app.instance_variable_get(:@app)
-        wrapped_app.should == PluginWithRackApp::RackApp
-        wrapped_app.plugin_object.should == plugin
+        app = passthrough.send(:get_app, env)
+        app.should == PluginWithRackApp::RackApp
 
         plugin_data.enabled = false
         plugin_data.save!
         site.reload
 
-        app = RackAppPassthrough.get_app(env)
+        app = passthrough.send(:get_app, env)
         app.should be_nil
       end
 
@@ -66,7 +63,7 @@ module Locomotive
         class PluginWithRackApp
           include Locomotive::Plugin
 
-          def self.rack_app
+          def rack_app
             RackApp
           end
 

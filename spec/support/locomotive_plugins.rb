@@ -12,6 +12,11 @@ module Locomotive
         clear_plugins!
         setup_load_path!
         load_defined_plugins!(*contexts)
+        begin
+          Locomotive::Plugins.do_all_load_init
+        rescue
+          # Stub the error
+        end
       end
 
       def self.clear_plugins!

@@ -26,6 +26,12 @@ module Locomotive
       end
     end
 
+    def self.do_all_load_init
+      Locomotive::Plugins.registered_plugins.each do |plugin_id, plugin_class|
+        plugin_class.do_load_initialization
+      end
+    end
+
     protected
 
     def self.initialize!

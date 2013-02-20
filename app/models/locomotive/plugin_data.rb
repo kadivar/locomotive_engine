@@ -39,5 +39,23 @@ module Locomotive
       self.to_presenter(options).as_json
     end
 
+    def construct_plugin_object
+      if plugin_class
+        plugin_class.new.tap do |plugin_object|
+          %w{config mountpoint}.each do |meth|
+            plugin_object.public_send(:"#{meth}=", self.send(meth))
+          end
+        end
+      else
+        raise %{Expected plugin_class to not be nil. Is plugin '#{plugin_id}' registered?}
+      end
+    end
+
+    protected
+
+    def mountpoint
+      Plugins::Mountpoint.mountpoint_for_plugin_id(plugin_id)
+    end
+
   end
 end

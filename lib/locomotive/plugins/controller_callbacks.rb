@@ -25,7 +25,7 @@ module Locomotive
         plugin_object.controller = self
 
         # Call callbacks
-        plugin_object.run_callbacks(:filter) do
+        plugin_object.run_callbacks(:page_render) do
           self._process_callbacks_for_plugin_objects(plugin_objects) do
             yield
           end
