@@ -36,7 +36,7 @@ module Locomotive
         plugin_id = env['action_dispatch.request.path_parameters'][@path_param]
         plugin_object = site.enabled_plugin_objects_by_id[plugin_id]
 
-        plugin_object.try(:prepared_rack_app)
+        plugin_object.try(:mounted_rack_app)
       end
 
     end

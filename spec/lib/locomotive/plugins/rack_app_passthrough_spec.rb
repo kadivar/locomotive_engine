@@ -61,7 +61,7 @@ module Locomotive
         class RackPlugin
           include Locomotive::Plugin
 
-          def rack_app
+          def self.rack_app
             RackApp
           end
 
