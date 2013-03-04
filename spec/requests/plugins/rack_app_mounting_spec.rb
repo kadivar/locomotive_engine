@@ -1,6 +1,6 @@
 require 'spec_helper'
 
-describe 'Rack App Passthrough' do
+describe 'Rack App Mounting' do
 
   let(:site) { FactoryGirl.create(:site) }
 
@@ -40,7 +40,7 @@ describe 'Rack App Passthrough' do
   end
 
   it 'should be able to access rack app paths and URLs from regular request' do
-    Locomotive::Middlewares::Plugins::Mountpoint.mountpoint_host = 'https://www.example.com:1234'
+    Locomotive::Middlewares::Plugins.mountpoint_host = 'https://www.example.com:1234'
     plugin_object = site.plugin_object_for_id('plugin_with_rack_app')
     plugin_object.rack_app_full_path('/my/path').should ==
       '/locomotive/plugins/plugin_with_rack_app/my/path'
@@ -53,20 +53,6 @@ describe 'Rack App Passthrough' do
   def stub_i18n_fallbacks
     # For some reason this method is making other specs fail. Stub it out
     Locomotive::Public::PagesController.any_instance.stubs(:setup_i18n_fallbacks).returns(true)
-  end
-
-  # Plugin class
-
-  Locomotive::Plugins.init_plugins do
-    class PluginWithRackApp
-      include Locomotive::Plugin
-
-      def self.rack_app
-        Proc.new do |env|
-          [200, {}, ['Rack app successful!']]
-        end
-      end
-    end
   end
 
 end
