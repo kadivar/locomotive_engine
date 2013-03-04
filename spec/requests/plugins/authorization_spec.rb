@@ -9,7 +9,6 @@ describe 'Plugin Authorization' do
 
     stub_i18n_fallbacks
     set_current_site
-    Locomotive::Plugins::SpecHelpers.before_each(__FILE__)
     enable_plugins
   end
 
@@ -179,7 +178,7 @@ describe 'Plugin Authorization' do
     end
   end
 
-  Locomotive::Plugins::SpecHelpers.define_plugins(__FILE__) do
+  Locomotive::Plugins.init_plugins do
     class FirstPlugin
       include Locomotive::Plugin
     end

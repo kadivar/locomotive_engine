@@ -7,7 +7,6 @@ module Locomotive
       before(:each) do
         @site = FactoryGirl.create(:site)
 
-        Locomotive::Plugins::SpecHelpers.before_each(__FILE__)
         enable_plugin(MobileDetectionPlugin)
 
         @controller = Locomotive::TestController.new
@@ -76,7 +75,7 @@ module Locomotive
 
       ## Classes ##
 
-      Locomotive::Plugins::SpecHelpers.define_plugins(__FILE__) do
+      Locomotive::Plugins.init_plugins do
         class MobileDetectionPlugin
 
           include Locomotive::Plugin

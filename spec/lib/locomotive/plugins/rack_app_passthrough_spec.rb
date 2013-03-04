@@ -6,8 +6,6 @@ module Locomotive
     describe RackAppPassthrough do
 
       let(:site) do
-        Locomotive::Plugins::SpecHelpers.before_each(__FILE__)
-
         # Make sure the site we're using isn't the first one in the DB
         FactoryGirl.create(:site)
         FactoryGirl.create(:site, subdomain: 'my-subdomain')
@@ -34,7 +32,7 @@ module Locomotive
       it 'should get the prepared Rack app' do
         passthrough.stubs(:fetch_site).returns(site)
 
-        plugin = PluginWithRackApp.new
+        plugin = RackPlugin.new
         plugin_id = plugin.class.default_plugin_id
 
         plugin_data = FactoryGirl.create(:plugin_data, plugin_id: plugin_id,
@@ -47,7 +45,7 @@ module Locomotive
         }
 
         app = passthrough.send(:get_app, env)
-        app.should == PluginWithRackApp::RackApp
+        app.should == RackPlugin::RackApp
 
         plugin_data.enabled = false
         plugin_data.save!
@@ -59,8 +57,8 @@ module Locomotive
 
       protected
 
-      Locomotive::Plugins::SpecHelpers.define_plugins(__FILE__) do
-        class PluginWithRackApp
+      Locomotive::Plugins.init_plugins do
+        class RackPlugin
           include Locomotive::Plugin
 
           def rack_app

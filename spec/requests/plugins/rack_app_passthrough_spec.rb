@@ -10,7 +10,6 @@ describe 'Rack App Passthrough' do
     Locomotive::Public::PagesController.any_instance.stubs(:current_site).returns(site)
     Locomotive::Plugins::RackAppPassthrough.any_instance.stubs(:fetch_site).returns(site)
 
-    Locomotive::Plugins::SpecHelpers.before_each(__FILE__)
     @plugin_data = FactoryGirl.create(:plugin_data, plugin_id: 'my_plugin', enabled: true,
       site: site)
   end
@@ -58,8 +57,8 @@ describe 'Rack App Passthrough' do
 
   # Plugin class
 
-  Locomotive::Plugins::SpecHelpers.define_plugins(__FILE__) do
-    class MyPlugin
+  Locomotive::Plugins.init_plugins do
+    class PluginWithRackApp
       include Locomotive::Plugin
 
       def rack_app
@@ -67,10 +66,6 @@ describe 'Rack App Passthrough' do
           [200, {}, ['Rack app successful!']]
         end
       end
-    end
-
-    class OtherPlugin
-      include Locomotive::Plugin
     end
   end
 

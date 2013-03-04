@@ -5,14 +5,12 @@ describe Locomotive::Extensions::Site::Plugins do
   let(:site) { FactoryGirl.create(:site, :subdomain => 'test') }
 
   before(:each) do
-    Locomotive::Plugins::SpecHelpers.before_each(__FILE__)
     enable_plugins
   end
 
   describe '#plugins' do
 
     it 'includes all registered plugins' do
-      site.plugins.count.should == 2
       plugin_ids = site.plugins.collect { |p| p[:plugin_id] }
       plugin_ids.should include('mobile_detection')
       plugin_ids.should include('language_detection')
@@ -48,9 +46,9 @@ describe Locomotive::Extensions::Site::Plugins do
         }
       }
 
-      enabled_plugin_ids = site.plugins.select do |plugin|
-        plugin[:plugin_enabled]
-      end.collect { |plugin| plugin[:plugin_id] }
+      enabled_plugin_ids = enabled_plugin_hashes.collect do |plugin|
+        plugin[:plugin_id]
+      end
       enabled_plugin_ids.count.should == 2
       enabled_plugin_ids.should include('mobile_detection')
       enabled_plugin_ids.should include('language_detection')
@@ -68,9 +66,9 @@ describe Locomotive::Extensions::Site::Plugins do
         }
       }
 
-      enabled_plugin_ids = site.plugins.select do |plugin|
-        plugin[:plugin_enabled]
-      end.collect { |plugin| plugin[:plugin_id] }
+      enabled_plugin_ids = enabled_plugin_hashes.collect do |plugin|
+        plugin[:plugin_id]
+      end
       enabled_plugin_ids.should be_empty
     end
 
@@ -102,8 +100,12 @@ describe Locomotive::Extensions::Site::Plugins do
         }
       }
 
-      site.plugins.first[:plugin_config].should == { 'key' => 'value' }
-      site.plugins.last[:plugin_config].should == { 'key2' => 'value2' }
+      plugins = site.plugins.select do |plugin|
+        %w{mobile_detection language_detection}.include? plugin[:plugin_id]
+      end
+
+      plugins.first[:plugin_config].should == { 'key' => 'value' }
+      plugins.last[:plugin_config].should == { 'key2' => 'value2' }
     end
 
     it 'should store boolean fields properly' do
@@ -122,8 +124,12 @@ describe Locomotive::Extensions::Site::Plugins do
         }
       }
 
-      site.plugins.first[:plugin_config].should == { 'boolean_key' => true }
-      site.plugins.last[:plugin_config].should == { 'boolean_key2' => false }
+      plugins = site.plugins.select do |plugin|
+        %w{mobile_detection language_detection}.include? plugin[:plugin_id]
+      end
+
+      plugins.first[:plugin_config].should == { 'boolean_key' => true }
+      plugins.last[:plugin_config].should == { 'boolean_key2' => false }
     end
 
     it 'should ignore attributes which are not in the params' do
@@ -184,7 +190,7 @@ describe Locomotive::Extensions::Site::Plugins do
 
   protected
 
-  Locomotive::Plugins::SpecHelpers.define_plugins(__FILE__) do
+  Locomotive::Plugins.init_plugins do
     class MobileDetection
       include Locomotive::Plugin
 
@@ -230,6 +236,12 @@ describe Locomotive::Extensions::Site::Plugins do
                       :plugin_id => 'language_detection',
                       :enabled => false,
                       :site => site)
+  end
+
+  def enabled_plugin_hashes
+    site.plugins.select do |plugin_hash|
+      plugin_hash[:plugin_enabled]
+    end
   end
 
 end
