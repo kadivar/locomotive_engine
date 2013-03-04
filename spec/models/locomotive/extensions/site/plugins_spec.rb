@@ -27,7 +27,9 @@ describe Locomotive::Extensions::Site::Plugins do
     end
 
     it 'includes the plugin config' do
-      site.plugins.first[:plugin_config].should == { :key => 'value' }
+      site.plugins.detect do |p|
+        p[:plugin_id] == 'mobile_detection'
+      end[:plugin_config].should == { :key => 'value' }
     end
 
   end
@@ -142,11 +144,15 @@ describe Locomotive::Extensions::Site::Plugins do
         }
       }
 
-      site.plugins.first[:plugin_enabled].should be_true
-      site.plugins.first[:plugin_config].should == { :key => 'value' }
+      plugins = site.plugins.select do |plugin|
+        %w{mobile_detection language_detection}.include? plugin[:plugin_id]
+      end
 
-      site.plugins.last[:plugin_enabled].should be_false
-      site.plugins.last[:plugin_config].should == {}
+      plugins.first[:plugin_enabled].should be_true
+      plugins.first[:plugin_config].should == { :key => 'value' }
+
+      plugins.last[:plugin_enabled].should be_false
+      plugins.last[:plugin_config].should == {}
     end
 
   end
