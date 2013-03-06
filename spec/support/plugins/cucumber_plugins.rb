@@ -76,7 +76,7 @@ class CucumberPlugin
 
 end
 
-class FirstPlugin
+class FirstCucumberPlugin
   include Locomotive::Plugin
 
   def config_template_file
@@ -86,7 +86,7 @@ class FirstPlugin
   end
 end
 
-class SecondPlugin
+class SecondCucumberPlugin
   include Locomotive::Plugin
 
   def config_template_file
