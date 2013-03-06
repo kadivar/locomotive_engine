@@ -24,24 +24,25 @@ module Locomotive
         called.should be_true
       end
 
-      it 'should fetch the correct site id' do
+      it 'should fetch the correct site' do
         middleware = Plugins.new(app)
+        middleware.stubs(:request).returns(stub(host: site.domains.first))
 
         Locomotive.config.stubs(:multi_sites).returns(true)
-        middleware.send(:fetch_site_id, site.domains.first).should == site.id
+        middleware.send(:fetch_site).should == site
 
         Locomotive.config.stubs(:multi_sites).returns(false)
-        middleware.send(:fetch_site_id, site.domains.first).should ==
-          Locomotive::Site.first.id
+        middleware.send(:fetch_site).should == Locomotive::Site.first
 
         Locomotive::Site.first.should_not == site
       end
 
-      it 'should get a nil site id for a subdomain which doesn\'t exist' do
+      it 'should get a nil site for a subdomain which doesn\'t exist' do
         middleware = Plugins.new(app)
+        middleware.stubs(:request).returns(stub(host: 'unknown-subdomain'))
 
         Locomotive.config.stubs(:multi_sites).returns(true)
-        middleware.send(:fetch_site_id, 'unknown-subdomain').should be_nil
+        middleware.send(:fetch_site).should be_nil
       end
 
       protected

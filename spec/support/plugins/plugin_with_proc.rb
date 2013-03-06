@@ -1,12 +1,8 @@
-class PluginWithRackApp
+class PluginWithProc
   include Locomotive::Plugin
 
   def self.rack_app
-    RackApp
-  end
-
-  class RackApp
-    def self.call(env)
+    Proc.new do |env|
       [200, {}, ['Rack app successful!']]
     end
   end
