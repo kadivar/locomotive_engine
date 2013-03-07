@@ -73,11 +73,12 @@ describe 'Rack App Mounting' do
     response.body.should == 'Content of the 404 page'
   end
 
+  it 'should call rack_app_request callbacks'
+
   protected
 
   def plugin_ids
-    #%w{plugin_with_rack_app plugin_with_proc plugin_with_no_call}
-    %w{plugin_with_rack_app plugin_with_proc}
+    %w{plugin_with_rack_app plugin_with_proc plugin_with_no_call}
   end
 
   def stub_i18n_fallbacks
