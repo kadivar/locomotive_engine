@@ -202,7 +202,7 @@ GEM
       mongoid (~> 2.0)
     locomotive-tinymce-rails (3.4.7.5)
       actionpack (~> 3.2)
-    locomotive_liquid (2.4.2)
+    locomotive_liquid (2.4.1)
     locomotive_plugins (1.0.0.beta10)
       bson_ext
       haml (~> 3.1)
