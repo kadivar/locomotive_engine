@@ -4,28 +4,11 @@ require 'spec_helper'
 module Locomotive
   describe Plugins do
 
-    before(:each) do
-      Locomotive::Plugins::SpecHelpers.before_each
-    end
-
-    it 'should log a warning if a plugin is loaded before init_plugins' do
-      load 'my_plugin.rb'
-      Locomotive::Logger.expects(:warn)
-      Plugins.init_plugins
-    end
-
-    it 'should log a warning if a plugin is loaded after init_plugins' do
-      Plugins.init_plugins
-      Locomotive::Logger.expects(:warn)
-      load 'my_plugin.rb'
-    end
-
-    it 'should load plugin without warning inside the init_plugins block' do
-      Locomotive::Logger.expects(:warn).never
+    it 'should register loaded plugins' do
+      Plugins.expects(:register_plugin!)
       Plugins.init_plugins do
-        load 'my_plugin.rb'
+        load_plugin 'my_plugin.rb', true
       end
-      Object.const_defined?(:MyPlugin).should be_true
     end
 
     it 'should require all plugins from Bundler' do
@@ -38,25 +21,20 @@ module Locomotive
       Plugins.bundler_require
     end
 
-    it 'should not log a warning when requiring plugins from Bundler' do
-      Locomotive::Logger.expects(:warn).never
-
-      def Bundler.require(*args)
-        Kernel.load 'my_plugin.rb'
-      end
-
-      Plugins.bundler_require
-    end
-
     it 'should allow for multiple init blocks' do
-      Locomotive::Logger.expects(:warn).never
+      first_called = false
       Plugins.init_plugins do
-        load 'my_plugin.rb'
-      end
-      Plugins.init_plugins do
-        load 'my_other_plugin.rb'
+        load_plugin 'my_plugin.rb', true
+        first_called = true
       end
 
+      second_called = false
+      Plugins.init_plugins do
+        load_plugin 'my_other_plugin.rb', true, 'custom_plugin_id'
+        second_called = true
+      end
+
+      (first_called && second_called).should be_true
       Object.const_defined?(:MyPlugin).should be_true
       Object.const_defined?(:MyOtherPlugin).should be_true
     end
@@ -69,24 +47,15 @@ module Locomotive
       end
     end
 
-    it 'should register loaded plugins' do
-      Plugins.expects(:register_plugin!)
-      Plugins.init_plugins do
-        load 'my_plugin.rb'
-      end
-    end
-
     it 'should be able to load liquid tags' do
-      load 'my_plugin.rb'
       MyPlugin.expects(:register_tags).with('my_plugin')
       Plugins.send(:load_tags!, 'my_plugin', MyPlugin)
     end
 
     it 'should load liquid tags for loaded plugins' do
-      load 'my_plugin.rb'
       Plugins.expects(:load_tags!).with('my_plugin', ::MyPlugin)
       Plugins.init_plugins do
-        load 'my_plugin.rb'
+        load_plugin 'my_plugin.rb', true
       end
     end
 
@@ -96,6 +65,10 @@ module Locomotive
     end
 
     protected
+
+    def load_plugin(*args)
+      Locomotive::Plugins::SpecHelpers.load_plugin(*args)
+    end
 
     class OtherModel
       include Mongoid::Document

@@ -7,18 +7,18 @@ Feature: View output from plugins on public pages
     Given I have a site set up
     And a page named "plugin-page" with the template:
     """
-    {% if plugins.my_plugin %}
-    {{ plugins.my_plugin.greeting }}
+    {% if plugins.cucumber_plugin %}
+    {{ plugins.cucumber_plugin.greeting }}
     {% else %}
     Goodbye, World!
     {% endif %}
-    {{ 'google.com' | my_plugin_add_http_prefix }}
-    {% my_plugin_paragraph %}My Text{% endmy_plugin_paragraph %}
-    My Text{% my_plugin_newline %}
+    {{ 'google.com' | cucumber_plugin_add_http_prefix }}
+    {% cucumber_plugin_paragraph %}My Text{% endcucumber_plugin_paragraph %}
+    My Text{% cucumber_plugin_newline %}
     """
 
   Scenario: Plugin is enabled
-    Given the plugin "my_plugin" is enabled
+    Given the plugin "cucumber_plugin" is enabled
     When I view the rendered page at "/plugin-page"
     Then the rendered output should look like:
     """
@@ -41,8 +41,8 @@ Feature: View output from plugins on public pages
     """
 
   Scenario: Plugin is enabled and then disabled
-    Given the plugin "my_plugin" is enabled
-    And the plugin "my_plugin" is disabled
+    Given the plugin "cucumber_plugin" is enabled
+    And the plugin "cucumber_plugin" is disabled
     When I view the rendered page at "/plugin-page"
     Then the rendered output should look like:
     """

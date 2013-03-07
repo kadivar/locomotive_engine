@@ -12,21 +12,21 @@ Feature: Add, view, and configure plugins
     Given I am an authenticated "admin"
     When I go to site settings
     And I unfold all folded inputs
-    And I check "site_plugins_my_plugin_enabled"
+    And I check "site_plugins_cucumber_plugin_enabled"
     And I press "Save"
-    Then after the AJAX finishes, the plugin "my_plugin" should be enabled
+    Then after the AJAX finishes, the plugin "cucumber_plugin" should be enabled
 
   Scenario: Configuring plugins
     Given I am an authenticated "designer"
-    And the plugin "my_plugin" is enabled
+    And the plugin "cucumber_plugin" is enabled
     When I go to site settings
     And I unfold all folded inputs
     And I follow "toggle" within "#plugin_list"
-    And I fill in "my_plugin_config" with "A Value"
+    And I fill in "cucumber_plugin_config" with "A Value"
     And I check "my_boolean_field"
     And I press "Save"
-    Then after the AJAX finishes, the plugin config for "my_plugin" should be:
-        | my_plugin_config  | A Value   |
+    Then after the AJAX finishes, the plugin config for "cucumber_plugin" should be:
+        | cucumber_plugin_config  | A Value   |
         | my_boolean_field  | true      |
     When I go to site settings
     And I unfold all folded inputs
@@ -39,10 +39,10 @@ Feature: Add, view, and configure plugins
     When I go to site settings
     And I unfold all folded inputs
     And I follow "toggle" within "#plugin_list"
-    And I fill in "my_plugin_config" with "A Value"
+    And I fill in "cucumber_plugin_config" with "A Value"
     And I press "Save"
-    Then after the AJAX finishes, the plugin config for "my_plugin" should be:
-        | my_plugin_config  | A Value   |
+    Then after the AJAX finishes, the plugin config for "cucumber_plugin" should be:
+        | cucumber_plugin_config  | A Value   |
 
   Scenario: Access content types from plugin config UI
     Given I am an authenticated "designer"
@@ -52,7 +52,7 @@ Feature: Add, view, and configure plugins
     And I have a custom model named "Clients" with
         | label     | type      | required  |
         | Name      | string    | true      |
-    And the plugin "my_plugin" is enabled
+    And the plugin "cucumber_plugin" is enabled
     When I go to site settings
     And I unfold all folded inputs
     And I follow "toggle" within "#plugin_list"

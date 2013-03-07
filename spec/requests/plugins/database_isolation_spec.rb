@@ -8,10 +8,9 @@ describe 'Plugin Database Isolation' do
     stub_i18n_fallbacks
 
     Locomotive::Public::PagesController.any_instance.stubs(:current_site).returns(site)
-    Locomotive::Middlewares::Plugins::CollectionPrefix.any_instance.stubs(:fetch_site_id).returns(site.id)
+    Locomotive::Middlewares::Plugins.any_instance.stubs(:site).returns(site)
 
-    Locomotive::Plugins::SpecHelpers.before_each(__FILE__)
-    FactoryGirl.create(:plugin_data, plugin_id: 'my_plugin', enabled: true,
+    FactoryGirl.create(:plugin_data, plugin_id: 'my_db_plugin', enabled: true,
       site: site)
   end
 
@@ -19,19 +18,19 @@ describe 'Plugin Database Isolation' do
     get('/')
 
     with_collection_prefix("#{site.id}__") do
-      MyPlugin::Model.collection.name.should == "#{site.id}__my_plugin_models"
-      MyPlugin::Model.count.should == 1
+      MyDBPlugin::Model.collection.name.should == "#{site.id}__my_db_plugin_models"
+      MyDBPlugin::Model.count.should == 1
     end
   end
 
   it 'should not access the default collection' do
-    MyPlugin::Model.collection.name.should == 'my_plugin_models'
-    MyPlugin::Model.count.should == 0
+    MyDBPlugin::Model.collection.name.should == 'my_db_plugin_models'
+    MyDBPlugin::Model.count.should == 0
 
     get('/')
 
-    MyPlugin::Model.collection.name.should == 'my_plugin_models'
-    MyPlugin::Model.count.should == 0
+    MyDBPlugin::Model.collection.name.should == 'my_db_plugin_models'
+    MyDBPlugin::Model.count.should == 0
   end
 
   it 'should access the default collection for Locomotive models' do
@@ -59,8 +58,8 @@ describe 'Plugin Database Isolation' do
 
   # Plugin class
 
-  Locomotive::Plugins::SpecHelpers.define_plugins(__FILE__) do
-    class MyPlugin
+  Locomotive::Plugins.init_plugins do
+    class MyDBPlugin
       include Locomotive::Plugin
 
       class Model

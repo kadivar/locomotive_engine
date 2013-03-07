@@ -83,8 +83,7 @@ module Locomotive
 
     self.app_middleware.use '::Locomotive::Middlewares::InlineEditor'
 
-    self.app_middleware.use '::Locomotive::Middlewares::Plugins::Mountpoint'
-    self.app_middleware.use '::Locomotive::Middlewares::Plugins::CollectionPrefix'
+    self.app_middleware.use '::Locomotive::Middlewares::Plugins'
   end
 
   def self.configure_multi_sites

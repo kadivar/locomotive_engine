@@ -40,11 +40,6 @@ module Locomotive
         _added_plugin_class(plugin_class)
       end
 
-      # Log a warning for all plugins loaded before initialization
-      Locomotive::Plugin.plugin_classes.each do |plugin_class|
-        log_load_warning(plugin_class)
-      end
-
       # Add tracker for new mongoid models
       ::Mongoid::Document.add_tracker do |model_class|
         _added_mongoid_model(model_class)
@@ -55,11 +50,6 @@ module Locomotive
 
     def self.in_init_block?
       !!@in_init_block
-    end
-
-    def self.log_load_warning(plugin_class)
-      Locomotive::Logger.warn("Plugin #{plugin_class} was loaded outside " +
-        "the init_plugins block. It will not registered")
     end
 
     # Register tags
@@ -79,8 +69,6 @@ module Locomotive
     def self._added_plugin_class(plugin_class)
       if in_init_block?
         @defined_plugins << plugin_class
-      else
-        log_load_warning(plugin_class)
       end
     end
 

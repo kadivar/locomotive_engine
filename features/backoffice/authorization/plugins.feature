@@ -5,7 +5,7 @@ Feature: Plugin Settings
 
 Background:
   Given I have the site: "test site" set up
-  And the plugin "first_plugin" is enabled
+  And the plugin "first_cucumber_plugin" is enabled
   And I have a designer and an author
 
   @javascript
@@ -14,11 +14,11 @@ Background:
     When I go to site settings
     And I unfold all folded inputs
     Then I should see "Plugins"
-    And I should see "First plugin"
-    And I should see the element "#site_plugins_first_plugin_enabled"
-    And I should see "Second plugin"
-    And I should see the element "#site_plugins_second_plugin_enabled"
-    And I should see "My Plugin Config"
+    And I should see "First cucumber plugin"
+    And I should see the element "#site_plugins_first_cucumber_plugin_enabled"
+    And I should see "Second cucumber plugin"
+    And I should see the element "#site_plugins_second_cucumber_plugin_enabled"
+    And I should see "Cucumber Plugin Config"
 
   @javascript
   Scenario: Accessing plugin settings as a Designer
@@ -26,11 +26,11 @@ Background:
     When I go to site settings
     And I unfold all folded inputs
     Then I should see "Plugins"
-    And I should see "First plugin"
-    And I should not see the element "#site_plugins_first_plugin_enabled"
-    And I should not see "Second plugin"
-    And I should not see the element "#site_plugins_second_plugin_enabled"
-    And I should see "My Plugin Config"
+    And I should see "First cucumber plugin"
+    And I should not see the element "#site_plugins_first_cucumber_plugin_enabled"
+    And I should not see "Second cucumber plugin"
+    And I should not see the element "#site_plugins_second_cucumber_plugin_enabled"
+    And I should see "Cucumber Plugin Config"
 
   @javascript
   Scenario: Accessing plugin settings as an Author
@@ -38,8 +38,8 @@ Background:
     When I go to site settings
     And I unfold all folded inputs
     Then I should see "Plugins"
-    And I should see "First plugin"
-    And I should not see the element "#site_plugins_first_plugin_enabled"
-    And I should not see "Second plugin"
-    And I should not see the element "#site_plugins_second_plugin_enabled"
-    And I should not see "My Plugin Config"
+    And I should see "First cucumber plugin"
+    And I should not see the element "#site_plugins_first_cucumber_plugin_enabled"
+    And I should not see "Second cucumber plugin"
+    And I should not see the element "#site_plugins_second_cucumber_plugin_enabled"
+    And I should not see "Cucumber Plugin Config"
