@@ -5,13 +5,12 @@ class PluginWithNoCall
     RackApp
   end
 
-  class RackApp
-    def self.method_missing(meth, *args, &block)
-      if meth == 'call'
-        [200, {}, ['Rack app successful!']]
-      else
-        super
-      end
+  class SuperRackApp
+    def self.call(env)
+      [200, {}, ['Rack app successful!']]
     end
+  end
+
+  class RackApp < SuperRackApp
   end
 end
