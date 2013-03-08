@@ -45,6 +45,20 @@ module Locomotive
         middleware.send(:fetch_site).should be_nil
       end
 
+      it 'should not reference the site between requests' do
+        called = false
+        middleware = Plugins.new(Proc.new do |env|
+          called = true
+          Plugins.current_site.should == site
+        end)
+
+        middleware.stubs(:fetch_site).returns(site)
+        Plugins.current_site.should == nil
+        middleware.call(default_env)
+        called.should be_true
+        Plugins.current_site.should == nil
+      end
+
       protected
 
       def default_env

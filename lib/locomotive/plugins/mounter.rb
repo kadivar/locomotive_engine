@@ -12,7 +12,7 @@ module Locomotive
         Locomotive::Plugins.registered_plugins.each do |plugin_id, plugin_class|
           app = plugin_class.mounted_rack_app
           if app
-            setup_app!(app)
+            setup_app!(app) unless app_ready?(app)
             router.mount(app => mount_path_for_plugin_id(plugin_id))
           end
         end
@@ -51,10 +51,16 @@ module Locomotive
 
             define_singleton_method(:call) do |env|
               if Middlewares::Plugins.current_rack_app_enabled?
-                if old_call_method
-                  old_call_method.call(env)
-                else
-                  super(env)
+                plugin_id = Middlewares::Plugins.plugin_id
+                plugin_object =
+                  Middlewares::Plugins.current_site.plugin_object_for_id(plugin_id)
+
+                plugin_object.run_callbacks(:rack_app_request) do
+                  if old_call_method
+                    old_call_method.call(env)
+                  else
+                    super(env)
+                  end
                 end
               else
                 [404, {'X-Cascade' => 'pass'}, []]
@@ -63,6 +69,17 @@ module Locomotive
           end
         end
         app._setup_call_method!
+        app_is_ready(app)
+      end
+
+      def self.app_is_ready(app)
+        @app_ready ||= {}
+        @app_ready[app] = true
+      end
+
+      def self.app_ready?(app)
+        @app_ready ||= {}
+        @app_ready[app]
       end
 
     end

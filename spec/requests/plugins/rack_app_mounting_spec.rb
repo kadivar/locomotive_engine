@@ -8,7 +8,8 @@ describe 'Rack App Mounting' do
     stub_i18n_fallbacks
 
     Locomotive::Public::PagesController.any_instance.stubs(:current_site).returns(site)
-    Locomotive::Middlewares::Plugins.any_instance.stubs(:site).returns(site)
+    Locomotive::Middlewares::Plugins.stubs(:current_site).returns(site)
+    Locomotive::Middlewares::Plugins.any_instance.stubs(:current_site).returns(site)
 
     @plugin_data = plugin_ids.map do |plugin_id|
       FactoryGirl.create(:plugin_data, plugin_id: plugin_id, enabled: true,
@@ -73,7 +74,30 @@ describe 'Rack App Mounting' do
     response.body.should == 'Content of the 404 page'
   end
 
-  it 'should call rack_app_request callbacks'
+  it 'should call rack_app_request callbacks when required' do
+    PluginWithRackApp.any_instance.expects(:before_request)
+    get('/locomotive/plugins/plugin_with_rack_app/path')
+
+    PluginWithRackApp.any_instance.expects(:before_request).never
+    get('/')
+  end
+
+  it 'should set the plugin_object' do
+    called = false
+    PluginWithRackApp::RackApp.block = Proc.new do
+      called = true
+      PluginWithRackApp::RackApp.plugin_object.should_not be_nil
+      PluginWithRackApp::RackApp.plugin_object.class.should == PluginWithRackApp
+    end
+
+    called.should be_false
+    PluginWithRackApp::RackApp.plugin_object.should be_nil
+
+    get('/locomotive/plugins/plugin_with_rack_app/path')
+
+    called.should be_true
+    PluginWithRackApp::RackApp.plugin_object.should be_nil
+  end
 
   protected
 

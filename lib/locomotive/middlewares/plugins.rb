@@ -3,6 +3,8 @@ module Locomotive
   module Middlewares
     class Plugins
 
+      cattr_accessor :current_site
+      cattr_accessor :plugin_id
       cattr_accessor :mountpoint_host
       cattr_accessor :current_rack_app_enabled
 
@@ -14,10 +16,14 @@ module Locomotive
         self.request = Rack::Request.new(env)
 
         response = nil
-        set_mountpoint_host do
-          set_rack_app_enabled do
-            set_collection_name_prefix do
-              response = @app.call(env)
+        set_current_site do
+          set_plugin_id do
+            set_mountpoint_host do
+              set_rack_app_enabled do
+                set_collection_name_prefix do
+                  response = @app.call(env)
+                end
+              end
             end
           end
         end
@@ -36,10 +42,6 @@ module Locomotive
 
       attr_accessor :request
 
-      def site
-        @site ||= fetch_site
-      end
-
       def fetch_site
         query = Locomotive::Site.all
 
@@ -48,6 +50,23 @@ module Locomotive
         end
 
         query.first
+      end
+
+      def set_current_site
+        old_site = self.current_site
+        self.current_site = fetch_site
+        yield
+      ensure
+        self.current_site = old_site
+      end
+
+      def set_plugin_id
+        old_plugin_id = self.plugin_id
+        self.plugin_id = \
+          Locomotive::Plugins::Mounter.plugin_id_for_rack_app_path(request.path)
+        yield
+      ensure
+        self.plugin_id = old_plugin_id
       end
 
       def set_mountpoint_host
@@ -59,11 +78,10 @@ module Locomotive
       end
 
       def set_rack_app_enabled
-        plugin_id = Locomotive::Plugins::Mounter.plugin_id_for_rack_app_path(request.path)
         old_value = current_rack_app_enabled
-        if site
+        if current_site
           self.current_rack_app_enabled =
-            !!site.enabled_plugin_objects_by_id[plugin_id]
+            !!current_site.enabled_plugin_objects_by_id[self.plugin_id]
         end
         yield
       ensure
@@ -71,8 +89,8 @@ module Locomotive
       end
 
       def set_collection_name_prefix
-        if site
-          ::Mongoid::Collections.with_collection_name_prefix("#{site.id}__") do
+        if current_site
+          ::Mongoid::Collections.with_collection_name_prefix("#{current_site.id}__") do
             yield
           end
         else
