@@ -86,19 +86,7 @@ module Locomotive
     end
 
     def translated_in
-      self.title_translations.keys
-    end
-
-    def to_liquid
-      Locomotive::Liquid::Drops::Page.new(self)
-    end
-
-    def to_presenter
-      Locomotive::PagePresenter.new(self)
-    end
-
-    def as_json(options = {})
-      self.to_presenter.as_json
+      self.title_translations.try(:keys)
     end
 
     protected

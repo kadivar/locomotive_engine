@@ -10,8 +10,8 @@ module Locomotive
     ## fields ##
     field :_slug
     field :_label_field_name
-    field :_position, :type => Integer, :default => 0
-    field :_visible,  :type => Boolean, :default => true
+    field :_position,         :type => Integer, :default => 0
+    field :_visible,          :type => Boolean, :default => true
 
     ## validations ##
     validates :_slug, :presence => true, :uniqueness => { :scope => :content_type_id }
@@ -122,16 +122,22 @@ module Locomotive
       end
     end
 
-    def to_liquid
-      Locomotive::Liquid::Drops::ContentEntry.new(self)
+    # All the content entries no matter the content type they belong to
+    # share the same presenter class.
+    #
+    # @param [ Class ] The content entry presenter class
+    #
+    def self.presenter_class
+      Locomotive::ContentEntryPresenter
     end
 
-    def to_presenter(options = {})
-      Locomotive::ContentEntryPresenter.new(self, options)
-    end
-
-    def as_json(options = {})
-      self.to_presenter(options).as_json
+    # All the content entries no matter the content type they belong to
+    # share the same liquid drop class.
+    #
+    # @param [ Class ] The liquid drop class
+    #
+    def self.drop_class
+      Locomotive::Liquid::Drops::ContentEntry
     end
 
     protected

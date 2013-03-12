@@ -7,7 +7,9 @@
   - content_for :buttons do
     = local_action_button t('.new'), new_translation_path, :icon => 'icon-plus' if can?(:create, Locomotive::Translation)
 
-- if @translations.present?
+- if @translations.empty?
+  %p.no-items!= t('.no_items', :url => new_translation_path)
+- else
   %ul.list
     - @translations.each do |translation|
       %li.item
@@ -23,4 +25,4 @@
           %span!= t('.updated_at')
           = l translation.updated_at, :format => :short
 
-          = link_to_icon :trash, translation_url(translation), :class => 'remove', :data => { :confirm => t('locomotive.messages.confirm') }, :method => :delete
+          = link_to_icon :trash, translation_url(translation), :title => t('.remove', key: translation.key), :class => 'remove', :data => { :confirm => t('locomotive.messages.confirm') }, :method => :delete

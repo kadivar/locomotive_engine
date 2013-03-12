@@ -26,19 +26,11 @@ module Locomotive
 
     ## methods ##
 
-    def to_presenter
-      Locomotive::SnippetPresenter.new(self)
-    end
-
-    def as_json(options = {})
-      self.to_presenter.as_json
-    end
-
     protected
 
     def normalize_slug
       self.slug = self.name.clone if self.slug.blank? && self.name.present?
-      self.slug.permalink! if self.slug.present?
+      self.slug.permalink!(true) if self.slug.present?
     end
 
     def update_templates

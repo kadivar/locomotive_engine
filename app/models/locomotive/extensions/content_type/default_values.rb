@@ -14,10 +14,8 @@ module Locomotive
         protected
 
         def set_order_by
-          unless self.order_by.nil? || %w(created_at updated_at _position).include?(self.order_by)
-            field = self.entries_custom_fields.where(:name => self.order_by).first || self.entries_custom_fields.find(self.order_by)
-
-            if field
+          unless self.order_by.blank? || %w(created_at updated_at _position).include?(self.order_by)
+            if field = self.find_entries_custom_field(self.order_by)
               self.order_by = field._id
             end
           end

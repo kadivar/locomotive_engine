@@ -8,6 +8,7 @@ require 'locomotive/formtastic'
 require 'locomotive/dragonfly'
 require 'locomotive/kaminari'
 require 'locomotive/liquid'
+require 'locomotive/presentable'
 require 'locomotive/mongoid'
 require 'locomotive/carrierwave'
 require 'locomotive/custom_fields'
@@ -15,6 +16,7 @@ require 'locomotive/httparty'
 require 'locomotive/action_controller'
 require 'locomotive/rails'
 require 'locomotive/routing'
+require 'locomotive/cancan'
 require 'locomotive/regexps'
 require 'locomotive/render'
 require 'locomotive/plugins'
@@ -69,10 +71,18 @@ module Locomotive
 
     # enable the hosting solution if both we are not in test or dev and that the config.hosting option has been filled up
     self.enable_hosting
+
+    # Check for outdated Dragonfly config
+    conf = Dragonfly.app.configuration
+    if conf[:identify_command] == conf[:convert_command]
+      Locomotive.log :warn, "WARNING: Old Dragonfly config detected, image uploads might be broken. Use 'rails g locomotive:install' to get the latest configuration files."
+    end
   end
 
   def self.add_middlewares
-    self.app_middleware.insert 0, 'Dragonfly::Middleware', :images
+    self.app_middleware.insert 0, '::Locomotive::Middlewares::Permalink'
+
+    self.app_middleware.insert 1, 'Dragonfly::Middleware', :images
 
     if self.rack_cache?
       self.app_middleware.insert_before 'Dragonfly::Middleware', '::Locomotive::Middlewares::Cache', self.config.rack_cache

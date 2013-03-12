@@ -60,10 +60,9 @@ Feature: Content Entries
         "desc": "The third",
         "type": "code",
         "started": false,
-        "formatted_due": "06/01/2012",
+        "due": "2012/06/01",
         "logo": "images/logo2.jpg",
-        "tasks": [ "t3", "t1" ],
-        "workers": [ "w1", "w3" ],
+        "workers": ["w1", "w3"],
         "client": "c1"
       }
     }
@@ -76,13 +75,11 @@ Feature: Content Entries
       | 2/desc              | "The third"                   |
       | 2/type              | "code"                        |
       | 2/started           | false                         |
-      | 2/formatted_due     | "06/01/2012"                  |
-      | 2/tasks/0/name      | "t3"                          |
-      | 2/tasks/1/name      | "t1"                          |
-      | 2/workers/0/name    | "w1"                          |
-      | 2/workers/1/name    | "w3"                          |
-      | 2/client_id         | "4f832c2cb0d86d3f42fffff8"    |
-    And the JSON at "2/logo_url" should match /logo2.jpg$/
+      | 2/due               | "06/01/2012"                  |
+      | 2/workers/0         | "w1"                          |
+      | 2/workers/1         | "w3"                          |
+      | 2/client            | "c1"                          |
+    And the JSON at "2/logo" should match /logo2.jpg$/
 
   Scenario: Updating existing project
     Given the JSON request at "content_entry/logo" is a file
@@ -94,11 +91,10 @@ Feature: Content Entries
         "desc": "Awesome Desc",
         "type": "design",
         "started": true,
-        "formatted_due": "06/01/2012",
+        "formatted_due": "2012/06/12",
         "logo": "images/logo2.jpg",
-        "tasks": [ "t3", "t1" ],
-        "workers": [ "w1", "w3" ],
-        "client": "c1"
+        "workers": ["w3", "w2"],
+        "client": "c2"
       }
     }
     """
@@ -110,14 +106,14 @@ Feature: Content Entries
       | 0/desc              | "Awesome Desc"                |
       | 0/type              | "design"                      |
       | 0/started           | true                          |
-      | 0/formatted_due     | "06/01/2012"                  |
-      | 0/tasks/0/name      | "t3"                          |
-      | 0/tasks/1/name      | "t1"                          |
-      | 0/workers/0/name    | "w1"                          |
-      | 0/workers/1/name    | "w3"                          |
-      | 0/client_id         | "4f832c2cb0d86d3f42fffff8"    |
-    And the JSON at "0/logo_url" should match /logo2.jpg$/
+      | 0/due               | "06/12/2012"                  |
+      | 0/workers/0         | "w3"                          |
+      | 0/workers/1         | "w2"                          |
+      | 0/client            | "c2"                          |
+    And the JSON at "0/logo" should match /logo2.jpg$/
 
+  # FIXME: (Did) What is the use case to modify the timestamps of a content entry
+  @wip
   Scenario: Creating new project with timestamps
     When I do an API POST to content_types/projects/entries.json with:
     """
@@ -152,3 +148,23 @@ Feature: Content Entries
       | seo_title           | "New super-cool SEO title"    |
       | meta_keywords       | "key1,key2"                   |
       | meta_description    | "My SEO description"          |
+
+  Scenario: Updating project select field with an unknown value
+    When I do an API PUT to content_types/projects/entries/4f832c2cb0d86d3f42fffff0.json with:
+    """
+    {
+      "content_entry": {
+        "type": "unknown"
+      }
+    }
+    """
+    When I do an API GET request to content_types/projects/entries/4f832c2cb0d86d3f42fffff0.json
+    And the JSON should have the following:
+      | title           | ""    |
+
+  Scenario: View a single project
+    When I do an API GET request to content_types/projects/entries/p1.json
+    Then the JSON should have the following:
+      | name | "p1"          |
+      | desc | "first"       |
+

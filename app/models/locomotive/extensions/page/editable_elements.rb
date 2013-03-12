@@ -14,7 +14,12 @@ module Locomotive
         end
 
         def disable_parent_editable_elements(block)
-          self.editable_elements.each { |el| el.disabled = true if el.from_parent? && el.block == block }
+          Rails.logger.debug "[disable_parent_editable_elements] #{block.inspect}"
+          self.editable_elements.each do |el|
+            if el.from_parent? && (el.block == block || el.block =~ %r(^#{block}/))
+              el.disabled = true
+            end
+          end
         end
 
         def disable_all_editable_elements
@@ -32,6 +37,10 @@ module Locomotive
         def editable_elements_grouped_by_blocks
           groups = self.enabled_editable_elements.group_by(&:block)
           groups.delete_if { |block, elements| elements.empty? }
+        end
+
+        def find_editable_elements(block)
+          self.editable_elements.find_all { |el| el.block == block }
         end
 
         def find_editable_element(block, slug)
@@ -57,6 +66,7 @@ module Locomotive
         end
 
         def enable_editable_elements(block)
+          Rails.logger.debug "[enable_editable_elements] #{block.inspect}"
           self.editable_elements.each { |el| el.disabled = false if el.block == block }
         end
 
@@ -76,7 +86,7 @@ module Locomotive
               existing_el.set_default_content_from(el)
 
               # only the type, hint and fixed properties can be modified from the parent element
-              %w(_type hint fixed priority).each do |attr|
+              %w(_type hint fixed priority locales).each do |attr|
                 existing_el.send(:"#{attr}=", el.send(attr.to_sym))
               end
             end
@@ -91,6 +101,12 @@ module Locomotive
 
           # super fast way to remove useless elements all in once
           self.collection.update(self.atomic_selector, '$pull' => { 'editable_elements' => { '_id' => { '$in' => ids } } })
+
+          # mark them as destroyed
+          self.editable_elements.each do |el|
+            next unless ids.include?(el._id)
+            el.destroyed = true
+          end
         end
 
       end

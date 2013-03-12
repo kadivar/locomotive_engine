@@ -1,44 +1,36 @@
 module Locomotive
   class MembershipPresenter < BasePresenter
 
-    delegate :role, :account_id, :to => :source
+    ## properties ##
 
-    delegate :role=, :account_id=, :email=, :to => :source
+    property    :role
+    properties  :role_name, :can_update, :grant_admin, only_getter: true
+    property    :account_id
+    properties  :name, :email, only_getter: true
+
+    ## other getters / setters ##
 
     def name
-      self.source.account.name
+      self.__source.account.name
     end
 
     def role_name
-      I18n.t("locomotive.memberships.roles.#{self.source.role}")
+      I18n.t("locomotive.memberships.roles.#{self.__source.role}")
     end
 
     def email
-      self.source.account.email
+      self.__source.account.email
     end
 
     def can_update
       return nil unless self.ability?
-      self.ability.can? :update, self.source
+      self.__ability.can? :update, self.__source
     end
 
     def grant_admin
       return nil unless self.ability?
-      self.ability.can? :grant_admin, self.source
+      self.__ability.can? :grant_admin, self.__source
     end
-
-    def included_methods
-      super + %w(account_id name email role role_name can_update grant_admin)
-    end
-
-    def included_setters
-      super + %w(role account_id email)
-    end
-
-    # def light_as_json
-    #   methods = included_methods.clone - %w(name email)
-    #   self.as_json(methods)
-    # end
 
   end
 end

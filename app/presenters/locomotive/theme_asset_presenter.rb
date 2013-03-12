@@ -1,53 +1,60 @@
 module Locomotive
   class ThemeAssetPresenter < BasePresenter
 
-    delegate :content_type, :folder, :plain_text, :to => :source
+    ## properties ##
 
-    delegate :content_type=, :folder=, :plain_text_name=, :plain_text=, :plain_text_type=, :performing_plain_text=, :source=, :to => :source
+    properties  :content_type,  :folder
+    property    :plain_text,    allow_nil: false
+
+    with_options only_setter: true do |presenter|
+      presenter.properties :plain_text_name, :plain_text_type, :performing_plain_text, :source
+    end
+
+    with_options only_getter: true do |presenter|
+      presenter.properties :local_path, :url, :size, :raw_size, :dimensions, :can_be_deleted
+    end
+
+    ## other getters / setters ##
 
     def local_path
-      self.source.local_path(true)
+      self.__source.local_path(true)
     end
 
     def url
-      self.source.source.url
+      self.__source.source.url
     end
 
     def size
-      number_to_human_size(self.source.size)
+      number_to_human_size(self.__source.size)
     end
 
     def raw_size
-      self.source.size
+      self.__source.size
     end
 
     def dimensions
-      self.source.image? ? "#{self.source.width}px x #{self.source.height}px" : nil
+      self.__source.image? ? "#{self.__source.width}px x #{self.__source.height}px" : nil
     end
 
     def updated_at
-      I18n.l(self.source.updated_at, :format => :short)
+      I18n.l(self.__source.updated_at, format: :short)
     end
 
     def can_be_deleted
-      self.ability.try(:can?, :destroy, self.source)
+      self.__ability.try(:can?, :destroy, self.__source)
     end
 
-    def included_methods
-      default_list = %w(content_type folder local_path url size raw_size dimensions can_be_deleted updated_at)
-      default_list += %w(plain_text) if plain_text?
-      super + default_list
+    def plain_text
+      plain_text? ? self.__source.plain_text : nil
     end
 
-    def included_setters
-      super + %w(content_type folder plain_text_name plain_text plain_text_type performing_plain_text source)
-    end
+    ## methods ##
 
-    private
+    protected
 
     def plain_text?
-      # FIXME: self.options contains all the options passed by the responder
-      self.options[:template] == 'update' && self.source.errors.empty? && self.source.stylesheet_or_javascript?
+      # FIXME: self.__options contains all the options passed by the responder
+      self.__options[:template] == 'update' && self.__source.errors.empty? && self.__source.stylesheet_or_javascript?
     end
 
   end

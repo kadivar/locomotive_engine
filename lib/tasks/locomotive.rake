@@ -56,6 +56,20 @@ namespace :locomotive do
       end
     end
 
+  end # namespace: upgrade
+
+  desc 'Generate the documentation about the REST API'
+  task :generate_api_doc => :environment do
+
+    require 'locomotive/misc/api_documentation'
+
+    output = Locomotive::Misc::ApiDocumentation.generate
+
+    path = File.join(Dir.pwd, 'public')
+
+    File.open(File.join(path, 'locomotive_api.html'), 'w') do |file|
+      file.write(output)
+    end
   end
 
   namespace :maintenance do

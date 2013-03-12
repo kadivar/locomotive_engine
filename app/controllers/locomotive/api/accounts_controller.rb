@@ -2,45 +2,65 @@ module Locomotive
   module Api
     class AccountsController < Api::BaseController
 
-      load_and_authorize_resource :class => Locomotive::Account
-
-      skip_load_and_authorize_resource :only => [ :show, :create ]
+      load_and_authorize_resource class: Locomotive::Account
 
       def index
-        @accounts = Locomotive::Account.all
-        authorize! :index, @accounts
         respond_with(@accounts)
       end
 
       def show
-        @account = Locomotive::Account.find(params[:id])
-        authorize! :show, @account
         respond_with(@account)
       end
 
       def create
-        @account = Locomotive::Account.new
-        authorize! :create, @account
-        @account_presenter = @account.to_presenter
-        @account_presenter.update_attributes(params[:account])
+        @account.from_presenter(params[:account])
+        @account.save
         respond_with(@account)
       end
 
       def destroy
-        @account = Locomotive::Account.find(params[:id])
-        authorize! :destroy, @account
         @account.destroy
         respond_with(@account)
       end
 
       protected
 
-      def load_account
-        @account ||= load_accounts.find(params[:id])
-      end
-
-      def load_accounts
-        @accounts ||= current_site.accounts
+      def self.description
+        {
+          overall: %{Manage the accounts (only if logged as an admin) no matter the site they belong to},
+          actions: {
+            index: {
+              description: %{Return all the accounts},
+              example: {
+                command: %{curl 'http://mysite.com/locomotive/api/accounts.json?auth_token=dtsjkqs1TJrWiSiJt2gg'},
+                response: %(TODO)
+              }
+            },
+            show: {
+              description: %{Return the attributes of an account},
+              response: Locomotive::AccountPresenter.getters_to_hash,
+              example: {
+                command: %{curl 'http://mysite.com/locomotive/api/accounts/4244af4ef0000002.json?auth_token=dtsjkqs1TJrWiSiJt2gg'},
+                response: %(TODO)
+              }
+            },
+            create: {
+              description: %{Create an account},
+              params: Locomotive::AccountPresenter.setters_to_hash,
+              example: {
+                command: %{curl -d '...' 'http://mysite.com/locomotive/api/accounts.json?auth_token=dtsjkqs1TJrWiSiJt2gg'},
+                response: %(TODO)
+              }
+            },
+            destroy: {
+              description: %{Delete an account},
+              example: {
+                command: %{curl -X DELETE 'http://mysite.com/locomotive/api/accounts.json?auth_token=dtsjkqs1TJrWiSiJt2gg'},
+                response: %(TODO)
+              }
+            }
+          }
+        }
       end
 
     end
