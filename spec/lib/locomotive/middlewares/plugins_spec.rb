@@ -13,6 +13,12 @@ module Locomotive
         FactoryGirl.create(:site, subdomain: 'my-subdomain')
       end
 
+      before(:each) do
+        %w{current_site plugin_id mountpoint_host current_rack_app_enabled}.each do |meth|
+          Plugins.public_send("#{meth}=", nil)
+        end
+      end
+
       it 'should store the mountpoint host' do
         called = false
         middleware = Plugins.new(Proc.new do |env|
