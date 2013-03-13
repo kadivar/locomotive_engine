@@ -64,12 +64,27 @@ describe Locomotive::Presentable do
   end
 
   it 'stores the list of getters' do
-    @presenter.getters.should == %w(id name age projects notes retirement_place)
+    @presenter.getters.should == %w(id name age american projects notes retirement_place)
   end
 
   it 'executes custom code after setting attributes' do
     @presenter.expects(:hello_world).once
     @presenter.attributes = {}
+  end
+
+  it 'converts boolean string to boolean value if property type is Boolean' do
+    true_values = %w{true 1}
+    false_values = %w{false 0}
+
+    true_values.each do |str|
+      @presenter.american = str
+      @presenter.american.should be_true
+    end
+
+    false_values.each do |str|
+      @presenter.american = str
+      @presenter.american.should be_false
+    end
   end
 
   describe '#if' do
@@ -146,6 +161,7 @@ describe Locomotive::Presentable do
 
     properties  :name, :age
     property    :address, :only_setter => true, :alias => :full_address
+    property    :american, :type => 'Boolean'
 
     collection  :projects
 

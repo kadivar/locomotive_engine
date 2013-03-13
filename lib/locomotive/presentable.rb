@@ -180,8 +180,11 @@ module Locomotive
         (@setters ||= []) << name.to_s
         @setters += aliases.map(&:to_s)
 
+        type = @property_options[name.to_s][:type]
+
         class_eval <<-EOV
           def #{name}=(value)
+            value = _convert_to_bool(value) if #{type == 'Boolean'}
             self.__source.send(:#{name}=, value)
           end
         EOV
@@ -209,8 +212,20 @@ module Locomotive
         end
       end
 
-
     end # ClassMethods
+
+    protected
+
+    # Convert the string to a boolean value
+    def _convert_to_bool(value)
+      if %w{true 1}.include?(value)
+        true
+      elsif %w{false 0}.include?(value)
+        false
+      else
+        value
+      end
+    end
 
   end # Presentable
 end # Locomotive
