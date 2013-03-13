@@ -31,7 +31,7 @@ module Locomotive
       Locomotive::Plugins.registered_plugins[self.plugin_id]
     end
 
-    def to_presenter(options)
+    def to_presenter(options = {})
       Locomotive::PluginDataPresenter.new(self, options)
     end
 

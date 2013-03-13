@@ -11,6 +11,18 @@ module Locomotive
 
           embeds_many :plugin_data, :class_name => 'Locomotive::PluginData'
 
+          # Creates default plugin_data objects for plugins which are
+          # registered but don't yet have a plugin_data object
+          def all_plugin_data
+            plugin_ids = Set.new(plugin_data.collect(&:plugin_id))
+            Locomotive::Plugins.registered_plugins.keys.each do |plugin_id|
+              unless plugin_ids.include?(plugin_id)
+                plugin_data.create(plugin_id: plugin_id)
+              end
+            end
+            plugin_data
+          end
+
           ## Getter and setter virtual attributes ##
 
           # Takes an optional block which will be called for each plugin to

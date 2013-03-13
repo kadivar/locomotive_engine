@@ -1,11 +1,9 @@
 module Locomotive
   class PluginDataPresenter < BasePresenter
 
-    delegate :name, :plugin_id, :config, :plugin_class, :to => :source
-
-    def included_methods
-      super + %w(name plugin_id config plugin_class)
-    end
+    properties :name, :plugin_id, only_getter: true
+    property :enabled, type: 'Boolean'
+    property :config
 
   end
 end

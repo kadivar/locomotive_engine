@@ -26,6 +26,38 @@ Given /^the plugin "(.*)" is disabled$/ do |plugin_id|
   end
 end
 
+Given /^the plugin data for "(.*?)" has ID "(.*?)"$/ do |plugin_id, id|
+  plugin_data = @site.reload.all_plugin_data.where(plugin_id: plugin_id).first
+
+  if plugin_data
+    new_plugin_data = @site.plugin_data.new
+    new_plugin_data.id = BSON::ObjectId(id)
+
+    %w{plugin_id config enabled}.each do |meth|
+      new_plugin_data.send("#{meth}=", plugin_data.send(meth))
+    end
+
+    plugin_data.destroy
+    new_plugin_data.save!
+  end
+end
+
+Given /^the config for the plugin "(.*?)" is:$/ do |plugin_id, table|
+  plugin_data = @site.reload.plugin_data.detect do |plugin_data|
+    plugin_data.plugin_id == plugin_id
+  end
+
+  if plugin_data
+    plugin_data.config = table.rows_hash
+    @site.save!
+  else
+    FactoryGirl.create(:plugin_data,
+                       :plugin_id => plugin_id,
+                       :config => table.rows_hash,
+                       :site => @site)
+  end
+end
+
 When /^I clear all registered plugins$/ do
   LocomotivePlugins.clear_registered_plugins
 end

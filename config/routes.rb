@@ -68,6 +68,8 @@ Rails.application.routes.draw do
 
       resources :accounts, only: [:index, :show, :create, :destroy]
 
+      resources :plugin_data, only: [:index, :show, :update]
+
       with_options only: [:index, :show, :create, :update, :destroy] do |api|
 
         api.resources :sites
