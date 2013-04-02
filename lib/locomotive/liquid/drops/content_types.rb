@@ -3,10 +3,20 @@ module Locomotive
     module Drops
       class ContentTypes < ::Liquid::Drop
 
+        include Locomotive::Liquid::Helpers::RemoteSource
+
+
         def before_method(meth)
           type = @context.registers[:site].content_types.where(:slug => meth.to_s).first
-          ContentTypeProxyCollection.new(type)
+          if(type.from_remote_source)
+            load_remote_source(type.remote_source_url, type.remote_source_expiry)
+          else
+            ContentTypeProxyCollection.new(type)
+          end
         end
+        
+        
+        
 
       end
 

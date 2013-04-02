@@ -1,0 +1,9 @@
+= f.input name,
+  :label        => field.label,
+  :hint         => field.hint
+= f.input "#{name}_expiry",
+  :as           => :select,
+  :label        => "#{field.label} #{t('.expiry')}",
+  :collection   => options_for_remote_source_expiry,
+  :include_blank => false
+

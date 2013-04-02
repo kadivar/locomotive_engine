@@ -1,7 +1,11 @@
 module Locomotive
   class ContentTypePresenter < BasePresenter
 
+<<<<<<< HEAD
     ## properties ##
+=======
+    delegate :name, :description, :slug, :order_by, :order_direction, :label_field_name, :group_by_field_id, :public_submission_accounts, :from_remote_source, :remote_source_url, :remote_source_expiry, :public_readonly_pi_enabled, :to => :source
+>>>>>>> remote_content
 
     properties  :name, :slug
 
@@ -54,9 +58,14 @@ module Locomotive
       self.__source.group_by_field.try(:name)
     end
 
+<<<<<<< HEAD
     def group_by_field_name=(name)
       field = self.__source.find_entries_custom_field(name)
       self.__source.group_by_field_id = field.try(:_id)
+=======
+    def included_methods
+      super + %w(name description slug order_by order_direction label_field_name group_by_field_id public_submission_accounts entries_custom_fields klass_name from_remote_source remote_source_url remote_source_expiry public_readonly_pi_enabled)
+>>>>>>> remote_content
     end
 
     def public_submission_account_emails

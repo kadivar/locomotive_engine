@@ -90,7 +90,8 @@ fr:
           new_entry: + Ajouter une nouvelle entrée
         many_to_many:
           empty: La liste est vide. Ajouter une entrée depuis la liste ci-dessous.
-
+        remote_source:
+          expiry: Expiration
       form:
         required: Requis
         default_label: Nom du champ

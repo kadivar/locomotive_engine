@@ -13,14 +13,20 @@
   = f.input :slug
 
   = f.input :description
+  
+  = f.input :from_remote_source, :as => :'Locomotive::Toggle'
 
-= f.inputs :name => :custom_fields, :class => "inputs foldable" do
+  = f.input :remote_source_url, :wrapper_html => { :style => "#{'display: none' if !@content_type.from_remote_source}" }
+
+  = f.input :remote_source_expiry, :as => :select, :collection => options_for_remote_source_expiry, :include_blank => false, :wrapper_html => { :style => "#{'display: none' if !@content_type.from_remote_source}" }
+
+= f.inputs :name => :custom_fields, :id=> :custom_fields_fieldset, :class => "inputs foldable",  :style => "#{'display: none' if @content_type.from_remote_source}"  do
 
   = f.input :entries_custom_fields, :as => :'Locomotive::Empty', :label => false, :wrapper_html => { :id => 'custom_fields_input' }
 
 - if @content_type.persisted?
 
-  = f.inputs :name => :presentation, :class => "inputs foldable #{'folded' if inputs_folded?(@content_type)}" do
+  = f.inputs :name => :presentation, :id=> :presentation_fieldset, :class => "inputs foldable #{'folded' if inputs_folded?(@content_type)}", :style => "#{'display: none' if @content_type.from_remote_source}" do
 
     = f.input :label_field_id, :as => :select, :collection => options_for_label_field(@content_type), :include_blank => false
 
@@ -28,7 +34,7 @@
 
     = f.input :raw_item_template, :as => :'Locomotive::SmallCode'
 
-  = f.inputs :name => :options, :class => "inputs foldable #{'folded' if inputs_folded?(@content_type)}" do
+  = f.inputs :name => :options, :id=> :options_fieldset, :class => "inputs foldable #{'folded' if inputs_folded?(@content_type)}", :style => "#{'display: none' if @content_type.from_remote_source}" do
 
     = f.input :order_by, :as => :select, :collection => options_for_order_by(@content_type), :include_blank => false
 
@@ -37,3 +43,5 @@
     = f.input :public_submission_enabled, :as => :'Locomotive::Toggle'
 
     = f.input :public_submission_accounts, :as => :select, :collection => options_for_account, :include_blank => false, :multiple => true, :wrapper_html => { :class => 'multiple', :style => (@content_type.public_submission_enabled? ? '' : 'display: none') }
+
+    = f.input :public_readonly_api_enabled, :as => :'Locomotive::Toggle'
