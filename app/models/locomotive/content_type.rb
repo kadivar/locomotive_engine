@@ -17,19 +17,13 @@ module Locomotive
     field :label_field_name
     field :group_by_field_id,           type: BSON::ObjectId
     field :order_by
-<<<<<<< HEAD
     field :order_direction,             default: 'asc'
     field :public_submission_enabled,   type: Boolean, default: false
     field :public_submission_accounts,  type: Array
-=======
-    field :order_direction,             :default => 'asc'
-    field :public_submission_enabled,   :type => Boolean, :default => false
-    field :public_submission_accounts,  :type => Array
-    field :from_remote_source,          :type => Boolean, :default => false
+    field :from_remote_source,          type: Boolean, default: false
     field :remote_source_url
-    field :remote_source_expiry,        :default => 'none'
-    field :public_readonly_api_enabled, :type => Boolean, :default => false
->>>>>>> remote_content
+    field :remote_source_expiry,        default: 'none'
+    field :public_readonly_api_enabled, type: Boolean, default: false
 
     ## associations ##
     belongs_to  :site,      class_name: 'Locomotive::Site'
@@ -55,13 +49,8 @@ module Locomotive
 
     ## validations ##
     validates_presence_of   :site, :name, :slug
-<<<<<<< HEAD
     validates_uniqueness_of :slug, scope: :site_id
     validates_size_of       :entries_custom_fields, minimum: 1, message: :too_few_custom_fields
-=======
-    validates_uniqueness_of :slug, :scope => :site_id
-    validates_size_of       :entries_custom_fields, :minimum => 1, :message => :too_few_custom_fields, :unless => :from_remote_source
->>>>>>> remote_content
 
     ## behaviours ##
     custom_fields_for :entries

@@ -2,11 +2,7 @@ module Locomotive
   module CustomFieldsHelper
 
     def options_for_custom_field_type
-<<<<<<< HEAD
-      %w(string text select boolean date file belongs_to has_many many_to_many tag_set).map do |type|
-=======
       %w(string text select boolean date file belongs_to has_many many_to_many remote_source).map do |type|
->>>>>>> remote_content
         [t("custom_fields.type.#{type}"), type]
       end
     end
@@ -48,11 +44,7 @@ module Locomotive
 
     def options_for_content_type
       current_site.content_types.map do |c|
-<<<<<<< HEAD
-        [c.name, c.entries_class_name]
-=======
         [c.name, c.klass_with_custom_fields(:entries).to_s] unless c.from_remote_source
->>>>>>> remote_content
       end.compact
     end
 
