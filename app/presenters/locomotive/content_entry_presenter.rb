@@ -14,7 +14,7 @@ module Locomotive
     # @returns [ List ] a list of attributes (string)
     #
     def safe_attributes
-      self.source.custom_fields_safe_attributes + %w(_slug seo_title meta_keywords meta_description _destroy)
+      self.source.custom_fields_safe_setters + %w(_slug seo_title meta_keywords meta_description _destroy)
     end
 
     def filtered_custom_fields_methods
