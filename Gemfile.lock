@@ -1,12 +1,4 @@
 PATH
-  remote: ../custom_fields
-  specs:
-    custom_fields (2.0.0.rc14)
-      activesupport (~> 3.2.9)
-      carrierwave-mongoid (~> 0.2.1)
-      mongoid (~> 2.4.12)
-
-PATH
   remote: .
   specs:
     locomotive_cms (2.0.0.rc12)
@@ -45,6 +37,14 @@ PATH
       rmagick (~> 2.12.2)
       sanitize (~> 2.0.3)
       unidecoder (~> 1.1.1)
+
+PATH
+  remote: ../custom_fields
+  specs:
+    custom_fields (2.0.0.rc14)
+      activesupport (~> 3.2.9)
+      carrierwave-mongoid (~> 0.2.1)
+      mongoid (~> 2.4.12)
 
 GEM
   remote: http://gem:t7UtSHMdmSSg8aZY@gem.colibri-software.com/
