@@ -11,7 +11,9 @@ class Locomotive.Models.Site extends Backbone.Model
 
     memberships = new Locomotive.Models.MembershipsCollection(@get('memberships'))
 
-    @set domains: domains, memberships: memberships
+    plugins = new Locomotive.Models.PluginsCollection(@get('plugins'))
+
+    @set domains: domains, memberships: memberships, plugins: plugins
 
   includes_domain: (name_with_port) ->
     name = name_with_port.replace(/:[0-9]*/, '')
@@ -26,6 +28,9 @@ class Locomotive.Models.Site extends Backbone.Model
       hash.memberships_attributes = @get('memberships').toJSONForSave() if @get('memberships')? && @get('memberships').length > 0
       delete hash.domains
       hash.domains = _.map(@get('domains'), (domain) -> domain.get('name'))
+      delete hash.plugins
+      plugins_json = @get('plugins').toJSON()
+      hash.plugins = plugins_json unless plugins_json.length == 0
 
 class Locomotive.Models.CurrentSite extends Locomotive.Models.Site
 

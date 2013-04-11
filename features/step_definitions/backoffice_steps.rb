@@ -35,6 +35,14 @@ When /^I forget to press the button on the cross-domain notice page$/ do
   Mongoid::Persistence::Update.new(@admin).send(:update)
 end
 
+### Form actions
+
+When /^I unfold all folded inputs$/ do
+  page.execute_script('$(".folded ol").css("display", "block")').inspect
+  page.execute_script('$(".folded").removeClass("folded")').inspect
+end
+
+
 ### Common
 
 Then /^I debug$/ do

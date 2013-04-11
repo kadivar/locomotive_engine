@@ -33,6 +33,10 @@ RSpec.configure do |config|
     DatabaseCleaner.orm = 'mongoid'
   end
 
+  config.before(:suite) do
+    Locomotive::Plugins::SpecHelpers.load_all_plugins
+  end
+
   config.before(:each) do
     Mongoid::IdentityMap.clear
   end

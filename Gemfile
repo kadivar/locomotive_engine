@@ -29,6 +29,7 @@ group :development do
   # gem 'locomotive-aloha-rails', path: '../gems/aloha-rails' # for Developers
   # gem 'locomotive-tinymce-rails', path: '../gems/tinymce-rails' # for Developers
   # gem 'locomotive_liquid', path: '../gems/liquid' # for Developers
+  # gem 'locomotive_plugins', :path => '../locomotive_plugins' # For Developers
 
   gem 'unicorn' # Using unicorn_rails instead of webrick (default server)
 

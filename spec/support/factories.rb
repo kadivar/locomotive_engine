@@ -55,6 +55,16 @@ FactoryGirl.define do
       email 'admin@locomotiveapp.org'
     end
 
+    factory 'designer user' do
+      name 'Designer'
+      email 'designer@locomotiveapp.org'
+    end
+
+    factory 'author user' do
+      name 'Author'
+      email 'author@locomotiveapp.org'
+    end
+
     factory 'frenchy user' do
       name 'Jean Claude'
       email 'jean@frenchy.fr'
@@ -151,6 +161,12 @@ FactoryGirl.define do
   end
   
   factory :translation, :class => Locomotive::Translation do
+  end
+
+  ## Plugins ##
+  factory :plugin_data, :class => Locomotive::PluginData do
+    site { Locomotive::Site.where(:subdomain => "acme").first || Factory(:site) }
+    plugin_id 'my_plugin_id'
   end
 
 end

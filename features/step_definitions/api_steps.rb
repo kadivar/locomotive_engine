@@ -167,6 +167,24 @@ Then /^the JSON at "([^"]*)" should be the time "(.+)"$/ do |path, time_str|
   json_time.should == time
 end
 
+Then /^the (?:JSON|json) array(?: at "(.*)")? should( not)? include a hash which includes:$/ do |path, negative, json_string|
+  json_to_include = parse_json(json_string)
+
+  modified_last_json = parse_json(last_json, path)
+  modified_last_json.each do |hash|
+    for key in hash.keys
+      hash.delete(key) unless json_to_include.keys.include?(key)
+    end
+  end
+  modified_last_json = modified_last_json.to_json
+
+  if negative
+    modified_last_json.should_not include_json(JsonSpec.remember(json_string))
+  else
+    modified_last_json.should include_json(JsonSpec.remember(json_string))
+  end
+end
+
 Then /^I print the JSON response$/ do
   puts %{JSON (status=#{@json_response.status}): "#{last_json}" / #{last_json.inspect}}
 end

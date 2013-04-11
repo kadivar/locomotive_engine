@@ -66,6 +66,19 @@ Then /^it returns a (\d+) error page$/ do |code|
   page.status_code.should == code.to_i
 end
 
+Then /^the "(.*?)" dropdown should contain "(.*?)"$/ do |name, text|
+  xpath = %{//select[@name="#{name}"]/option[text()="#{text}"]}
+  page.should have_xpath(xpath)
+end
+
+Then /^I should( not)? see the element "([^"]+)"$/ do |negate, selector|
+  if negate
+    page.should_not have_selector(selector)
+  else
+    page.should have_selector(selector)
+  end
+end
+
 Then /^I should see the following xml output:$/ do |xml_output|
   xml_output.gsub!(':now', Date.today.to_s)
   response = Hash.from_xml(page.source)
@@ -79,8 +92,6 @@ def wait_for_ajax(&block)
     begin
       block.call
       break
-    rescue RSpec::Expectations::ExpectationNotMetError => e
-      raise e
     rescue
       # Try again
     end

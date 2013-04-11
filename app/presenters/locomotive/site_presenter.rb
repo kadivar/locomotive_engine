@@ -35,5 +35,15 @@ module Locomotive
       self.as_json(self.getters - %w(memberships))
     end
 
+    def as_json(options = nil)
+      plugins = self.__source.plugins do |plugin_data|
+        self.__ability.try(:can?, :read, plugin_data)
+      end
+
+      super.merge({
+        'plugins' => plugins
+      })
+    end
+
   end
 end

@@ -19,6 +19,7 @@ require 'locomotive/routing'
 require 'locomotive/cancan'
 require 'locomotive/regexps'
 require 'locomotive/render'
+require 'locomotive/plugins'
 require 'locomotive/middlewares'
 require 'locomotive/session_store'
 
@@ -92,6 +93,8 @@ module Locomotive
     self.app_middleware.use '::Locomotive::Middlewares::SeoTrailingSlash'
 
     self.app_middleware.use '::Locomotive::Middlewares::InlineEditor'
+
+    self.app_middleware.use '::Locomotive::Middlewares::Plugins'
   end
 
   def self.configure_multi_sites

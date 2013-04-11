@@ -3,6 +3,13 @@ module Locomotive
 
     extend ActiveSupport::Concern
 
+    def self.included(base)
+      base.class_eval do
+        extend ActiveModel::Callbacks
+        define_model_callbacks :liquid_render
+      end
+    end
+
     protected
 
     # Render a Locomotive page from the the current site and both the params[:page] / params[:page_path]
@@ -26,7 +33,12 @@ module Locomotive
 
         render_no_page_error and return if @page.nil?
 
-        output = @page.render(self.locomotive_context(assigns))
+        @liquid_context = self.locomotive_context(assigns)
+
+        output = nil
+        run_callbacks(:liquid_render) do
+          output = @page.render(@liquid_context)
+        end
 
         self.prepare_and_set_response(output)
       end
@@ -150,7 +162,9 @@ module Locomotive
       end
 
       # Tip: switch from false to true to enable the re-thrown exception flag
-      ::Liquid::Context.new({}, assigns, self.locomotive_default_registers, false)
+      context = ::Liquid::Context.new({}, assigns, self.locomotive_default_registers, false)
+
+      context
     end
 
     # Get the assigns from the flash object (session). For instance, once
@@ -193,7 +207,7 @@ module Locomotive
         'locale'            => I18n.locale.to_s,
         'default_locale'    => current_site.default_locale.to_s,
         'locales'           => current_site.locales,
-        'current_user'      => Locomotive::Liquid::Drops::CurrentUser.new(current_locomotive_account)
+        'current_user'      => Locomotive::Liquid::Drops::CurrentUser.new(current_locomotive_account),
       }
     end
 

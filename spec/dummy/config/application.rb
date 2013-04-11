@@ -9,6 +9,13 @@ Bundler.require *Rails.groups(:assets) if defined?(Bundler)
 
 require 'locomotive/engine'
 
+# Plugins
+Locomotive::Plugins.init_plugins do
+  Dir[File.expand_path('../../../support/plugins/**/*.rb', __FILE__)].each do |f|
+    require f
+  end
+end
+
 module Dummy
   class Application < Rails::Application
     # Settings in config/environments/* take precedence over those specified here.

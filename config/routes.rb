@@ -68,6 +68,8 @@ Rails.application.routes.draw do
 
       resources :accounts, only: [:index, :show, :create, :destroy]
 
+      resources :plugin_data, only: [:index, :show, :update]
+
       with_options only: [:index, :show, :create, :update, :destroy] do |api|
 
         api.resources :sites
@@ -88,6 +90,9 @@ Rails.application.routes.draw do
       end
     end
   end
+
+  # Plugin rack apps
+  Locomotive::Plugins::Mounter.mount_plugin_rack_apps(self)
 
   # sitemap
   match '/sitemap.xml'  => 'locomotive/public/sitemaps#show', format: 'xml'

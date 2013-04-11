@@ -43,6 +43,10 @@ module Locomotive
       end
 
       can :read, ContentType
+
+      can :read, PluginData do |plugin_data|
+        plugin_data.enabled?
+      end
     end
 
     def setup_designer_permissions!
@@ -75,6 +79,14 @@ module Locomotive
       cannot [:update, :destroy], Membership do |membership|
         @membership.account_id == membership.account_id || # can not edit myself
         membership.admin? # can not modify an administrator
+      end
+
+      can :configure, PluginData do |plugin_data|
+        plugin_data.enabled?
+      end
+
+      can :read, PluginData do |plugin_data|
+        plugin_data.enabled?
       end
     end
 

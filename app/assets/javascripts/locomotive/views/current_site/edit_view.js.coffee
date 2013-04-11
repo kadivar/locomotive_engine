@@ -22,19 +22,30 @@ class Locomotive.Views.CurrentSite.EditView extends Locomotive.Views.Shared.Form
 
     @make_locales_sortable()
 
+    @render_plugins()
+
+    @add_toggle_mode_for_enabled_plugins()
+
     @render_domains()
 
     @render_memberships()
 
     @enable_liquid_editing()
 
-  add_toggle_mode_for_locales: ->
-    @$('#site_locales_input .list input[type=checkbox]').bind 'change', (event) ->
+  add_toggle_mode_for: (el_class) ->
+    el_id = '#site_' + el_class + '_input'
+    @$(el_id + ' .list input[type=checkbox]').bind 'change', (event) =>
       el = $(event.target)
       if el.is(':checked')
         el.closest('.entry').addClass('selected')
       else
         el.closest('.entry').removeClass('selected')
+
+  add_toggle_mode_for_locales: ->
+    @add_toggle_mode_for('locales')
+
+  add_toggle_mode_for_enabled_plugins: ->
+    @add_toggle_mode_for('enabled_plugins')
 
   make_locales_sortable: ->
     @sortable_locales_list = @$('#site_locales_input .list').sortable
@@ -43,6 +54,10 @@ class Locomotive.Views.CurrentSite.EditView extends Locomotive.Views.Shared.Form
       update: =>
         list = _.map @$('#site_locales_input .list input:checked'), (el) => $(el).val()
         @model.set locales: list
+
+  render_plugins: ->
+    @plugins_view = new Locomotive.Views.CurrentSite.PluginsView model: @model
+    @$('#plugins_input').append(@plugins_view.render().el)
 
   render_domains: ->
     @domains_view = new Locomotive.Views.Sites.DomainsView model: @model, errors: @options.errors

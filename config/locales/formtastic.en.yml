@@ -5,6 +5,7 @@ en:
       advanced_options: Advanced options
       meta: SEO Metadata
       seo: SEO settings
+      plugins: Plugins
       robots_txt: Robots.txt file
       code: Code
       raw_template: Template
