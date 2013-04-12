@@ -21,7 +21,7 @@ Feature: Add, view, and configure plugins
     And the plugin "cucumber_plugin" is enabled
     When I go to site settings
     And I unfold all folded inputs
-    And I follow "toggle" within "#plugin_list"
+    And I follow "toggle" within "#plugin_entry_cucumber_plugin"
     And I fill in "cucumber_plugin_config" with "A Value"
     And I check "my_boolean_field"
     And I press "Save"
@@ -30,16 +30,16 @@ Feature: Add, view, and configure plugins
         | my_boolean_field  | true      |
     When I go to site settings
     And I unfold all folded inputs
-    And I follow "toggle" within "#plugin_list"
-    Then I should see "A Value"
+    And I follow "toggle" within "#plugin_entry_cucumber_plugin"
+    Then the "cucumber_plugin_config" field should contain "A Value" within "#plugin_entry_cucumber_plugin"
     And the "my_boolean_field" checkbox should be checked
 
   Scenario: Configuring disabled plugins
     Given I am an authenticated "admin"
     When I go to site settings
     And I unfold all folded inputs
-    And I follow "toggle" within "#plugin_list"
-    And I fill in "cucumber_plugin_config" with "A Value"
+    And I follow "toggle" within "#plugin_entry_cucumber_plugin"
+    And I fill in "cucumber_plugin_config" with "A Value" within "#plugin_entry_cucumber_plugin"
     And I press "Save"
     Then after the AJAX finishes, the plugin config for "cucumber_plugin" should be:
         | cucumber_plugin_config  | A Value   |
@@ -55,6 +55,6 @@ Feature: Add, view, and configure plugins
     And the plugin "cucumber_plugin" is enabled
     When I go to site settings
     And I unfold all folded inputs
-    And I follow "toggle" within "#plugin_list"
+    And I follow "toggle" within "#plugin_entry_cucumber_plugin"
     Then the "content_type" dropdown should contain "Projects"
     Then the "content_type" dropdown should contain "Clients"

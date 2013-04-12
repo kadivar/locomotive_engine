@@ -1,11 +1,15 @@
 
-%label{ :name => 'cucumber_plugin_config' } Cucumber Plugin Config
-%input{ :type => 'text', :name => 'cucumber_plugin_config' }
+%li
+  %label{ :name => 'cucumber_plugin_config' } Cucumber Plugin Config
+  %input{ :type => 'text', :name => 'cucumber_plugin_config' }
 
-%select{ :name => 'content_type' }
-  {{#each content_types}}
-  %option{ :value => '{{ this.slug }}' } {{ this.name }}
-  {{/each}}
+%li
+  %label{ :name => 'content_type' } My Content Type
+  %select{ :name => 'content_type' }
+    {{#each content_types}}
+    %option{ :value => '{{ this.slug }}' } {{ this.name }}
+    {{/each}}
 
-%label{ :name => 'my_boolean_field' } My Boolean Field
-%input{ :type => 'checkbox', :name => 'my_boolean_field' }
+%li
+  %label{ :name => 'my_boolean_field' } My Boolean Field
+  %input{ :type => 'checkbox', :name => 'my_boolean_field' }

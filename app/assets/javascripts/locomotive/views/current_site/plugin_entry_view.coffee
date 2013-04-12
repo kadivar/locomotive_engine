@@ -14,11 +14,17 @@ class Locomotive.Views.CurrentSite.PluginEntryView extends Backbone.View
 
     Backbone.ModelBinding.bind @, all: 'class'
 
+    @set_id()
+
     @render_config_view()
 
     @hide_toggle_unless_config_view()
 
     return @
+
+  set_id: ->
+    id = "plugin_entry_#{@model.get('plugin_id')}"
+    $(@el).attr('id', id)
 
   render_config_view: ->
     @config_view = new Locomotive.Views.CurrentSite.PluginConfigView
