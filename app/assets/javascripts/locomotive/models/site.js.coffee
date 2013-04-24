@@ -5,15 +5,11 @@ class Locomotive.Models.Site extends Backbone.Model
   urlRoot: "#{Locomotive.mounted_on}/sites"
 
   initialize: ->
-    # Be careful, domains_without_subdomain becomes domains
-    domains = _.map @get('domains_without_subdomain'), (name) =>
-      new Locomotive.Models.Domain(name: name)
+    @_fix_attributes()
 
-    memberships = new Locomotive.Models.MembershipsCollection(@get('memberships'))
-
-    plugins = new Locomotive.Models.PluginsCollection(@get('plugins'))
-
-    @set domains: domains, memberships: memberships, plugins: plugins
+    # After save, need to fix the attributes again
+    this.on 'sync', ->
+      @_fix_attributes()
 
   includes_domain: (name_with_port) ->
     name = name_with_port.replace(/:[0-9]*/, '')
@@ -31,6 +27,18 @@ class Locomotive.Models.Site extends Backbone.Model
       delete hash.plugins
       plugins_json = @get('plugins').toJSON()
       hash.plugins = plugins_json unless plugins_json.length == 0
+
+  _fix_attributes: ->
+    # Be careful, domains_without_subdomain becomes domains
+    domains = _.map @get('domains_without_subdomain'), (name) =>
+      new Locomotive.Models.Domain(name: name)
+
+    memberships = new Locomotive.Models.MembershipsCollection(@get('memberships'))
+
+    plugins = new Locomotive.Models.PluginsCollection(@get('plugins'))
+
+    @set domains: domains, memberships: memberships, plugins: plugins
+
 
 class Locomotive.Models.CurrentSite extends Locomotive.Models.Site
 
