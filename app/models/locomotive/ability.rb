@@ -7,12 +7,12 @@ module Locomotive
     def initialize(account, site)
       @account, @site = account, site
 
-      alias_action :index, :show, :edit, :update, :to => :touch
+      alias_action :index, :show, :edit, :update, to: :touch
 
       if @site
-        @membership = @site.memberships.where(:account_id => @account.id).first
+        @membership = @site.memberships.where(account_id: @account.id).first
       elsif @account.admin?
-        @membership = Membership.new(:account => @account, :role => 'admin')
+        @membership = Membership.new(account: @account, role: 'admin')
       end
 
       return false if @membership.nil?
@@ -33,14 +33,15 @@ module Locomotive
     end
 
     def setup_author_permissions!
-      can :touch, [Page, ThemeAsset]
-      can :sort, Page
+      can :touch, ThemeAsset
+
+      can [:read, :create, :update], Page
+      cannot :destroy, Page
+      cannot :customize, Page
 
       can :manage, [ContentEntry, ContentAsset, Translation]
 
-      can :touch, Site do |site|
-        site == @site
-      end
+      can :touch, Site, _id: @site._id
 
       can :read, ContentType
 
@@ -64,9 +65,7 @@ module Locomotive
 
       can :manage, Translation
 
-      can :manage, Site do |site|
-        site == @site
-      end
+      can :manage, Site, _id: @site._id
 
       can :point, Site
 

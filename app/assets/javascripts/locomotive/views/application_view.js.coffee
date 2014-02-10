@@ -13,8 +13,7 @@ class Locomotive.Views.ApplicationView extends Backbone.View
 
     @enable_content_locale_picker()
 
-    window.Locomotive.tinyMCE.defaultSettings.language = window.locale # set the default tinyMCE language
-    window.Locomotive.tinyMCE.minimalSettings.language = window.locale
+    @set_locale_for_tinymce_widgets()
 
     # render page view
     if @options.view?
@@ -80,13 +79,25 @@ class Locomotive.Views.ApplicationView extends Backbone.View
       picker.toggle()
 
     picker.find('li').bind 'click', (event) ->
-      locale = $(@).attr('data-locale')
+      locale = $(@).data('locale')
       window.addParameterToURL 'content_locale', locale
+
+  set_locale_for_tinymce_widgets: ->
+    # tinyMCE likes only lowercase locales
+    tinymce_locale = window.locale.toLowerCase()
+
+    # pt-BR does not exist, pt does though
+    tinymce_locale = 'pt' if tinymce_locale == 'pt-br'
+
+    # set the default tinyMCE language
+    window.Locomotive.tinyMCE.defaultSettings.language  = tinymce_locale
+    window.Locomotive.tinyMCE.minimalSettings.language  = tinymce_locale
+    window.Locomotive.tinyMCE.popupSettings.language    = tinymce_locale
 
   unique_dialog_zindex: ->
     # returns the number of jQuery UI modals created in order to set a valid zIndex for each of them.
     # Each modal window should have a different zIndex, otherwise there will be conflicts between them.
     window.Locomotive.jQueryModals ||= 0
 
-    998 + window.Locomotive.jQueryModals++
-
+    # 998 + window.Locomotive.jQueryModals++
+    300000 + window.Locomotive.jQueryModals++

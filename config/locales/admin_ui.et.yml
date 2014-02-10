@@ -21,6 +21,10 @@ et:
       es: Hispaania
       ru: Vene
       et: Eesti
+      ja: Jaapanlane
+      zh-CN: Hiina
+      cs: Tsehhi
+      bg: Bulgaaria
 
     messages:
       confirm: Oled kindel ?

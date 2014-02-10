@@ -16,3 +16,15 @@ Scenario: Simple Page
     """
     Hello World
     """
+
+Scenario: Missing 404 page
+  Given a page named "hello-world" with the template:
+    """
+    Hello World
+    """
+  And the page "404" is unpublished
+  When I view the rendered page at "/madeup"
+  Then the rendered output should look like:
+    """
+    No Page!
+    """

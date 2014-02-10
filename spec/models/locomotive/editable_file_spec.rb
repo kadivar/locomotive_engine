@@ -6,7 +6,7 @@ describe Locomotive::EditableFile do
     @site = FactoryGirl.create(:site)
     @home = @site.pages.root.first
 
-    @home.update_attributes :raw_template => "{% block body %}{% editable_file 'image' %}Lorem ipsum{% endeditable_file %}{% endblock %}"
+    @home.update_attributes raw_template: "{% block body %}{% editable_file 'image' %}Lorem ipsum{% endeditable_file %}{% endblock %}"
 
     @home = @site.pages.root.first
   end
@@ -39,15 +39,31 @@ describe Locomotive::EditableFile do
     before(:each) do
       @editable_file = @home.editable_elements.first
       @editable_file.source = FixturedAsset.open('5k.png')
+      # @editable_file.save
+      # Rails.logger.debug "------------- START --------"
+      # puts "changed"
+      # puts @editable_file.changed.inspect
+      # puts "changes"
+      # puts @editable_file.changes.inspect
+      # puts @home.changes.inspect
       @home.save
+      @home.reload
+      # puts @editable_file.inspect
+      # puts @home.errors.inspect
+      # Rails.logger.debug "------------- DONE --------"
+      # @home = Locomotive::Page.find(@home._id)
     end
 
     it 'has a valid source' do
       @editable_file.source?.should be_true
+      # puts @editable_file.source.inspect
     end
 
     it 'returns the right path even if the page has been retrieved with the minimum_attributes scope' do
-      @home = @site.pages.minimal_attributes(%w(editable_elements)).root.first
+      # @home = @site.pages.minimal_attributes(%w(editable_elements)).root.first
+      @home = @site.pages.root.first
+      # puts @home.inspect
+      # puts @home.editable_elements.inspect
       @home.editable_elements.first.source?.should be_true
     end
 
@@ -56,10 +72,10 @@ describe Locomotive::EditableFile do
   describe '"sticky" files' do
 
     before(:each) do
-      @home.update_attributes :raw_template => "{% block body %}{% editable_file 'image', fixed: true %}/foo.png{% endeditable_file %}{% endblock %}"
+      @home.update_attributes raw_template: "{% block body %}{% editable_file 'image', fixed: true %}/foo.png{% endeditable_file %}{% endblock %}"
 
-      @sub_page_1 = FactoryGirl.create(:page, :slug => 'sub_page_1', :parent => @home, :raw_template => "{% extends 'index' %}")
-      @sub_page_2 = FactoryGirl.create(:page, :slug => 'sub_page_2', :parent => @home, :raw_template => "{% extends 'index' %}")
+      @sub_page_1 = FactoryGirl.create(:page, slug: 'sub_page_1', parent: @home, raw_template: "{% extends 'index' %}")
+      @sub_page_2 = FactoryGirl.create(:page, slug: 'sub_page_2', parent: @home, raw_template: "{% extends 'index' %}")
 
       @sub_page_1_el = @sub_page_1.editable_elements.first
       @sub_page_2_el = @sub_page_2.editable_elements.first

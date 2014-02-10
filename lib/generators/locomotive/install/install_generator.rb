@@ -16,15 +16,10 @@ module Locomotive
 
       template 'mongoid.yml', 'config/mongoid.yml'
     end
-    
-    def copy_migrations
-      rake("db:mongoid:migration:install")
-      rake("db:mongoid:migrate")
-    end
 
     def insert_engine_routes
       route %(
-  mount Locomotive::Engine => '/locomotive', :as => 'locomotive' # you can change the value of the path, by default set to "/locomotive"
+  mount Locomotive::Engine => '/locomotive', as: 'locomotive' # you can change the value of the path, by default set to "/locomotive"
       )
     end
 

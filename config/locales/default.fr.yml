@@ -30,7 +30,7 @@ fr:
       invalid_domain: "%{value} n'est pas valide"
       needs_admin_account: "Un minimum d'un compte admin est requis"
       protected_page: "Vous ne pouvez pas supprimer les pages index et 404"
-      extname_changed: "Nouveau fichier n'a pas l'extension original"
+      extname_changed: "La nouvelle version du fichier n'a pas l'extension originale"
       array_too_short: "est trop petit (le nombre minimum d'éléments est %{count})"
       security: "présente un problème de sécurité"
       site:
@@ -55,7 +55,7 @@ fr:
   mongoid:
     errors:
       messages:
-        blank_on_locale: "doit être rempli(e)"
+        blank_in_locale: "doit être rempli(e)"
 
     attributes:
       locomotive/page:
@@ -83,6 +83,8 @@ fr:
         group_by_field_id: Champ pour grouper
         public_submission_enabled: Activation API
         public_submission_accounts: Comptes à notifier
+      locomotive/content_entry:
+        created_at: Date de création
       locomotive/asset:
         source: Fichier
       locomotive/account:
@@ -141,7 +143,7 @@ fr:
 
   time:
     formats:
-      default: "%d %B %Y %H:%M"
+      default: "%d/%m/%Y %H:%M"
       time: "%H:%M"
       short: "%d %b %H:%M"
       long: "%A %d %B %Y %H:%M:%S %Z"

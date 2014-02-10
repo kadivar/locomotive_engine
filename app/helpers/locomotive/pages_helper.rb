@@ -11,20 +11,18 @@ module Locomotive
     def page_toggler(page)
       icon_class = cookies["folder-#{page._id}"] != 'none' ? 'icon-caret-down' : 'icon-caret-right'
       content_tag :i, '',
-        :class  => "#{icon_class} toggler",
-        :data   => {
-          :open   => 'icon-caret-down',
-          :closed => 'icon-caret-right'
+        class:  "#{icon_class} toggler",
+        data:   {
+          open:   'icon-caret-down',
+          closed: 'icon-caret-right'
         }
     end
 
     def parent_pages_options
-      roots = current_site.pages.roots.where(:slug.ne => '404').and(:_id.ne => @page.id)
-
       [].tap do |list|
-        roots.each do |page|
-          list = add_children_to_options(page, list)
-        end
+        root = Locomotive::Page.quick_tree(current_site).first
+
+        add_children_to_options(root, list)
       end
     end
 
@@ -85,7 +83,7 @@ module Locomotive
     #
     def page_main_template_path(page)
       if not_the_default_current_locale?
-        page_path(page, :content_locale => current_site.default_locale, :format => :json)
+        page_path(page, content_locale: current_site.default_locale, format: :json)
       else
         nil
       end

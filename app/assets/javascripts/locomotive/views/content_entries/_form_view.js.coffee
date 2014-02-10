@@ -10,6 +10,8 @@ class Locomotive.Views.ContentEntries.FormView extends Locomotive.Views.Shared.F
 
   _file_field_views: []
 
+  _belongs_to_field_views: []
+
   _has_many_field_views: []
 
   _many_to_many_field_views: []
@@ -31,11 +33,17 @@ class Locomotive.Views.ContentEntries.FormView extends Locomotive.Views.Shared.F
 
     @enable_checkboxes()
 
+    @enable_tags()
+
     @enable_datepickers()
+
+    @enable_datetimepickers()
 
     @enable_richtexteditor()
 
     @enable_select_fields()
+
+    @enable_belongs_to_fields()
 
     @enable_file_fields()
 
@@ -50,8 +58,16 @@ class Locomotive.Views.ContentEntries.FormView extends Locomotive.Views.Shared.F
   enable_checkboxes: ->
     @$('li.input.toggle input[type=checkbox]').checkToggle()
 
+  enable_tags: ->
+    @$('li.input.tags input[type=text]').tagit(allowSpaces: true)
+
   enable_datepickers: ->
     @$('li.input.date input[type=text]').datepicker()
+
+  enable_datetimepickers: ->
+    @$('li.input.date-time input[type=text]').datetimepicker
+      controlType: 'select'
+      showTime: false
 
   enable_richtexteditor: ->
     _.each @$('li.input.rte textarea.html'), (textarea) =>
@@ -88,13 +104,26 @@ class Locomotive.Views.ContentEntries.FormView extends Locomotive.Views.Shared.F
             unless option.destroyed()
               $select.append(new Option(option.get('name'), option.get('id'), false, option.get('id') == @model.get("#{name}_id")))
 
+  enable_belongs_to_fields: ->
+    prefix = if @namespace? then "#{@namespace}_" else ''
+
+    _.each @model.get('belongs_to_custom_fields'), (name) =>
+      $el = @$("##{prefix}#{@model.paramRoot}_#{name}_id")
+
+      if $el.length > 0
+        view = new Locomotive.Views.Shared.Fields.BelongsToView model: @model, name: name, el: $el
+
+        @_belongs_to_field_views.push(view)
+
+        view.render()
+
   enable_file_fields: ->
+    prefix = if @namespace? then "#{@namespace}_" else ''
+
     _.each @model.get('file_custom_fields'), (name) =>
       view = new Locomotive.Views.Shared.Fields.FileView model: @model, name: name, namespace: @namespace
 
       @_file_field_views.push(view)
-
-      prefix = if @namespace? then "#{@namespace}_" else ''
 
       @$("##{prefix}#{@model.paramRoot}_#{name}_input label").after(view.render().el)
 
@@ -130,7 +159,7 @@ class Locomotive.Views.ContentEntries.FormView extends Locomotive.Views.Shared.F
 
   refresh: ->
     @$('li.input.toggle input[type=checkbox]').checkToggle('sync')
-    _.each @_file_field_views, (view) => view.refresh()
+    @refresh_file_fields()
 
   reset: ->
     @$('li.input.string input[type=text], li.input.text textarea, li.input.date input[type=text]').val('').trigger('change')
@@ -140,6 +169,7 @@ class Locomotive.Views.ContentEntries.FormView extends Locomotive.Views.Shared.F
 
   remove: ->
     @$('li.input.date input[type=text]').datepicker('destroy')
+    @$('li.input.date_time input[type=text]').datetimepicker('destroy')
     @_select_field_view.remove()
     _.each @_file_field_views, (view) => view.remove()
     _.each @_has_many_field_views, (view) => view.remove()

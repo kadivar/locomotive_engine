@@ -19,22 +19,34 @@ module Locomotive
           ## callbacks ##
           before_validation :get_templatized_from_parent
           before_validation :ensure_target_klass_name_security
-          after_validation  :set_slug_if_templatized
+          before_validation :set_slug_if_templatized
           after_save        :propagate_templatized
 
           ## scopes ##
-          scope :templatized, where: { templatized: true }
+          scope :templatized, where(templatized: true)
 
           ## virtual attributes ##
           attr_accessor :content_entry
+        end
+
+        # Return the content type specified by the target_klass_name property.
+        #
+        # @return [ Object ] The content type or nil if not found
+        #
+        def content_type
+          if self.target_klass_name =~ /^Locomotive::ContentEntry([a-z0-9]+)$/
+            @content_type ||= self.site.content_types.find($1) rescue nil
+          else
+            nil
+          end
         end
 
         # Return the class specified by the target_klass_name property
         #
         # @example
         #
-        #   page.target_klass_name = 'Locomotive::Entry12345'
-        #   page.target_klass # <Locomotive::Entry12345...>
+        #   page.target_klass_name = 'Locomotive::ContentEntry12345'
+        #   page.target_klass # <Locomotive::ContentEntry12345...>
         #
         # @return [ Class ] The target class
         #
@@ -45,15 +57,10 @@ module Locomotive
         # Return the slug related to the target_klass.
         # In other words, it returns the slug of the target content type.
         #
-        # @return [ String ] The slug of the target class / content type. Nil if no target klass.
+        # @return [ String ] The slug of the target class / content type. Nil if no target klass matching a content type
         #
         def target_klass_slug
-          if self.target_klass_name =~ /^Locomotive::Entry([a-z0-9]+)$/
-            @content_type ||= self.site.content_types.find($1)
-            @content_type.slug
-          else
-            nil
-          end
+          self.content_type.try(:slug)
         end
 
         # Set the target klass from the slug of a content type
@@ -75,7 +82,7 @@ module Locomotive
         #
         # @example
         #
-        #   page.target_klass_name = 'Locomotive::Entry12345' # related to the content type Articles
+        #   page.target_klass_name = 'Locomotive::ContentEntry12345' # related to the content type Articles
         #   page.target_entry_name = 'article'
         #
         #   page.target_klass_name = 'OurProduct'
@@ -84,9 +91,8 @@ module Locomotive
         # @return [ String ] The name in lowercase and underscored
         #
         def target_entry_name
-          if self.target_klass_name =~ /^Locomotive::Entry([a-z0-9]+)$/
-            @content_type ||= self.site.content_types.find($1)
-            @content_type.slug.singularize
+          if self.content_type
+            self.content_type.slug.singularize
           else
             self.target_klass_name.underscore
           end
@@ -110,9 +116,8 @@ module Locomotive
         # @return [ Object ] The documents
         #
         def fetch_target_entries(conditions = {})
-          if self.target_klass_name =~ /^Locomotive::Entry([a-z0-9]+)$/
-            @content_type ||= self.site.content_types.find($1)
-            @content_type.ordered_entries(conditions)
+          if self.content_type
+            self.content_type.ordered_entries(conditions)
           else
             []
           end
@@ -143,7 +148,7 @@ module Locomotive
         def ensure_target_klass_name_security
           return if !self.templatized? || self.target_klass_name.blank?
 
-          if self.target_klass_name =~ /^Locomotive::Entry([a-z0-9]+)$/
+          if self.target_klass_name =~ /^Locomotive::ContentEntry([a-z0-9]+)$/
             content_type = Locomotive::ContentType.find($1)
 
             if content_type.site_id != self.site_id
@@ -170,7 +175,7 @@ module Locomotive
             }
           }
 
-          self.collection.update selector, operations, multi: true
+          self.collection.find(selector).update(operations, multi: true)
         end
 
       end

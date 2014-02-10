@@ -22,6 +22,10 @@ fr:
       es: Espagnol
       ru: Russe
       et: Estonien
+      ja: Japonais
+      zh-CN: Chinois
+      cs: Tchèque
+      bg: Bulgare
 
     buttons:
       login: Se connecter
@@ -30,6 +34,7 @@ fr:
       new_item: "+ ajouter"
       switch_to_site: Aller
       delete: "Supprimer"
+      close: Fermer
 
     messages:
       confirm: "Êtes-vous sûr(e) ?"
@@ -73,8 +78,19 @@ fr:
         title: "Bonjour %{name}, nous voulions vous faire savoir qu'une nouvelle instance a été créée le %{date} pour le site <b>%{domain}</b>"
         type: "Modèle: %{type}"
 
+    pagination:
+      first: "&laquo;"
+      last: "&raquo;"
+      previous: "&lsaquo;"
+      next: "&rsaquo;"
+      truncate: "&hellip;"
+
     sites_picker:
       new: + nouveau site
+
+    api_key:
+      none: Cliquez sur le bouton suivant pour générer une clé API.
+      button: Re-générer
 
     custom_fields:
       edit:
@@ -216,6 +232,7 @@ fr:
         images: Images
         media: Média
         fonts: Polices
+        others: Autres
         no_items: "Il n'existe pas de fichiers."
         quick_upload: "Upload rapide"
       asset:

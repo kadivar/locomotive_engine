@@ -56,7 +56,7 @@ pl:
   mongoid:
     errors:
       messages:
-        blank_on_locale: "nie może być pusty"
+        blank_in_locale: "nie może być pusty"
 
     attributes:
       locomotive/page:
@@ -184,7 +184,7 @@ pl:
 
   time:
     formats:
-      default: "%a, %d %b %Y %H:%M:%S %z"
+      default: "%d-%m-%Y %H:%M"
       short: "%d %b %H:%M"
       long: "%B %d, %Y %H:%M"
     am: "przed południem"
@@ -314,4 +314,4 @@ pl:
       create: 'Utwórz %{model}'
       update: 'Aktualizuj %{model}'
       submit: 'Zapisz %{model}'
-  
+

@@ -182,6 +182,24 @@ form.formtastic {
             float: left;
             margin: -3px 10px 0 0;
           }
+
+          .localized-icon {
+            margin-right: 8px;
+            padding: 2px;
+
+            background-color: #6D6D6B;
+            @include border-radius(8px);
+
+            font-size: 10px;
+            color: #fff;
+            @include single-text-shadow(transparent, 0px, 0px, 0px, 0px);
+            text-shadow: none;
+
+            &.untranslated {
+              background-color: #f2af00;
+            }
+          }
+
         }
 
         p.inline-hints {
@@ -195,6 +213,7 @@ form.formtastic {
             color: #5E5F64;
             @include single-text-shadow(rgba(255, 255, 255, 0.8), 0px, 1px, 1px);
           }
+
         } // p.inline-hints
 
         .actions {
@@ -231,15 +250,18 @@ form.formtastic {
           }
         } // div.inline-errors
 
-        &.string, &.password {
+        &.string, &.password, &.numeric, &.select2 {
           label {
             padding-top: 2px;
           }
 
-          input[type=text], input[type=password] {
+          input[type=text], input[type=password], input[type=number] {
             @include default-input-style;
-
             width: 700px;
+          }
+
+          input[type=number] {
+            width: 150px;
           }
 
           &.highlighted {
@@ -261,10 +283,10 @@ form.formtastic {
 
         &.text {
 
-          &.short textarea {
+          textarea {
             padding: 5px;
-            height: 28px;
             width: 696px;
+            height: auto;
             overflow-y: hidden;
           }
 
@@ -277,6 +299,20 @@ form.formtastic {
             margin-left: 10px;
           }
         } // li.select_with_edit
+
+        &.select2 {
+
+          a.select2-choice {
+            @include default-input-style;
+            padding: 0px 4px;
+            @include border-radius(0px);
+
+            & > div {
+              @include border-radius(0px);
+            }
+          }
+
+        } // li.select2
 
         &.locale, &.locales {
           .list {
@@ -418,6 +454,14 @@ form.formtastic {
 
         } // li.date
 
+        &.date-time {
+
+          input[type=text] {
+            width: 120px;
+          }
+
+        } // li.date-time
+
         &.file {
           span.file {
             a:first-child {
@@ -439,6 +483,18 @@ form.formtastic {
             }
           }
         } // li.file
+
+        &.api_key {
+          code {
+            color: #000;
+            font-weight: bold;
+            font-family: Monaco, monospace;
+          }
+          button.regenerate {
+            @include blue-button;
+            margin-left: 10px;
+          }
+        }
 
         &.subdomain {
 

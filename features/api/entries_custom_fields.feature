@@ -14,8 +14,8 @@ Feature: Entries Custom Field
 
   Scenario: Return the minimal set of attributes for each kind of field
     When I do an API GET request to content_types/4f832c2cb0d86d3f42fffffe.json
-    Then the JSON at "entries_custom_fields/0" should have 8 keys
-    Then the JSON at "entries_custom_fields/1" should have 9 keys
+    Then the JSON at "entries_custom_fields/0" should have 9 keys
+    Then the JSON at "entries_custom_fields/1" should have 10 keys
 
   Scenario: Update custom field
     When I do an API PUT to content_types/4f832c2cb0d86d3f42fffffe.json with:
@@ -140,11 +140,11 @@ Feature: Entries Custom Field
     """
     Then the JSON response at "entries_custom_fields" should have 3 entries
     And the JSON response should have the following:
-      | entries_custom_fields/0/label       | "Title"                                     |
-      | entries_custom_fields/0/type        | "string"                                    |
-      | entries_custom_fields/1/label       | "Content"                                   |
-      | entries_custom_fields/1/type        | "text"                                      |
-      | entries_custom_fields/2/label       | "Project"                                   |
-      | entries_custom_fields/2/type        | "belongs_to"                                |
-      | entries_custom_fields/2/class_name  | "Locomotive::Entry4f832c2cb0d86d3f42fffffe" |
-      | entries_custom_fields/2/class_slug  | "projects"                                  |
+      | entries_custom_fields/0/label       | "Title"                                             |
+      | entries_custom_fields/0/type        | "string"                                            |
+      | entries_custom_fields/1/label       | "Content"                                           |
+      | entries_custom_fields/1/type        | "text"                                              |
+      | entries_custom_fields/2/label       | "Project"                                           |
+      | entries_custom_fields/2/type        | "belongs_to"                                        |
+      | entries_custom_fields/2/class_name  | "Locomotive::ContentEntry4f832c2cb0d86d3f42fffffe"  |
+      | entries_custom_fields/2/class_slug  | "projects"                                          |

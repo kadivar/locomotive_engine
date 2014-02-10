@@ -7,6 +7,7 @@ require 'locomotive/haml'
 require 'locomotive/formtastic'
 require 'locomotive/dragonfly'
 require 'locomotive/kaminari'
+require 'locomotive/markdown'
 require 'locomotive/liquid'
 require 'locomotive/presentable'
 require 'locomotive/mongoid'
@@ -21,7 +22,6 @@ require 'locomotive/regexps'
 require 'locomotive/render'
 require 'locomotive/plugins'
 require 'locomotive/middlewares'
-require 'locomotive/session_store'
 
 module Locomotive
   extend ActiveSupport::Autoload
@@ -40,6 +40,7 @@ module Locomotive
 
     yield(self.config)
 
+
     after_configure
   end
 
@@ -55,19 +56,12 @@ module Locomotive
 
     # cookies stored in mongodb (mongoid_store)
     Rails.application.config.session_store :mongoid_store, {
-      :key    => self.config.cookie_key,
-      :domain => :all
+      key:    self.config.cookie_key,
+      domain: :all
     }
 
     # add middlewares (dragonfly, font, seo, ...etc)
     self.add_middlewares
-
-    # Load all the dynamic classes (custom fields)
-    begin
-      ContentType.all.collect { |content_type| content_type.klass_with_custom_fields(:entries) }
-    rescue ::Mongoid::Errors::InvalidDatabase => e
-      # let assume it's because of the first install (meaning no config.yml file)
-    end
 
     # enable the hosting solution if both we are not in test or dev and that the config.hosting option has been filled up
     self.enable_hosting
@@ -88,7 +82,6 @@ module Locomotive
       self.app_middleware.insert_before 'Dragonfly::Middleware', '::Locomotive::Middlewares::Cache', self.config.rack_cache
     end
 
-    self.app_middleware.insert_before Rack::Lock, '::Locomotive::Middlewares::Fonts', :path => %r{^/fonts}
     self.app_middleware.use '::Locomotive::Middlewares::SeoTrailingSlash'
 
     self.app_middleware.use '::Locomotive::Middlewares::InlineEditor'

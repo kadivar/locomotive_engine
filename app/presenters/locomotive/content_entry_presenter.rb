@@ -7,7 +7,7 @@ module Locomotive
 
     property    :_slug
 
-    property    :_position, required: false
+    properties  :_position, :_visible, required: false
 
     properties  :seo_title, :meta_keywords, :meta_description, required: false
 
@@ -19,7 +19,7 @@ module Locomotive
 
     with_options only_getter: true, if: Proc.new { html_view? } do |presenter|
       presenter.properties  :safe_attributes
-      presenter.properties  :select_custom_fields, :file_custom_fields, :has_many_custom_fields, :many_to_many_custom_fields
+      presenter.properties  :select_custom_fields, :file_custom_fields, :belongs_to_custom_fields, :has_many_custom_fields, :many_to_many_custom_fields
     end
 
     ## callbacks ##
@@ -37,7 +37,7 @@ module Locomotive
     end
 
     def safe_attributes
-      self.__source.custom_fields_safe_setters + %w(_slug seo_title meta_keywords meta_description)
+      self.__source.custom_fields_safe_setters + %w(_slug _visible seo_title meta_keywords meta_description)
     end
 
     ## other methods ##

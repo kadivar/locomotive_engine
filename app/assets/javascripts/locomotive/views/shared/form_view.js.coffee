@@ -29,6 +29,8 @@ class Locomotive.Views.Shared.FormView extends Backbone.View
   save_in_ajax: (event, options) ->
     event.stopPropagation() & event.preventDefault()
 
+    @trigger_change_event_on_focused_inputs()
+
     form = $(event.target).trigger('ajax:beforeSend')
 
     @clear_errors()
@@ -41,12 +43,13 @@ class Locomotive.Views.Shared.FormView extends Backbone.View
       headers:  options.headers
       silent:   true # since we pass an empty hash above, no need to trigger the callbacks
 
-    xhr.success (model, response) =>
+    xhr.success (model, response, _options) =>
       form.trigger('ajax:complete')
 
+      @model.set(previous_attributes)
       model.attributes = previous_attributes
 
-      options.on_success(response, xhr) if options.on_success
+      options.on_success(model, xhr) if options.on_success
 
     xhr.error (model, xhr) =>
       form.trigger('ajax:complete')
@@ -84,15 +87,15 @@ class Locomotive.Views.Shared.FormView extends Backbone.View
       else
         content.slideUp 100, -> parent.addClass('folded')
 
+  trigger_change_event_on_focused_inputs: ->
+    # make sure that the current text field gets saved too
+    input = @$('form input[type=text]:focus, form input[type=password]:focus, form textarea:focus')
+    input.trigger('change') if input.size() > 0
+
   enable_save_with_keys_combination: ->
     $.cmd 'S', (() =>
-      # make sure that the current text field gets saved too
-      input = @$('form input[type=text]:focus, form input[type=password]:focus')
-      input.trigger('change') if input.size() > 0
-
       @$('form input[type=submit]').trigger('click')
     ), [], ignoreCase: true
-
 
   enable_form_notifications: ->
     @$('form').formSubmitNotification()
@@ -116,6 +119,7 @@ class Locomotive.Views.Shared.FormView extends Backbone.View
 
     input = @$("##{prefix}#{@model.paramRoot}_#{attribute}")
     input = @$("##{prefix}#{@model.paramRoot}_#{attribute}_id") if input.size() == 0
+    input = @$("##{prefix}#{@model.paramRoot}_#{attribute}_ids") if input.size() == 0
 
     return unless input.size() > 0
 

@@ -23,24 +23,29 @@ Locomotive.configure do |config|
   #   - from ENV variables: HEROKU_LOGIN & HEROKU_PASSWORD
   #   - from this file, see the example below and uncomment it if needed
   # config.heroku = {
-  #   :login      => '<your_heroku_login>',
-  #   :password   => '<your_heroku_password>'
+  #   login:      '<your_heroku_login>',
+  #   password:   '<your_heroku_password>'
   # }
 
   # configure how many items we display in sub menu in the "Contents" section.
-  # config.ui = {
-  #   :lastest_entries_nb => 5,
-  #   :max_content_types  => 4
-  # }
+  config.ui = {
+    latest_entries_nb:  5,
+    max_content_types:  4,
+    per_page:           10
+  }
 
-  # default locale (for now, only en, de, fr, pl, pt-BR and it are supported)
+  # default locale (for now, only en, de, fr, pl, pt-BR, it, nl, nb, ja, cs and bg are supported)
   config.default_locale = :en
 
   # available locales suggested to "localize" a site. You will have to pick up at least one among that list.
-  config.site_locales = %w{en de fr pl pt-BR it nl nb es ru}
+  # config.site_locales = %w{en de fr pl pt-BR it nl nb es ru ja cs bg}
 
   # tell if logs are enabled. Useful for debug purpose.
   config.enable_logs = true
+
+  # Uncomment this line to force LocomotiveCMS to redirect all requests in the
+  # back-office to https in production.
+  # config.enable_admin_ssl = Rails.env.production?
 
   # Configure the e-mail address which will be shown in the DeviseMailer, NotificationMailer, ...etc
   # if you do not put the domain name in the email, Locomotive will take the default domain name depending
@@ -68,9 +73,9 @@ Locomotive.configure do |config|
 
   # Rack-cache settings, mainly used for the inline resizing image module. Default options:
   # config.rack_cache = {
-  #   :verbose     => true,
-  #   :metastore   => URI.encode("file:#{Rails.root}/tmp/dragonfly/cache/meta"), # URI encoded in case of spaces
-  #   :entitystore => URI.encode("file:#{Rails.root}/tmp/dragonfly/cache/body")
+  #   verbose:     true,
+  #   metastore:   URI.encode("file:#{Rails.root}/tmp/dragonfly/cache/meta"), # URI encoded in case of spaces
+  #   entitystore: URI.encode("file:#{Rails.root}/tmp/dragonfly/cache/body")
   # }
   # If you do want to disable it for good, just use the following syntax
   # config.rack_cache = false

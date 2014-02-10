@@ -4,6 +4,8 @@ module Locomotive
 
       include Locomotive::Render
 
+      before_filter :set_locale
+
       before_filter :set_content_type
 
       before_filter :sanitize_entry_params, only: :create
@@ -11,7 +13,7 @@ module Locomotive
       respond_to :html, :json
 
       def create
-        @entry = @content_type.entries.create(params[:entry] || params[:content])
+        @entry = @content_type.entries.safe_create(params[:entry] || params[:content])
 
         respond_with @entry, {
           location:   self.callback_url,
@@ -20,6 +22,11 @@ module Locomotive
       end
 
       protected
+
+      def set_locale
+        ::I18n.locale = params[:locale] || current_site.default_locale
+        ::Mongoid::Fields::I18n.locale = ::I18n.locale
+      end
 
       def set_content_type
         @content_type = current_site.content_types.where(slug: params[:slug]).first

@@ -13,9 +13,9 @@ module Locomotive
     field :name
     field :description
     field :slug
-    field :label_field_id,              type: BSON::ObjectId
+    field :label_field_id,              type: Moped::BSON::ObjectId
     field :label_field_name
-    field :group_by_field_id,           type: BSON::ObjectId
+    field :group_by_field_id,           type: Moped::BSON::ObjectId
     field :order_by
     field :order_direction,             default: 'asc'
     field :public_submission_enabled,   type: Boolean, default: false
@@ -29,13 +29,20 @@ module Locomotive
         any_of({ _id: id_or_permalink }, { _slug: id_or_permalink }).first
       end
 
+      def safe_create(attributes = {})
+        build.tap do |entry|
+          entry.from_presenter(attributes)
+          entry.save
+        end
+      end
+
     end
 
     ## named scopes ##
-    scope :ordered, order_by: :updated_at.desc
+    scope :ordered, order_by(updated_at: :desc)
 
     ## indexes ##
-    index [[:site_id, Mongo::ASCENDING], [:slug, Mongo::ASCENDING]]
+    index site_id: 1, slug: 1
 
     ## callbacks ##
     before_validation   :normalize_slug
@@ -67,9 +74,31 @@ module Locomotive
       [order_by_attribute, direction]
     end
 
-    def ordered_entries(conditions = {})
-      _order_by_definition = (conditions || {}).delete(:order_by).try(:split) || self.order_by_definition
-      self.entries.order_by([_order_by_definition]).where(conditions)
+    # Order the list of entries, paginate it if requested
+    # and filter it.
+    #
+    # @param [ Hash ] options Options to filter and paginate.
+    #
+    # @return [ Criteria ] A Mongoid criteria if not paginated (array otherwise).
+    #
+    def ordered_entries(options = nil)
+      options ||= {}
+
+      page, per_page = options.delete(:page), options.delete(:per_page)
+
+      # search for a label
+      if options[:q]
+        options[label_field_name.to_sym] = /#{options.delete(:q)}/i
+      end
+
+      # order list
+      _order_by_definition = (options || {}).delete(:order_by).try(:split) || self.order_by_definition
+
+      # get list
+      _entries = self.entries.order_by([_order_by_definition]).where(options)
+
+      # pagination or full list
+      !self.order_manually? && page ? _entries.page(page).per(per_page) : _entries
     end
 
     def groupable?
@@ -80,15 +109,25 @@ module Locomotive
       self.find_entries_custom_field(self.group_by_field_id)
     end
 
-    def list_or_group_entries
+    def sortable_column
+      # only the belongs_to field has a special column for relative positionning
+      # that's why we don't call groupable?
+      if self.group_by_field.try(:type) == 'belongs_to' && self.order_manually?
+        "position_in_#{self.group_by_field.name}"
+      else
+        '_position'
+      end
+    end
+
+    def list_or_group_entries(options = {})
       if self.groupable?
-        if group_by_field.type == 'select'
+        if self.group_by_field.type == 'select'
           self.entries.group_by_select_option(self.group_by_field.name, self.order_by_definition)
         else
           group_by_belongs_to_field(self.group_by_field)
         end
       else
-        self.ordered_entries
+        self.ordered_entries(options)
       end
     end
 
@@ -140,7 +179,7 @@ module Locomotive
     # @return [ Locomotive::ContentType ] The content type matching the class_name
     #
     def self.class_name_to_content_type(class_name, site)
-      if class_name =~ /^Locomotive::Entry(.*)/
+      if class_name =~ /^Locomotive::ContentEntry(.*)/
         site.content_types.find($1)
       else
         nil
@@ -172,8 +211,14 @@ module Locomotive
     end
 
     def order_by_attribute
-      return self.order_by if %w(created_at updated_at _position).include?(self.order_by)
-      self.entries_custom_fields.find(self.order_by).name rescue 'created_at'
+      case self.order_by
+      when '_position'
+        self.sortable_column
+      when 'created_at', 'updated_at'
+        self.order_by
+      else
+        self.entries_custom_fields.find(self.order_by).name rescue 'created_at'
+      end
     end
 
     def normalize_slug
@@ -213,8 +258,9 @@ module Locomotive
     # @param [ CustomFields::Field ] field The field to check
     #
     def ensure_class_name_security(field)
-      if field.class_name =~ /^Locomotive::Entry([a-z0-9]+)$/
-        content_type = Locomotive::ContentType.find($1)
+      if field.class_name =~ /^Locomotive::ContentEntry([a-z0-9]+)$/
+        # if the content type does not exist (anymore), bypass the security checking
+        content_type = Locomotive::ContentType.find($1) rescue return
 
         if content_type.site_id != self.site_id
           field.errors.add :class_name, :security

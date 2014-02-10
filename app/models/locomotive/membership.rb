@@ -4,22 +4,22 @@ module Locomotive
     include Locomotive::Mongoid::Document
 
     ## fields ##
-    field :role, :default => 'author'
+    field :role, default: 'author'
 
     ## associations ##
-    referenced_in :account, :class_name => 'Locomotive::Account', :validate => false
-    embedded_in   :site,    :class_name => 'Locomotive::Site',    :inverse_of => :memberships
+    belongs_to  :account, class_name: 'Locomotive::Account', validate: false
+    embedded_in :site,    class_name: 'Locomotive::Site',    inverse_of: :memberships
 
     ## validations ##
     validates_presence_of :account
-    validate              :can_change_role, :if => :role_changed?
+    validate              :can_change_role, if: :role_changed?
 
     ## callbacks ##
     before_save :define_role
 
     ## methods ##
 
-    Ability::ROLES.each do |_role|
+    Locomotive::Ability::ROLES.each do |_role|
       define_method("#{_role}?") do
         self.role == _role
       end
@@ -29,7 +29,7 @@ module Locomotive
 
     def email=(email)
       @email = email
-      self.account = Locomotive::Account.where(:email => email).first
+      self.account = Locomotive::Account.where(email: email).first
     end
 
     def process!
@@ -48,13 +48,13 @@ module Locomotive
     end
 
     def ability
-      @ability ||= Ability.new(self.account, self.site)
+      @ability ||= Locomotive::Ability.new(self.account, self.site)
     end
 
     protected
 
     def define_role
-      self.role = Ability::ROLES.include?(role.downcase) ? role.downcase : Ability::ROLES.first
+      self.role = Locomotive::Ability::ROLES.include?(role.downcase) ? role.downcase : Locomotive::Ability::ROLES.first
     end
 
     # Users should not be able to set the role of another user to be higher than
@@ -62,12 +62,12 @@ module Locomotive
     # be an administrator
     def can_change_role
       current_site       = Thread.current[:site]
-      current_membership = current_site.memberships.where(:account_id => Thread.current[:account].id).first if current_site.present?
+      current_membership = current_site.memberships.where(account_id: Thread.current[:account].id).first if current_site.present?
 
       if current_membership.present?
         # The role cannot be set higher than the current one (we use the index in
         # the roles array to check role presidence)
-        errors.add(:role, :invalid) if Ability::ROLES.index(role) < Ability::ROLES.index(current_membership.role)
+        errors.add(:role, :invalid) if Locomotive::Ability::ROLES.index(role) < Locomotive::Ability::ROLES.index(current_membership.role)
       end
     end
 

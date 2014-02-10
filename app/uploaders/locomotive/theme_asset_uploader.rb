@@ -18,10 +18,17 @@ module Locomotive
     end
 
     def self.build(site, path)
-      asset     = site.theme_assets.build(:folder => File.dirname(path))
+      asset     = site.theme_assets.build(folder: File.dirname(path))
       uploader  = ThemeAssetUploader.new(asset)
       uploader.retrieve_from_store!(File.basename(path))
       uploader
+    end
+
+    def self.content_types
+      # pdf is not considered as a custom content type for theme assets.
+      list = super.clone
+      list.delete(:pdf)
+      list
     end
 
   end

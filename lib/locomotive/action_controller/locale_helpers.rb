@@ -33,11 +33,14 @@ module Locomotive
       end
 
       def back_to_default_site_locale
+        # we do force the content locale to the site default locale
+        params.delete(:content_locale)
+
         session[:content_locale] = ::Mongoid::Fields::I18n.locale = current_site.default_locale
       end
 
       def setup_i18n_fallbacks
-        (current_site.locales || []).each do |locale|
+        (current_site.try(:locales) || []).each do |locale|
           ::Mongoid::Fields::I18n.fallbacks_for(locale, current_site.locale_fallbacks(locale))
         end
       end

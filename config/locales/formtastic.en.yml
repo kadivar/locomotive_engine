@@ -42,7 +42,9 @@ en:
           select_options: "Options"
       content_entry:
         _slug: Permalink
+        _visible: Visible
       account:
+        api_key: API key
         edit:
           locale: UI Language
           password: New password
@@ -52,6 +54,9 @@ en:
         target_klass_name: Model
       site:
         locales: Languages
+        timezone_name: Timezone
+        new:
+          locales: First language
 
     hints:
       page:
@@ -73,6 +78,8 @@ en:
         meta_description: "Meta description used within the head tag of the page. Required for SEO."
         domain_name: "ex: locomotiveapp.org"
         robots_txt: "Content of the <span class='code'>/robots.txt</span> file. Check the following <a href='http://www.w3.org/TR/html4/appendix/notes.html#h-B.4.1.1'>url</a> for more information."
+        new:
+          locales: "You can add other languages once your site will be created."
       theme_asset:
         slug: "You do not need to add the extension file (.css or .js)"
         edit:
@@ -87,6 +94,7 @@ en:
           source: "The current file is available here %{url}"
       content_entry:
         _slug: "Property used to generate the url of a page working as a template for this content type (ex: \"template_page/{{ your_object._permalink }})\"."
+        _visible: "By default, the entry will show up in the site. So it can be used as a published attribute."
         seo_title: "The value you fill in will replace the SEO title of the templatized page related to your model."
         meta_keywords: "Overrides the site's meta keywords used within the head tag of the page. They are separated by a comma."
         meta_description: "Overrides the site's meta description used within the head tag of the page."

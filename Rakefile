@@ -8,13 +8,21 @@ end
 APP_RAKEFILE = File.expand_path("../spec/dummy/Rakefile", __FILE__)
 load APP_RAKEFILE
 
-# === Locomotive tasks ===
+# === LocomotiveCMS tasks ===
 load 'lib/tasks/locomotive.rake'
 
 # === Gems install tasks ===
 Bundler::GemHelper.install_tasks
 
-# === Travis
+# === Cucumber tasks ===
+
+require 'cucumber/rake/task'
+
+Cucumber::Rake::Task.new do |t|
+  t.rcov = false
+end
+
+# === Travis ===
 task :travis do
   puts "Precompile assets first to avoid potential time outs"
   system("bundle exec rake assets:precompile")

@@ -5,10 +5,10 @@
 
 - if can? :create, Locomotive::Translation
   - content_for :buttons do
-    = local_action_button t('.new'), new_translation_path, :icon => 'icon-plus' if can?(:create, Locomotive::Translation)
+    = local_action_button t('.new'), new_translation_path, icon: 'icon-plus' if can?(:create, Locomotive::Translation)
 
 - if @translations.empty?
-  %p.no-items!= t('.no_items', :url => new_translation_path)
+  %p.no-items!= t('.no_items', url: new_translation_path)
 - else
   %ul.list
     - @translations.each do |translation|
@@ -17,12 +17,14 @@
         %strong
           = link_to "#{translation.key}", edit_translation_path(translation)
 
-        %em= translation.values[I18n.locale.to_s]
+        %em= truncate translation.values[I18n.locale.to_s], length: 100
 
         - untranslated_locales(current_site, translation)
 
         .more
           %span!= t('.updated_at')
-          = l translation.updated_at, :format => :short
+          = l translation.updated_at, format: :short
 
-          = link_to_icon :trash, translation_url(translation), :title => t('.remove', key: translation.key), :class => 'remove', :data => { :confirm => t('locomotive.messages.confirm') }, :method => :delete
+          = link_to_icon :trash, translation_path(translation), title: t('.remove', key: translation.key, default: ''), class: 'remove', data: { confirm: t('locomotive.messages.confirm') }, method: :delete
+
+    = paginate @translations, namespace: 'locomotive'

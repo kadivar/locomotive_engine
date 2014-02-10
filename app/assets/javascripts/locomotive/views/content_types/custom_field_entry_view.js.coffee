@@ -34,7 +34,7 @@ class Locomotive.Views.ContentTypes.CustomFieldEntryView extends Backbone.View
 
   enable_behaviours: ->
     required_input = @$('.required-input input[type=checkbox]')
-    required_input.checkToggle(on_label: required_input.attr('data-on-label'), off_label: required_input.attr('data-off-label'))
+    required_input.checkToggle(on_label: required_input.data('on-label'), off_label: required_input.data('off-label'))
     @$('li.input.toggle input[type=checkbox]').checkToggle()
     @render_select_options_view()
 
@@ -49,7 +49,10 @@ class Locomotive.Views.ContentTypes.CustomFieldEntryView extends Backbone.View
       when 'belongs_to'
         @$('li.input.localized').hide()
         @$('li.input.class-name').show()
+      when 'image'
+        @$('li.input.unique').hide()
       when 'has_many', 'many_to_many'
+        @$('li.input.unique').hide()
         @$('li.input.localized').hide()
         @$('li.input.class-name').show()
         @$('li.input.inverse-of').show()
@@ -98,7 +101,7 @@ class Locomotive.Views.ContentTypes.CustomFieldEntryView extends Backbone.View
   remove: (event) ->
     event.stopPropagation() & event.preventDefault()
 
-    if confirm($(event.target).attr('data-confirm'))
+    if confirm($(event.target).data('confirm'))
       @$('.label-input input[type=text], .type-input select').editableField('destroy')
       super()
       @options.parent_view.remove_entry(@model, @)

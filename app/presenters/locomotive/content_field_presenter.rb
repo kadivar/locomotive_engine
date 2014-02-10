@@ -5,7 +5,7 @@ module Locomotive
 
     properties  :name, :label, :type
 
-    properties  :required, :localized, type: 'Boolean'
+    properties  :required, :localized, :unique, type: 'Boolean'
 
     properties  :hint, :position, required: false
 
@@ -49,11 +49,11 @@ module Locomotive
     end
 
     def class_slug
-      self.content_type.class_name_to_content_type(self.__source.class_name).try(:slug)
+      self.content_type.class_name_to_content_type(self.__source.class_name).try(:slug) rescue ::Mongoid::Errors::DocumentNotFound
     end
 
     def class_name=(value)
-      if value =~ /^Locomotive::Entry/
+      if value =~ /^Locomotive::ContentEntry/
         self.__source.class_name = value
       else
         if content_type = self.site.content_types.where(slug: value).first

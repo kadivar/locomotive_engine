@@ -8,21 +8,40 @@ module Locomotive
         included do
           include ::Mongoid::Tree
           include ::Mongoid::Tree::Ordering
+          include PatchedTreeMethods
 
           ## fields ##
-          field :depth, :type => Integer, :default => 0
+          field :depth, type: Integer, default: 0
 
           ## callbacks ##
           before_save     :persist_depth
+          before_save     :ensure_index_position
           before_destroy  :delete_descendants
 
           ## indexes ##
-          index :position
-          index [[:depth, Mongo::ASCENDING], [:position, Mongo::ASCENDING]]
+          index position: 1
+          index depth:    1, position: 1
+          index site_id:  1, depth:    1, position: 1
 
           alias_method_chain :rearrange, :identity_map
           alias_method_chain :rearrange_children, :identity_map
           alias_method_chain :siblings_and_self, :scoping
+        end
+
+        module PatchedTreeMethods
+
+          def ancestors
+            # https://github.com/benhutton/mongoid-tree/commit/acb6eb0440dc003cd8536cb8cc6ff4b16c9c9402
+            super.order_by(:depth.asc)
+          end
+
+          private
+
+          def assign_default_position
+            return if self.position.present? && !self.persisted?
+            super
+          end
+
         end
 
         module ClassMethods
@@ -37,7 +56,7 @@ module Locomotive
           # @return [ Array ] The first array of pages (depth = 0)
           #
           def quick_tree(site, minimal_attributes = true)
-            pages = (minimal_attributes ? site.pages.unscoped.minimal_attributes : site.pages.unscoped).order_by([:depth.asc, :position.asc]).to_a
+            pages = (minimal_attributes ? site.pages.unscoped.minimal_attributes : site.pages.unscoped).order_by(:depth.asc, :position.asc).to_a
 
             tmp = []
 
@@ -66,12 +85,7 @@ module Locomotive
               end
             end
 
-            current_page.instance_eval do
-              def children=(list); @children = list; end
-              def children; @children || []; end
-            end
-
-            current_page.children = children
+            current_page.instance_variable_set(:@children, children || [])
 
             current_page
           end
@@ -93,7 +107,7 @@ module Locomotive
         def sort_children!(ids)
           cached_children = self.children.to_a
           ids.each_with_index do |id, position|
-            child = cached_children.detect { |p| p._id == BSON::ObjectId(id) }
+            child = cached_children.detect { |p| p._id == Moped::BSON::ObjectId(id) }
             child.position = position
             child.save
           end
@@ -104,7 +118,7 @@ module Locomotive
         #
         # @return [Mongoid::Criteria] Mongoid criteria to retrieve the document's siblings and itself
         def siblings_and_self_with_scoping
-          base_class.where(:parent_id => self.parent_id, :site_id => self.site_id)
+          base_class.where(parent_id: self.parent_id, site_id: self.site_id)
         end
 
         def depth
@@ -125,6 +139,10 @@ module Locomotive
 
         def persist_depth
           self.depth = self.parent_ids.count
+        end
+
+        def ensure_index_position
+          self.position = 0 if self.index?
         end
 
       end

@@ -21,6 +21,10 @@ en:
       es: Spanish
       ru: Russian
       et: Estonian
+      ja: Japanese
+      zh-CN: Chinese
+      cs: Czech
+      bg: Bulgarian
 
     messages:
       confirm: Are you sure ?
@@ -74,8 +78,19 @@ en:
         title: "Hi %{name}, just to let you know that a new instance has been created on %{date} for the site <b>%{domain}</b>"
         type: "Model: %{type}"
 
+    pagination:
+      first: "&laquo;"
+      last: "&raquo;"
+      previous: "&lsaquo;"
+      next: "&rsaquo;"
+      truncate: "&hellip;"
+
     sites_picker:
       new: + new site
+
+    api_key:
+      none: Please click on the next button to generate the API key.
+      button: Regenerate
 
     custom_fields:
       edit:

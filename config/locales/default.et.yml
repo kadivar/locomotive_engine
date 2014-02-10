@@ -57,8 +57,8 @@ et:
   mongoid:
     errors:
       messages:
-        blank_on_locale: "ei saa olla tühi"
-        
+        blank_in_locale: "ei saa olla tühi"
+
     attributes:
       page:
         title: Tiitel
@@ -123,7 +123,7 @@ et:
 
   time:
     formats:
-      default: "%d %B %Y %H:%M"
+      default: "%d.%m.%Y %H:%M"
       time: "%H:%M"
       short: "%d %b %H:%M"
       long: "%A %d %B %Y %H:%M:%S %Z"

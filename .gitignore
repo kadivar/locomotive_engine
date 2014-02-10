@@ -26,6 +26,8 @@ doc/dev.txt
 *.gem
 tmp/*
 .rvmrc
+.ruby-gemset
+.ruby-version
 Capfile
 config/deploy.rb
 perf/*.rb
@@ -39,8 +41,12 @@ spec/dummy/public/sites
 /spec/dummy/spec/tmp
 /spec/dummy/log/*.log
 /spec/dummy/tmp/**/*
+/spec/dummy/mongodb
 app/assets/javascripts/old/
 app/assets/stylesheets/old/
 .rbenv-gemsets
 .gitignore
 Gemfile.lock
+dump.rdb
+doc/dump/
+doc/locomotive/new_ui.md

@@ -7,7 +7,7 @@ module Locomotive
 
     skip_load_and_authorize_resource
 
-    load_and_authorize_resource :class => 'Site'
+    load_and_authorize_resource class: 'Site'
 
     helper 'Locomotive::Sites'
 
@@ -15,11 +15,11 @@ module Locomotive
 
     before_filter :filter_attributes
 
-    before_filter :ensure_domains_list, :only => :update
+    before_filter :ensure_domains_list, only: :update
 
     before_filter :load_plugins
 
-    respond_to :json, :only => :update
+    respond_to :json, only: :update
 
     def edit
       respond_with @site
@@ -27,7 +27,7 @@ module Locomotive
 
     def update
       @site.update_attributes(params[:site])
-      respond_with @site, :location => edit_current_site_url(new_host_if_subdomain_changed)
+      respond_with @site, location: edit_current_site_path(new_host_if_subdomain_changed)
     end
 
     protected
@@ -61,7 +61,7 @@ module Locomotive
       if !Locomotive.config.manage_subdomain? || @site.domains.include?(request.host)
         {}
       else
-        { :host => site_url(@site, { :fullpath => false, :protocol => false }) }
+        { host: site_url(@site, { fullpath: false, protocol: false }) }
       end
     end
 

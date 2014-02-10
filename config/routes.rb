@@ -8,6 +8,10 @@ Locomotive::Engine.routes.draw do
     failure_app:  'Locomotive::Devise::FailureApp',
     controllers:  { sessions: 'locomotive/sessions', passwords: 'locomotive/passwords' }
 
+  authenticated :locomotive_account do
+    root to: 'pages#index'
+  end
+
   devise_scope :locomotive_account do
     match '/'         => 'sessions#new'
     delete 'signout'  => 'sessions#destroy', as: :destroy_locomotive_session
@@ -28,7 +32,9 @@ Locomotive::Engine.routes.draw do
 
   resources :accounts
 
-  resource :my_account, controller: 'my_account'
+  resource :my_account, controller: 'my_account' do
+    put :regenerate_api_key, on: :member
+  end
 
   resources :memberships
 
@@ -43,7 +49,8 @@ Locomotive::Engine.routes.draw do
   resources :content_types
 
   resources :content_entries, path: 'content_types/:slug/entries' do
-    put :sort, on: :collection
+    put :sort,    on: :collection
+    get :export,  on: :collection
   end
 
   # installation guide
@@ -71,6 +78,8 @@ Rails.application.routes.draw do
       resources :plugin_data, only: [:index, :show, :update]
 
       with_options only: [:index, :show, :create, :update, :destroy] do |api|
+
+        api.resources :accounts
 
         api.resources :sites
 

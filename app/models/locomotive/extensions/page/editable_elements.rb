@@ -6,7 +6,7 @@ module Locomotive
         extend ActiveSupport::Concern
 
         included do
-          embeds_many   :editable_elements, :class_name => 'Locomotive::EditableElement', :cascade_callbacks => true
+          embeds_many   :editable_elements, class_name: 'Locomotive::EditableElement', cascade_callbacks: true
 
           after_save    :remove_disabled_editable_elements
 
@@ -79,17 +79,36 @@ module Locomotive
             if existing_el.nil? # new one from parents
               new_el = self.editable_elements.build({}, el.class)
               new_el.copy_attributes_from(el)
-            else
+            elsif existing_el.from_parent? # it inherits from a parent page
               existing_el.disabled = false
+
+              # same type ? if not, convert it
+              if existing_el._type != el._type
+                existing_el = self.change_element_type(existing_el, el.class)
+              end
 
               # make sure the default content gets updated too
               existing_el.set_default_content_from(el)
 
-              # only the type, hint and fixed properties can be modified from the parent element
-              %w(_type hint fixed priority locales).each do |attr|
-                existing_el.send(:"#{attr}=", el.send(attr.to_sym))
-              end
+              # copy _type, hint, fixed, priority and locales + type custom attributes
+              existing_el.copy_default_attributes_from(el)
             end
+          end
+        end
+
+        def change_element_type(element, klass)
+          # build the new element
+          self.editable_elements.build({}, klass).tap do |new_element|
+            # copy the most important mongoid internal attributes
+            %w{_id _index new_record}.each do |attr|
+              new_element.send(:"#{attr}=", element.send(attr.to_sym))
+            end
+
+            # copy the main attributes from the previous version
+            new_element.attributes = element.attributes.reject { |attr| !%w(slug block from_parent).include?(attr) }
+
+            # remove the old one
+            self.editable_elements.delete_one(element)
           end
         end
 
@@ -100,7 +119,7 @@ module Locomotive
           return if ids.empty?
 
           # super fast way to remove useless elements all in once
-          self.collection.update(self.atomic_selector, '$pull' => { 'editable_elements' => { '_id' => { '$in' => ids } } })
+          self.collection.find(self.atomic_selector).update('$pull' => { 'editable_elements' => { '_id' => { '$in' => ids } } })
 
           # mark them as destroyed
           self.editable_elements.each do |el|

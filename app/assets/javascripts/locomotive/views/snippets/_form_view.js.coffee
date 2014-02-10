@@ -39,7 +39,6 @@ class Locomotive.Views.Snippets.FormView extends Locomotive.Views.Shared.FormVie
     @$('#snippet_name').slugify
       target:     @$('#snippet_slug')
       url:        window.permalink_service_url
-      underscore: true
 
   open_image_picker: (event) ->
     event.stopPropagation() & event.preventDefault()
@@ -72,7 +71,8 @@ class Locomotive.Views.Snippets.FormView extends Locomotive.Views.Shared.FormVie
       passDelay:        50
       tabMode:          'shift'
       theme:            'default medium'
-      onChange: (editor) => @model.set(template: editor.getValue())
+
+    @editor.on 'change', (editor, change) => @model.set(template: editor.getValue())
 
   after_inputs_fold: ->
     @editor.refresh()

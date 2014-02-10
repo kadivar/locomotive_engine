@@ -8,23 +8,23 @@ module Locomotive
     field :slug
     field :block
     field :hint
-    field :priority,          :type => Integer, :default => 0
-    field :fixed,             :type => Boolean, :default => false
-    field :disabled,          :type => Boolean, :default => false, :localize => true
-    field :from_parent,       :type => Boolean, :default => false
-    field :locales,           :type => Array,   :default => []
+    field :priority,          type: Integer, default: 0
+    field :fixed,             type: Boolean, default: false
+    field :disabled,          type: Boolean, default: false, localize: true
+    field :from_parent,       type: Boolean, default: false
+    field :locales,           type: Array,   default: []
 
     ## associations ##
-    embedded_in :page, :class_name => 'Locomotive::Page', :inverse_of => :editable_elements
+    embedded_in :page, class_name: 'Locomotive::Page', inverse_of: :editable_elements
 
     ## validations ##
     validates_presence_of :slug
 
     ## callbacks ##
-    after_save :propagate_content, :if => :fixed?
+    after_save :propagate_content, if: :fixed?
 
     ## scopes ##
-    scope :by_priority, :order_by => [[:priority, :desc]]
+    scope :by_priority, order_by(priority: :desc)
 
     ## methods ##
 
@@ -33,6 +33,7 @@ module Locomotive
     end
 
     def disabled_in_all_translations?
+      return self.disabled_translations if self.disabled_translations.is_a?(Boolean)
       self.disabled_translations.all? { |_, v| v == true }
     end
 
@@ -60,11 +61,16 @@ module Locomotive
     # @param [ Hash ] attributes The up-to-date attributes
     #
     def copy_attributes(attributes)
+      # _type is among the mass-assign protected attributes.
+      if type = attributes.delete(:_type)
+        self._type = type
+      end
+
       self.attributes = attributes
     end
 
     # Copy attributes from an existing editable element coming
-    # from the parent page. Each editable element may or not
+    # from the parent page. Each type of an editable element may or not
     # override this method. The source element is a new record.
     #
     # @param [ EditableElement] el The source element
@@ -72,6 +78,20 @@ module Locomotive
     def copy_attributes_from(el)
       self.attributes   = el.attributes.reject { |attr| !%w(slug block hint priority fixed disabled locales from_parent).include?(attr) }
       self.from_parent  = true
+    end
+
+    # Copy the default attributes: _type, hint, fixed, priority and locales
+    # from an existing editable element coming from the parent page.
+    # Each type of an editable element may or not override this method for
+    # options for instance.
+    #
+    # @param [ EditableElement] el The source element
+    #
+    def copy_default_attributes_from(el)
+      # only the type, hint and fixed properties can be modified from the element
+      %w(_type hint fixed priority locales).each do |attr|
+        self.send(:"#{attr}=", el.send(attr.to_sym))
+      end
     end
 
     # Set the default content from an existing editable element coming

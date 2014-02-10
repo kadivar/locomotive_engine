@@ -6,7 +6,7 @@ module Locomotive
         protected
 
         # Convert an array of properties ('key:value') into a hash
-        # Ex: ['width:50', 'height:100'] => { :width => '50', :height => '100' }
+        # Ex: ['width:50', 'height:100'] => { width: '50', height: '100' }
         def args_to_options(*args)
           options = {}
           args.flatten.each do |a|
@@ -31,7 +31,13 @@ module Locomotive
         end
 
         def asset_url(path)
-          ThemeAssetUploader.url_for(@context.registers[:site], path)
+          # keep the query string safe
+          path.gsub!(/(\?+.+)$/, '')
+          query_string = $1
+
+          url = ThemeAssetUploader.url_for(@context.registers[:site], path)
+
+          query_string ? "#{url}#{query_string}" : url
         end
 
         def absolute_url(url)

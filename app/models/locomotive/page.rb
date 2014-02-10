@@ -3,6 +3,8 @@ module Locomotive
 
     include Locomotive::Mongoid::Document
 
+    MINIMAL_ATTRIBUTES = %w(_id title slug fullpath position depth published templatized redirect listed response_type parent_id parent_ids site_id created_at updated_at)
+
     ## Extensions ##
     include Extensions::Page::Tree
     include Extensions::Page::EditableElements
@@ -11,49 +13,53 @@ module Locomotive
     include Extensions::Page::Templatized
     include Extensions::Page::Redirect
     include Extensions::Page::Listed
+    include Extensions::Shared::Slug
     include Extensions::Shared::Seo
 
     ## fields ##
-    field :title,               :localize => true
-    field :slug,                :localize => true
-    field :fullpath,            :localize => true
+    field :title,               localize: true
+    field :slug,                localize: true
+    field :fullpath,            localize: true
     field :handle
-    field :raw_template,        :localize => true
-    field :locales,             :type => Array
-    field :published,           :type => Boolean, :default => false
-    field :cache_strategy,      :default => 'none'
-    field :response_type,       :default => 'text/html'
+    field :raw_template,        localize: true
+    field :locales,             type: Array
+    field :published,           type: Boolean, default: false
+    field :cache_strategy,      default: 'none'
+    field :response_type,       default: 'text/html'
 
     ## associations ##
-    belongs_to :site, :class_name => 'Locomotive::Site'
+    belongs_to :site, class_name: 'Locomotive::Site', autosave: false
 
     ## indexes ##
-    index :site_id
-    index :parent_id
-    index [[:fullpath, Mongo::ASCENDING], [:site_id, Mongo::ASCENDING]]
+    index site_id:    1
+    index parent_id:  1
+    index fullpath:   1, site_id: 1
+
+    ## behaviours ##
+    slugify_from        :title
 
     ## callbacks ##
     after_initialize    :set_default_raw_template
-    before_validation   :normalize_slug
     before_save         :build_fullpath
     before_save         :record_current_locale
     before_destroy      :do_not_remove_index_and_404_pages
+    after_save          :update_children
 
     ## validations ##
     validates_presence_of     :site,    :title, :slug
-    validates_uniqueness_of   :slug,    :scope => [:site_id, :parent_id]
-    validates_uniqueness_of   :handle,  :scope => :site_id, :allow_blank => true
-    validates_exclusion_of    :slug,    :in => Locomotive.config.reserved_slugs, :if => Proc.new { |p| p.depth <= 1 }
+    validates_uniqueness_of   :slug,    scope: [:site_id, :parent_id], allow_blank: true
+    validates_uniqueness_of   :handle,  scope: :site_id, allow_blank: true
+    validates_exclusion_of    :slug,    in: Locomotive.config.reserved_slugs, if: Proc.new { |p| p.depth <= 1 }
 
     ## named scopes ##
-    scope :latest_updated,      :order_by => [[:updated_at, :desc]], :limit => Locomotive.config.ui[:latest_entries_nb]
-    scope :root,                :where => { :slug => 'index', :depth => 0 }
-    scope :not_found,           :where => { :slug => '404', :depth => 0 }
-    scope :published,           :where => { :published => true }
-    scope :fullpath,            lambda { |fullpath| { :where => { :fullpath => fullpath } } }
-    scope :handle,              lambda { |handle| { :where => { :handle => handle } } }
-    scope :minimal_attributes,  lambda { |attrs = []| { :only => (attrs || []) + %w(title slug fullpath position depth published templatized redirect listed response_type parent_id parent_ids site_id created_at updated_at) } }
-    scope :dependent_from,      lambda { |id| { :where => { :template_dependencies.in => [id] } } }
+    scope :latest_updated,      order_by(updated_at: :desc).limit(Locomotive.config.ui[:latest_entries_nb])
+    scope :root,                -> { where(slug: 'index', depth: 0) }
+    scope :not_found,           -> { where(slug: '404', depth: 0) }
+    scope :published,           where(published: true)
+    scope :fullpath,            ->(fullpath){ where(fullpath: fullpath) }
+    scope :handle,              ->(handle){ where(handle: handle) }
+    scope :minimal_attributes,  ->(attrs = []) { without(self.fields.keys - MINIMAL_ATTRIBUTES) }
+    scope :dependent_from,      ->(id) { where(:template_dependencies.in => [id]) }
 
     ## methods ##
 
@@ -101,11 +107,6 @@ module Locomotive
       self.errors.empty?
     end
 
-    def normalize_slug
-      self.slug = self.title.clone if self.slug.blank? && self.title.present?
-      self.slug.permalink! if self.slug.present?
-    end
-
     def set_default_raw_template
       self.raw_template ||= ::I18n.t('attributes.defaults.pages.other.body')
     end
@@ -118,6 +119,10 @@ module Locomotive
         slugs.shift unless slugs.size == 1
         self.fullpath = File.join slugs.compact
       end
+    end
+
+    def update_children
+      self.children.map(&:save) if self.slug_changed? or self.fullpath_changed?
     end
 
     def record_current_locale

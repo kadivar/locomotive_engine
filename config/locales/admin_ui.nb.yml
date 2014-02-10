@@ -21,6 +21,10 @@ nb:
       es: Spansk
       ru: Russisk
       et: Estisk
+      ja: Anamnese
+      zh-CN: Kinesisk
+      cs: Tsjekkisk
+      bg: Bulgarian
 
     messages:
       confirm: Er du sikker?
@@ -42,6 +46,7 @@ nb:
         account: Min konto
         site: Siden
         theme_assets: Temafiler
+        translations: Oversettelser
       form:
         change_file: Endre
         delete_file: Slett

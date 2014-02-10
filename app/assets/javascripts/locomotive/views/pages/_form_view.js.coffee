@@ -89,7 +89,8 @@ class Locomotive.Views.Pages.FormView extends Locomotive.Views.Shared.FormView
         passDelay:        50
         tabMode:          'shift'
         theme:            'default'
-        onChange: (editor) => @model.set(raw_template: editor.getValue())
+
+      @editor.on 'change', (editor, change) => @model.set(raw_template: editor.getValue())
 
   after_inputs_fold: ->
     @editor.refresh()
@@ -115,11 +116,11 @@ class Locomotive.Views.Pages.FormView extends Locomotive.Views.Shared.FormView
     @$('#page_slug').bind 'change', ((event) => @touched_url = true)
 
   listen_for_url_changes: ->
-    setInterval (=> (@change_page_url() & @touched_url = false) if @touched_url), 2000
+    setInterval (=> (@change_page_url() & @touched_url = false) if @touched_url), 1200
 
   change_page_url: ->
     $.rails.ajax
-      url:        @$('#page_slug').attr('data-url')
+      url:        @$('#page_slug').data('url')
       type:       'get'
       dataType:   'json'
       data:       { parent_id:  @$('#page_parent_id').val(), slug: @$('#page_slug').val() }
@@ -158,5 +159,5 @@ class Locomotive.Views.Pages.FormView extends Locomotive.Views.Shared.FormView
         @$('li#page_redirect_url_input, li#page_redirect_type_input').hide()
 
   enable_other_checkboxes: ->
-    _.each ['published', 'listed'], (exp) =>
-      @$('li#page_' + exp + '_input input[type=checkbox]').checkToggle()
+    @$('li.toggle input[type=checkbox].simple-toggle').checkToggle()
+    @$('li.toggle.simple-toggle input[type=checkbox]').checkToggle()

@@ -20,7 +20,7 @@ class Locomotive.Views.InlineEditor.ToolbarView extends Backbone.View
     @
 
   notify: (aloha_editable) ->
-    element_id  = aloha_editable.obj.attr('data-element-id')
+    element_id  = aloha_editable.obj.data('element-id')
     @model.get('editable_elements').get(element_id).set
       content: aloha_editable.getContents()
 
@@ -78,7 +78,7 @@ class Locomotive.Views.InlineEditor.ToolbarView extends Backbone.View
 
   editable_elements: ->
     if @options.target[0].contentWindow.Aloha
-      @options.target[0].contentWindow.Aloha.jQuery('.editable-long-text, .editable-short-text')
+      @options.target[0].contentWindow.Aloha.jQuery('.editable-text')
     else
       null
 

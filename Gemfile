@@ -1,28 +1,9 @@
 #!/usr/bin/env bundle
 # encoding: utf-8
 
-source :rubygems
+source "https://rubygems.org"
 
 gemspec # Include gemspec dependencies
-
-# The rest of the dependencies are for use when in the locomotive development environment
-
-group :development do
-  # gem 'custom_fields', :path => '../gems/custom_fields' # for Developers
-  # gem 'custom_fields', :git => 'git://github.com/locomotivecms/custom_fields.git', :branch => '2.0.0.rc' # Branch on Github
-
-  # gem 'locomotive-aloha-rails', :path => '../gems/aloha-rails' # for Developers
-  # gem 'locomotive-tinymce-rails', '~> 3.4.7.5', :path => '../gems/tinymce-rails' # for Developers
-  # gem 'locomotive_liquid', :path => '../gems/liquid' # for Developers
-
-  # gem 'locomotive_plugins', :path => '../locomotive_plugins' # For Developers
-
-  gem 'rspec-rails', '~> 2.8.0' # In order to have rspec tasks and generators
-  gem 'rspec-cells'
-
-  gem 'unicorn' # Using unicorn_rails instead of webrick (default server)
-
-end
 
 group :assets do
   gem 'sass-rails',   '~> 3.2.4'
@@ -31,30 +12,57 @@ group :assets do
   gem 'compass-rails'
 end
 
+# The rest of the dependencies are for use when in the locomotive development / test environments
+
+group :test, :development do
+  gem 'rspec-rails', '~> 2.13.0' # In order to have rspec tasks and generators
+  gem 'rspec-cells'
+end
+
+group :development do
+  # gem 'custom_fields', path: '../gems/custom_fields' # for Developers
+  # gem 'custom_fields', github: 'locomotivecms/custom_fields'
+  # gem 'custom_fields', git: 'git://github.com/locomotivecms/custom_fields.git', branch: '2.0.0.rc' # Branch on Github
+
+  # gem 'locomotive-aloha-rails', path: '../gems/aloha-rails' # for Developers
+  # gem 'locomotive-tinymce-rails', path: '../gems/tinymce-rails' # for Developers
+  # gem 'locomotive_liquid', path: '../gems/liquid' # for Developers
+  # gem 'locomotivecms_solid', path: '../gems/solid' # for Developers
+
+  # gem 'locomotive_plugins', :path => '../locomotive_plugins' # For Developers
+
+  gem 'rspec-rails', '~> 2.8.0' # In order to have rspec tasks and generators
+  gem 'rspec-cells'
+  # gem 'carrierwave-mongoid', git: 'git://github.com/locomotivecms/carrierwave-mongoid.git'
+
+  gem 'thor'
+  gem 'github_api'
+
+  gem 'unicorn' # Using unicorn_rails instead of webrick (default server)
+
+end
+
 group :test do
   gem 'launchy'
 
-  # gem 'autotest', :platforms => :mri
-  # gem 'ZenTest', :platforms => :mri
+  gem 'cucumber-rails', require: false
 
-  # gem 'growl-glue'
+  # gem 'autotest', platforms: :mri
+  # gem 'ZenTest', platforms: :mri
 
-  gem 'cucumber-rails',     :require => false
-  gem 'poltergeist',        '~> 1.0.2'
-  gem 'rspec-rails',        '~> 2.8.0'
-  gem 'shoulda-matchers'
+  gem 'poltergeist',        '~> 1.1.0'
+  gem 'shoulda-matchers',   '~> 1.5.2'
 
-  gem 'factory_girl_rails', '~> 1.6.0'
+  gem 'factory_girl_rails', '~> 4.2.1'
   gem 'pickle'
-  gem 'mocha',              '0.9.12' # :git => 'git://github.com/floehopper/mocha.git'
 
-  gem 'capybara',           '~> 1.1'
-
-  gem 'xpath',              '~> 0.1.4'
+  gem 'capybara',           '~> 2.0.2'
 
   gem 'json_spec'
 
   gem 'database_cleaner'
 
-  # gem 'debugger', :git => 'git://github.com/cldwalker/debugger.git'
+  gem 'mocha', '~> 0.13.0', require: false
+
+  # gem 'debugger', git: 'git://github.com/cldwalker/debugger.git'
 end

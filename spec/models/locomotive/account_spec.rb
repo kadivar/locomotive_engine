@@ -1,7 +1,7 @@
 require 'spec_helper'
 
 describe Locomotive::Account do
-  let!(:existing_account) { Factory(:account, :email => 'another@email.com') }
+  let!(:existing_account) { FactoryGirl.create(:account, email: 'another@email.com') }
 
   it 'has a valid factory' do
     FactoryGirl.build(:account).should be_valid
@@ -31,8 +31,8 @@ describe Locomotive::Account do
 
   it 'owns many sites' do
     account = FactoryGirl.create(:account)
-    site_1  = FactoryGirl.create(:site, :memberships => [Locomotive::Membership.new(:account => account)])
-    site_2  = FactoryGirl.create(:site, :subdomain => 'another_one', :memberships => [Locomotive::Membership.new(:account => account)])
+    site_1  = FactoryGirl.create(:site, memberships: [Locomotive::Membership.new(account: account)])
+    site_2  = FactoryGirl.create(:site, subdomain: 'another_one', memberships: [Locomotive::Membership.new(account: account)])
     sites   = [site_1, site_2].map(&:_id)
     account.reload.sites.all? { |s| sites.include?(s._id) }.should be_true
   end
@@ -41,8 +41,8 @@ describe Locomotive::Account do
 
     before(:each) do
       @account = FactoryGirl.build(:account)
-      @site_1 = FactoryGirl.build(:site,:memberships => [FactoryGirl.build(:membership, :account => @account)])
-      @site_2 = FactoryGirl.build(:site,:memberships => [FactoryGirl.build(:membership, :account => @account)])
+      @site_1 = FactoryGirl.build(:site,memberships: [FactoryGirl.build(:membership, account: @account)])
+      @site_2 = FactoryGirl.build(:site,memberships: [FactoryGirl.build(:membership, account: @account)])
       @account.stubs(:sites).returns([@site_1, @site_2])
       Locomotive::Site.any_instance.stubs(:save).returns(true)
     end
@@ -64,7 +64,7 @@ describe Locomotive::Account do
 
   end
 
-  describe '#admin?' do
+  describe '.admin?' do
 
     it 'is considered as an admin if she/he has a membership with an admin role' do
       create_site_and_account
@@ -78,8 +78,30 @@ describe Locomotive::Account do
 
     def create_site_and_account(role = 'admin')
       @account    = FactoryGirl.create(:account)
-      @membership = Locomotive::Membership.new(:account => @account, :role => role)
-      @site       = FactoryGirl.create(:site, :memberships => [@membership])
+      @membership = Locomotive::Membership.new(account: @account, role: role)
+      @site       = FactoryGirl.create(:site, memberships: [@membership])
+    end
+
+  end
+
+  describe 'api_key' do
+
+    let(:account) { FactoryGirl.build(:account) }
+
+    it 'is not nil for a new account (after validation)' do
+      account.valid?
+      account.api_key.should_not be_nil
+    end
+
+    it 'can be not changed by mass assignment' do
+      account.attributes = { api_key: 'foo' }
+      account.api_key.should_not == 'foo'
+    end
+
+    it 'can be regenerated over and over' do
+      key_1 = account.regenerate_api_key
+      key_1.should_not be_nil
+      account.regenerate_api_key.should_not == key_1
     end
 
   end

@@ -49,6 +49,11 @@ describe Locomotive::Liquid::Filters::Html do
     stylesheet_url('https://cdn.example.com/trash/main').should == result
   end
 
+  it 'should return a url for a stylesheet file with respect to URL-parameters' do
+    result = "/sites/000000000000000000000042/theme/stylesheets/main.css?v=42"
+    stylesheet_url('main.css?v=42').should == result
+  end
+
   it 'should return a link tag for a stylesheet file' do
     result = "<link href=\"/sites/000000000000000000000042/theme/stylesheets/main.css\" media=\"screen\" rel=\"stylesheet\" type=\"text/css\">"
     stylesheet_tag('main.css').should == result
@@ -77,6 +82,13 @@ describe Locomotive::Liquid::Filters::Html do
     result = "<link href=\"https://cdn.example.com/trash/main.css\" media=\"screen\" rel=\"stylesheet\" type=\"text/css\">"
     stylesheet_tag('https://cdn.example.com/trash/main.css').should == result
     stylesheet_tag('https://cdn.example.com/trash/main').should == result
+  end
+
+  it 'should return a link tag for a stylesheet stored in Amazon S3' do
+    url = 'https://com.citrrus.locomotive.s3.amazonaws.com/sites/42/theme/stylesheets/bootstrap2.css'
+    stubs(:asset_url).returns(url)
+    result = "<link href=\"#{url}\" media=\"screen\" rel=\"stylesheet\" type=\"text/css\">"
+    stylesheet_tag('bootstrap2.css').should == result
   end
 
   it 'should return a link tag for a stylesheet file and media attribute set to print' do
@@ -140,35 +152,45 @@ describe Locomotive::Liquid::Filters::Html do
     javascript_url('https://cdn.example.com/trash/main').should == result
   end
 
+  it 'should return a url for a javascript file with respect to URL-parameters' do
+    result = "/sites/000000000000000000000042/theme/javascripts/main.js?v=42"
+    javascript_url('main.js?v=42').should == result
+  end
+
   it 'should return a script tag for a javascript file' do
-    result = %{<script src="/sites/000000000000000000000042/theme/javascripts/main.js" type="text/javascript"></script>}
+    result = %{<script src="/sites/000000000000000000000042/theme/javascripts/main.js" type="text/javascript" ></script>}
     javascript_tag('main.js').should == result
     javascript_tag('main').should == result
     javascript_tag(nil).should == ''
   end
 
   it 'should return a script tag for a javascript file with folder' do
-    result = %{<script src="/sites/000000000000000000000042/theme/javascripts/trash/main.js" type="text/javascript"></script>}
+    result = %{<script src="/sites/000000000000000000000042/theme/javascripts/trash/main.js" type="text/javascript" ></script>}
     javascript_tag('trash/main.js').should == result
     javascript_tag('trash/main').should == result
   end
 
   it 'should return a script tag for a javascript file without touching the url that starts with "/"' do
-    result = %{<script src="/trash/main.js" type="text/javascript"></script>}
+    result = %{<script src="/trash/main.js" type="text/javascript" ></script>}
     javascript_tag('/trash/main.js').should == result
     javascript_tag('/trash/main').should == result
   end
 
   it 'should return a script tag for a javascript file without touching the url that starts with "http:"' do
-    result = %{<script src="http://cdn.example.com/trash/main.js" type="text/javascript"></script>}
+    result = %{<script src="http://cdn.example.com/trash/main.js" type="text/javascript" ></script>}
     javascript_tag('http://cdn.example.com/trash/main.js').should == result
     javascript_tag('http://cdn.example.com/trash/main').should == result
   end
 
   it 'should return a script tag for a javascript file without touching the url that starts with "https:"' do
-    result = %{<script src="https://cdn.example.com/trash/main.js" type="text/javascript"></script>}
+    result = %{<script src="https://cdn.example.com/trash/main.js" type="text/javascript" ></script>}
     javascript_tag('https://cdn.example.com/trash/main.js').should == result
     javascript_tag('https://cdn.example.com/trash/main').should == result
+  end
+
+  it 'should return a script tag for a javascript file with "defer" option' do
+    result = %{<script src="https://cdn.example.com/trash/main.js" type="text/javascript" defer="defer" ></script>}
+    javascript_tag('https://cdn.example.com/trash/main.js', ['defer:defer']).should == result
   end
 
   it 'should return an image tag for a given theme file without parameters' do
@@ -211,11 +233,11 @@ describe Locomotive::Liquid::Filters::Html do
     klass = Class.new
     klass.class_eval do
       def registers
-        { :site => FactoryGirl.build(:site, :id => fake_bson_id(42)) }
+        { site: FactoryGirl.build(:site, id: fake_bson_id(42)) }
       end
 
       def fake_bson_id(id)
-        BSON::ObjectId(id.to_s.rjust(24, '0'))
+        Moped::BSON::ObjectId(id.to_s.rjust(24, '0'))
       end
     end
     klass.new

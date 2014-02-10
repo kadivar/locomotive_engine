@@ -7,7 +7,7 @@ module Locomotive
     replace_field 'source', ::String, true
 
     ## fields ##
-    field :default_source_url, :localize => true
+    field :default_source_url, localize: true
 
     ## callbacks ##
     after_save :propagate_content
@@ -40,7 +40,7 @@ module Locomotive
     def copy_attributes_from(el)
       super(el)
 
-      if el.source_translations.nil?
+      if el.source_translations.blank?
         self.attributes['default_source_url'] = el.attributes['default_source_url'] || {}
       else
         el.source_translations.keys.each do |locale|
@@ -55,6 +55,9 @@ module Locomotive
       super(el)
 
       locale = ::Mongoid::Fields::I18n.locale.to_s
+
+      # make sure the default_source_url is safely defined
+      self.attributes['default_source_url'] ||= { locale => nil }
 
       if self.attributes['default_source_url'][locale].nil?
         self.default_source_url = el.default_source_url
@@ -77,8 +80,9 @@ module Locomotive
           }
         }
 
-        self.page.collection.update self._selector, operations, :multi => true
+        self.page.collection.find(self._selector).update(operations, multi: true)
       end
+      true
     end
 
   end

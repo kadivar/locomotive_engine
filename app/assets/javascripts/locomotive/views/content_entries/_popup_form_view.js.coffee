@@ -15,6 +15,8 @@ class Locomotive.Views.ContentEntries.PopupFormView extends Locomotive.Views.Con
     return @
 
   save: (event) ->
+    @touch_richtexteditor()
+
     @save_in_ajax event,
       headers:  { 'X-Flash': true }
       on_success: (response, xhr) =>
@@ -24,10 +26,11 @@ class Locomotive.Views.ContentEntries.PopupFormView extends Locomotive.Views.Con
 
   create_dialog: ->
     @dialog = $(@el).dialog
-      autoOpen: false
-      modal:    true
-      zIndex:   window.application_view.unique_dialog_zindex()
-      width:    770,
+      autoOpen:     false
+      modal:        true
+      dialogClass:  'content-entry-popup'
+      zIndex:       window.application_view.unique_dialog_zindex()
+      width:        770,
       create: (event, ui) =>
         $(@el).prev().find('.ui-dialog-title').html(@$('h2').html())
         @$('h2').remove()
@@ -69,6 +72,7 @@ class Locomotive.Views.ContentEntries.PopupFormView extends Locomotive.Views.Con
     $(@el).dialog('option', 'position', 'center')
 
   reset: (entry) =>
+    @model.reset_attributes()
     @model.set entry.attributes
 
     if entry.isNew()
@@ -86,5 +90,9 @@ class Locomotive.Views.ContentEntries.PopupFormView extends Locomotive.Views.Con
   enable_many_to_many_fields: ->
     # disabled in a popup form
 
+  touch_richtexteditor: ->
+    _.each @$('li.input.rte textarea.html'), (textarea) =>
+      $(textarea).tinymce().save()
+
   tinyMCE_settings: ->
-    _.extend { language: window.locale }, window.Locomotive.tinyMCE.popupSettings
+    window.Locomotive.tinyMCE.popupSettings

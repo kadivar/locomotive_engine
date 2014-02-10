@@ -61,7 +61,7 @@ module Locomotive
     # the "Page Not Found" page.
     #
     def render_no_page_error
-      render template: '/locomotive/errors/no_page', layout: false
+      render template: '/locomotive/errors/no_page', layout: false, status: 404, formats: [:html]
     end
 
     # Prepare and set the response object for the Locomotive page retrieved
@@ -108,7 +108,7 @@ module Locomotive
 
     # Get the Locomotive page matching the request and scoped by the current Locomotive site
     #
-    # @param [ String ] path An optional path overriding the default default behaviour to get a page
+    # @param [ String ] path An optional path overriding the default behaviour to get a page
     #
     # @return [ Object ] The Locomotive::Page
     #
@@ -162,9 +162,7 @@ module Locomotive
       end
 
       # Tip: switch from false to true to enable the re-thrown exception flag
-      context = ::Liquid::Context.new({}, assigns, self.locomotive_default_registers, false)
-
-      context
+      ::Liquid::Context.new({}, assigns, self.locomotive_default_registers, true)
     end
 
     # Get the assigns from the flash object (session). For instance, once
@@ -202,12 +200,18 @@ module Locomotive
         'path'              => request.path,
         'fullpath'          => request.fullpath,
         'url'               => request.url,
-        'now'               => Time.now.utc,
+        'ip_address'        => request.remote_ip,
+        'post?'             => request.post?,
+        'host'              => request.host_with_port,
+        'now'               => Time.now.in_time_zone(current_site.timezone),
         'today'             => Date.today,
         'locale'            => I18n.locale.to_s,
         'default_locale'    => current_site.default_locale.to_s,
         'locales'           => current_site.locales,
         'current_user'      => Locomotive::Liquid::Drops::CurrentUser.new(current_locomotive_account),
+        'session'           => Locomotive::Liquid::Drops::SessionProxy.new,
+        'wagon'             => false,
+        'editing'           => self.editing_page?
       }
     end
 
@@ -221,6 +225,7 @@ module Locomotive
         site:           current_site,
         page:           @page,
         inline_editor:  self.editing_page?,
+        logger:         Rails.logger,
         current_locomotive_account: current_locomotive_account
       }
     end

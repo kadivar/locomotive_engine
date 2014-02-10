@@ -28,6 +28,10 @@ module Locomotive
           @count ||= self.collection.count
         end
 
+        def all
+          self.collection
+        end
+
         alias :size   :count
         alias :length :count
 
@@ -37,6 +41,10 @@ module Locomotive
 
         def any
           self.collection.any?
+        end
+
+        def content_type
+
         end
 
         protected

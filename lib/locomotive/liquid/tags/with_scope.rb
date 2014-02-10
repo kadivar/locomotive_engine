@@ -6,42 +6,55 @@ module Locomotive
       #
       # Usage:
       #
-      # {% with_scope main_developer: 'John Doe', active: true %}
+      # {% with_scope main_developer: 'John Doe', providers.in: ['acme'], started_at.le: today, active: true %}
       #   {% for project in contents.projects %}
       #     {{ project.name }}
       #   {% endfor %}
       # {% endwith_scope %}
       #
 
-      class WithScope < ::Liquid::Block
+      class WithScope < Solid::Block
 
-        TagAttributes = /(\w+|\w+\.\w+)\s*\:\s*(#{::Liquid::QuotedFragment})/
+        OPERATORS = %w(all exists gt gte in lt lte ne nin size near within)
 
-        def initialize(tag_name, markup, tokens, context)
-          @attributes = HashWithIndifferentAccess.new
-          markup.scan(TagAttributes) do |key, value|
-            @attributes[key] = value
-          end
-          super
+        SYMBOL_OPERATORS_REGEXP = /(\w+\.(#{OPERATORS.join('|')})){1}\s*\:/
+
+        # register the tag
+        tag_name :with_scope
+
+        def initialize(tag_name, arguments_string, tokens, context = {})
+          # convert symbol operators into valid ruby code
+          arguments_string.gsub!(SYMBOL_OPERATORS_REGEXP, ':"\1" =>')
+
+          super(tag_name, arguments_string, tokens, context)
         end
 
-        def render(context)
-          context.stack do
-            context['with_scope'] = decode(@attributes.clone, context)
-            render_all(@nodelist, context)
+        def display(options = {}, &block)
+          current_context.stack do
+            current_context['with_scope'] = self.decode(options)
+            yield
           end
         end
 
-        private
+        protected
 
-        def decode(attributes, context)
-          attributes.each_pair do |key, value|
-            attributes[key] = context[value]
+        def decode(options)
+          HashWithIndifferentAccess.new.tap do |hash|
+            options.each do |key, value|
+              _key, _operator = key.to_s.split('.')
+
+              # _slug instead of _permalink
+              _key = '_slug' if _key == '_permalink'
+
+              # key to h4s symbol
+              _key = _key.to_s.to_sym.send(_operator.to_sym) if _operator
+
+              hash[_key] = value
+            end
           end
         end
       end
 
-      ::Liquid::Template.register_tag('with_scope', WithScope)
     end
   end
 end

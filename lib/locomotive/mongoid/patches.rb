@@ -2,6 +2,15 @@
 
 require 'mongoid'
 
+class RawArray < ::Array
+  def resizable?; false; end
+end
+
+# FIXME: we have serialiez templates which have references to the old BSON::ObjectId class.
+module BSON
+  class ObjectId < Moped::BSON::ObjectId; end
+end
+
 module Mongoid#:nodoc:
 
   module Document #:nodoc:
@@ -10,16 +19,6 @@ module Mongoid#:nodoc:
       attrs["id"] = attrs["_id"]
       attrs
     end
-  end
-
-  module Fields #:nodoc:
-    module Internal #:nodoc:
-      class RawArray < Mongoid::Fields::Internal::Array
-        def resizable?; false; end
-      end
-    end
-
-    class RawArray < ::Array; end
   end
 
   class Criteria
@@ -51,21 +50,6 @@ module Mongoid#:nodoc:
 
     class ExclusionValidator < ActiveModel::Validations::ExclusionValidator
       include Localizable
-    end
-
-    class UniquenessValidator < ActiveModel::EachValidator
-
-      def to_validate_with_localization(document, attribute, value)
-        field = document.fields[attribute.to_s]
-        if field.try(:localized?)
-          # no need of the translations, just the current value
-          value = document.send(attribute.to_sym)
-        end
-        to_validate_without_localization(document, attribute, value)
-      end
-
-      alias_method_chain :to_validate, :localization
-
     end
 
     module ClassMethods

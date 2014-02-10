@@ -3,7 +3,7 @@ module Locomotive
     module Filters
       module Html
 
-        # Returns a link tag that browsers and news readers can use to auto-detect an RSS or ATOM feed.
+        # Return a link tag that browsers and news readers can use to auto-detect an RSS or ATOM feed.
         # input: url of the feed
         # example:
         #   {{ '/foo/bar' | auto_discovery_link_tag: 'rel:alternate', 'type:application/atom+xml', 'title:A title' }}
@@ -22,13 +22,14 @@ module Locomotive
         def stylesheet_url(input)
           return '' if input.nil?
 
-          unless input =~ /^(\/|https?:)/
-            input = asset_url("stylesheets/#{input}")
+          if input =~ /^(\/|https?:)/
+            uri = URI(input)
+          else
+            uri = URI(asset_url("stylesheets/#{input}"))
           end
 
-          input = "#{input}.css" unless input.ends_with?('.css')
-
-          input
+          uri.path = "#{uri.path}.css" unless uri.path.ends_with?('.css')
+          uri.to_s
         end
 
         # Write the link tag of a theme stylesheet
@@ -46,23 +47,24 @@ module Locomotive
         def javascript_url(input)
           return '' if input.nil?
 
-          unless input =~ /^(\/|https?:)/
-            input = asset_url("javascripts/#{input}")
+          if input =~ /^(\/|https?:)/
+            uri = URI(input)
+          else
+            uri = URI(asset_url("javascripts/#{input}"))
           end
 
-          input = "#{input}.js" unless input.ends_with?('.js')
-
-          input
+          uri.path = "#{uri.path}.js" unless uri.path.ends_with?('.js')
+          uri.to_s
         end
 
         # Write the link to javascript resource
         # input: url of the javascript file
-        def javascript_tag(input)
+        def javascript_tag(input, *args)
           return '' if input.nil?
-
+          javascript_options = inline_options(args_to_options(args))
           input = javascript_url(input)
 
-          %{<script src="#{input}" type="text/javascript"></script>}
+          "<script src=\"#{input}\" type=\"text/javascript\" #{javascript_options}></script>"
         end
 
         def theme_image_url(input)

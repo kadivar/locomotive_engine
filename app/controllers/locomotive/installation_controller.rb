@@ -7,6 +7,8 @@ module Locomotive
 
     before_filter :allow_installation?
 
+    before_filter :set_content_locale
+
     helper Locomotive::BaseHelper, Locomotive::SitesHelper
 
     def show
@@ -48,7 +50,7 @@ module Locomotive
       case params[:step].to_i
       when 1 # already an account in db
         if account = Account.first
-          @step_done = I18n.t('locomotive.installation.step_1.done', :name => account.name, :email => account.email)
+          @step_done = I18n.t('locomotive.installation.step_1.done', name: account.name, email: account.email)
           render 'step_1' and return false
         end
       else
@@ -60,9 +62,15 @@ module Locomotive
       redirect_to pages_url if Site.count > 0 && Account.count > 0
     end
 
+    def set_content_locale
+      locale = params[:site].try(:[], :locales).try(:first) || Locomotive.config.site_locales.first
+      ::Mongoid::Fields::I18n.locale = locale
+      ::Mongoid::Fields::I18n.fallbacks_for(locale, Locomotive.config.site_locales)
+    end
+
     def last_url
       if Locomotive.config.manage_domains?
-        locomotive_account_session_url(:host => Site.first.domains.first, :port => request.port)
+        locomotive_account_session_url(host: Site.first.domains.first, port: request.port)
       else
         locomotive_account_session_url
       end

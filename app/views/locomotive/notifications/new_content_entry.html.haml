@@ -1,7 +1,7 @@
-%p= t('.title', :name => @account.name, :domain => @domain, :date => I18n.l(Time.now), :locale => @account.locale).html_safe
+%p= t('.title', name: @account.name, domain: @domain, date: I18n.l(Time.zone.now), locale: @account.locale).html_safe
 
 %p
-  %b= t('.type', :type => @type.name, :locale => @account.locale)
+  %b= t('.type', type: @type.name, locale: @account.locale)
   %br
   %i= @type.description
 
@@ -15,8 +15,6 @@
       &nbsp;-&nbsp;
       %i
         - case field.type.to_s
-        - when 'string', 'text', 'boolean', 'date'
-          = value
         - when 'file'
           - url = value.guess_url
           - url = url =~ /^http/ ? url : URI.join("http://#{@domain}", url).to_s # Amazon S3 (http/https) or local files ?
@@ -27,3 +25,7 @@
           = value.try(:_label)
         - when 'has_many', 'many_to_many'
           = value.map(&:_label).join(', ')
+        - when 'tags'
+          = value.join(', ')
+        - else
+          = value

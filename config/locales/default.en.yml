@@ -3,10 +3,17 @@ en:
     formats:
       default: "%m/%d/%Y"
 
+  time:
+    formats:
+      default: "%m/%d/%Y %H:%M"
+
   mongoid:
     errors:
       messages:
-        blank_on_locale: "can't be blank"
+        blank_in_locale: "can't be blank"
+    attributes:
+      locomotive/content_entry:
+        created_at: Created at
 
   errors:
       messages:

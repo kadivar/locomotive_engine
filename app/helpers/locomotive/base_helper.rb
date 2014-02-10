@@ -26,7 +26,7 @@ module Locomotive
     #
     def link_to_icon(name, *args, &block)
       name = name.is_a?(Symbol) ? "icon-#{name.to_s.dasherize}" : name
-      icon = content_tag(:i, '', :class => name)
+      icon = content_tag(:i, '', class: name)
       link_to(icon, *args, &block).html_safe
     end
 
@@ -45,19 +45,19 @@ module Locomotive
     end
 
     def submenu_entry(name, url, options = {}, &block)
-      default_options = { :i18n => true, :css => name.dasherize.downcase }
+      default_options = { i18n: true, css: name.dasherize.downcase }
       default_options.merge!(options)
 
       css = "#{'on' if name == sections(:sub)} #{options[:css]}"
 
       label_link = default_options[:i18n] ? t("locomotive.shared.menu.#{name}") : name
       if block_given?
-        popup = content_tag(:div, capture(&block), :class => 'popup', :style => 'display: none')
-        text  = content_tag(:span, preserve(label_link) + content_tag(:i, '', :class => 'icon-caret-down'))
-        link  = link_to(text + content_tag(:em), url, :class => css)
-        content_tag(:li, link + popup, :class => 'hoverable')
+        popup = content_tag(:div, capture(&block), class: 'popup', style: 'display: none')
+        text  = content_tag(:span, preserve(label_link) + content_tag(:i, '', class: 'icon-caret-down'))
+        link  = link_to(text + content_tag(:em), url, class: css)
+        content_tag(:li, link + popup, class: 'hoverable')
       else
-        content_tag(:li, link_to(content_tag(:span, label_link), url, :class => css))
+        content_tag(:li, link_to(content_tag(:span, label_link), url, class: css))
       end
     end
 
@@ -68,13 +68,13 @@ module Locomotive
       icon = icon.is_a?(Symbol) ? "icon-#{icon.to_s.dasherize}" : icon
 
       link_to(url, options) do
-        content_tag(:i, '', :class => icon) + text
+        content_tag(:i, '', class: icon) + text
       end
     end
 
     def locale_picker_link
       if current_site.locales.size > 1 && localized?
-        content_tag :div, render('locomotive/shared/locale_picker_link'), :class => 'action'
+        content_tag :div, render('locomotive/shared/locale_picker_link'), class: 'action'
       else
         nil
       end
@@ -84,8 +84,8 @@ module Locomotive
       if not flash.empty?
         first_key = flash.keys.first
         content_tag :div, flash[first_key],
-          :id => "flash-#{first_key}",
-          :class => 'application-message'
+          id: "flash-#{first_key}",
+          class: 'application-message'
       else
         ''
       end
@@ -136,11 +136,11 @@ module Locomotive
     # @return [ String ] The HTML image tag with the path to the matching flag.
     #
     def flag_tag(locale, size = '24x24')
-      image_tag("locomotive/icons/flags/#{locale}.png", :class => 'flag', :size => size)
+      image_tag("locomotive/icons/flags/#{locale}.png", class: 'flag', size: size)
     end
 
     def nocoffee_tag
-      link_to 'noCoffee', 'http://www.nocoffee.fr', :id => 'nocoffee'
+      link_to 'noCoffee', 'http://www.nocoffee.fr', id: 'nocoffee'
     end
 
     # sites
@@ -167,14 +167,6 @@ module Locomotive
       Locomotive.config.multi_sites?
     end
 
-    def public_page_url(page, options = {})
-      if content = options.delete(:content)
-        File.join(current_site_public_url, page.fullpath.gsub('content_type_template', ''), content._slug)
-      else
-        File.join(current_site_public_url, page.fullpath)
-      end
-    end
-
     # memberships
 
     def options_for_membership_roles(options = {})
@@ -199,6 +191,14 @@ module Locomotive
     def not_the_default_current_locale?
       current_site.localized? && current_content_locale.to_s != current_site.default_locale.to_s
     end
+
+    def localize(object, options = nil)
+      if respond_to?(:current_site) && current_site && object.respond_to?(:in_time_zone)
+        object = object.in_time_zone(current_site.timezone)
+      end
+      I18n.localize(object, options)
+    end
+    alias :l :localize
 
   end
 end
