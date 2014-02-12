@@ -90,7 +90,7 @@ module Locomotive
 
       def set_collection_name_prefix
         if current_site
-          ::Mongoid::Collections.with_collection_name_prefix("#{current_site.id}__") do
+          ::Mongoid::Sessions.with_collection_name_prefix("#{current_site.id}__") do
             yield
           end
         else

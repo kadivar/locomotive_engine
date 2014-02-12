@@ -46,7 +46,7 @@ describe 'Plugin Database Isolation' do
   protected
 
   def with_collection_prefix(name)
-    ::Mongoid::Collections.with_collection_name_prefix(name) do
+    ::Mongoid::Sessions.with_collection_name_prefix(name) do
       yield
     end
   end

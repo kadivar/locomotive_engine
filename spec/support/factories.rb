@@ -176,7 +176,7 @@ FactoryGirl.define do
 
   ## Plugins ##
   factory :plugin_data, :class => Locomotive::PluginData do
-    site { Locomotive::Site.where(:subdomain => "acme").first || Factory(:site) }
+    site { Locomotive::Site.where(:subdomain => "acme").first || FactoryGirl.create(:site) }
     plugin_id 'my_plugin_id'
   end
 

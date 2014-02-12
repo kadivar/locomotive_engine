@@ -120,9 +120,9 @@ describe 'Plugin Authorization' do
   end
 
   def enable_plugins
-    Factory.create(:plugin_data, plugin_id: 'first_plugin', enabled: true,
+    FactoryGirl.create(:plugin_data, plugin_id: 'first_plugin', enabled: true,
       site: site)
-    Factory.create(:plugin_data, plugin_id: 'second_plugin', enabled: false,
+    FactoryGirl.create(:plugin_data, plugin_id: 'second_plugin', enabled: false,
       site: site)
   end
 
