@@ -31,8 +31,6 @@ group :development do
 
   # gem 'locomotive_plugins', :path => '../locomotive_plugins' # For Developers
 
-  gem 'rspec-rails', '~> 2.8.0' # In order to have rspec tasks and generators
-  gem 'rspec-cells'
   # gem 'carrierwave-mongoid', git: 'git://github.com/locomotivecms/carrierwave-mongoid.git'
 
   gem 'thor'
