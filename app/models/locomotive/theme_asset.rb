@@ -18,7 +18,7 @@ module Locomotive
     mount_uploader :source, ThemeAssetUploader, mount_on: :source_filename, validate_integrity: true
 
     ## associations ##
-    belongs_to :site, class_name: 'Locomotive::Site', autosave: false
+    belongs_to :site, class_name: 'Locomotive::Site', validate: false, autosave: false
 
     ## indexes ##
     index site_id:  1
@@ -39,6 +39,7 @@ module Locomotive
     validate                :content_type_can_not_change
 
     ## named scopes ##
+
 
     ## accessors ##
     attr_accessor   :plain_text_name, :plain_text, :plain_text_type, :performing_plain_text
@@ -72,11 +73,8 @@ module Locomotive
     end
 
     def plain_text
-      if RUBY_VERSION =~ /1\.9/
-        @plain_text ||= (self.source.read.force_encoding('UTF-8') rescue nil)
-      else
-        @plain_text ||= self.source.read
-      end
+      # only for ruby >= 1.9.x. Forget about ruby 1.8
+      @plain_text ||= (self.source.read.force_encoding('UTF-8') rescue nil)
     end
 
     def plain_text_type
@@ -109,6 +107,14 @@ module Locomotive
     def self.all_grouped_by_folder(site)
       assets = site.theme_assets.order_by(:slug.asc)
       assets.group_by { |a| a.folder.split('/').first.to_sym }
+    end
+
+    def self.checksums
+      {}.tap do |hash|
+        self.only(:local_path, :checksum).each do |asset|
+          hash[asset.local_path] = asset.checksum
+        end
+      end
     end
 
     def to_liquid

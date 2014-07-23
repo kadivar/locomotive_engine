@@ -25,6 +25,8 @@ en:
       zh-CN: Chinese
       cs: Czech
       bg: Bulgarian
+      sk: Slovak
+      sr: Serbian
 
     messages:
       confirm: Are you sure ?
@@ -264,6 +266,12 @@ en:
         title: "Insert media"
         no_items: "There are no media for now."
         upload: "Upload media"
+        placeholder_search: Search by filename
+        types:
+          pdf: PDFs
+          image: images
+          media: rich media
+          others: others
 
     content_types:
       index:

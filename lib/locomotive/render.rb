@@ -77,8 +77,14 @@ module Locomotive
       response.headers['Content-Type']  = "#{@page.response_type}; charset=utf-8"
       response.headers['Editable']      = 'true' unless self.editing_page? || current_locomotive_account.nil?
 
+      # Inputs which define the ETag for this response
+      etag_inputs = {
+        'page'   => @page.cache_key,
+        'locale' => params[:locale]
+      }
+
       if @page.with_cache?
-        fresh_when etag: @page, last_modified: @page.updated_at.utc, public: true
+        fresh_when etag: etag_inputs, last_modified: @page.updated_at.utc, public: true
 
         if @page.cache_strategy != 'simple' # varnish
           response.headers['Editable']      = ''
@@ -191,6 +197,7 @@ module Locomotive
     #
     def locomotive_default_assigns
       {
+        'env'               => Rails.env,
         'site'              => current_site.to_liquid,
         'page'              => @page,
         'models'            => Locomotive::Liquid::Drops::ContentTypes.new,
@@ -221,12 +228,13 @@ module Locomotive
     #
     def locomotive_default_registers
       {
-        controller:     self,
-        site:           current_site,
-        page:           @page,
-        inline_editor:  self.editing_page?,
-        logger:         Rails.logger,
-        current_locomotive_account: current_locomotive_account
+        controller:                 self,
+        site:                       current_site,
+        page:                       @page,
+        inline_editor:              self.editing_page?,
+        logger:                     Rails.logger,
+        current_locomotive_account: current_locomotive_account,
+        theme_assets_checksum:      Locomotive.config.theme_assets_checksum ? current_site.theme_assets.checksums : {}
       }
     end
 

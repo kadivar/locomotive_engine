@@ -26,6 +26,8 @@ fr:
       zh-CN: Chinois
       cs: Tchèque
       bg: Bulgare
+      sk: Slovaque
+      sr: Serbe
 
     buttons:
       login: Se connecter
@@ -149,6 +151,9 @@ fr:
         ask_for_title: "Veuillez entrer le nouveau titre"
       form:
         default_block: Défaut
+        change_file: Changer
+        cancel: Annuler
+        delete_file: Supprimer
         cache_strategy:
           none: Aucun
           simple: Simple
@@ -260,6 +265,12 @@ fr:
         title: "Insérer un média"
         no_items: "Il n'y a aucun média."
         upload: "Uploader média"
+        placeholder_search: Recherche par nom de fichier
+        types:
+          pdf: pdf
+          image: image
+          media: média
+          others: autres
 
     content_types:
       index:
@@ -271,8 +282,8 @@ fr:
       edit:
         title: Edition modèle
         help: "Votre modèle doit au moins comporter un champ. Le premier champ sera obligatoire lorsque vous ajouterez un élément de ce type-là."
-        show_items: voir éléments
-        new_item: nouvel élément
+        show_entries: voir éléments
+        new_entry: nouvel élément
       form:
         order_by:
           created_at: 'Par date de création'

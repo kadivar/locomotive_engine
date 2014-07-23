@@ -8,9 +8,8 @@ Locomotive.configure do |config|
   config.multi_sites do |multi_sites|
     # each new website you add will have a default entry based on a subdomain
     # and the multi_site_domain value (ex: website_1.locomotivehosting.com).
-    # multi_sites.domain = 'engine.dev' #'myhostingplatform.com'
-    multi_sites.domain = 'example.com'
-    # multi_sites.domain = 'locomotivehosting.fr'
+    # multi_sites.domain = 'example.com'
+    multi_sites.domain = 'lvh.me'
 
     # define the reserved subdomains
     # Ex:
@@ -34,11 +33,11 @@ Locomotive.configure do |config|
     per_page:           10
   }
 
-  # default locale (for now, only en, de, fr, pl, pt-BR, it, nl, nb, ja, cs and bg are supported)
+  # default locale (for now, only en, de, fr, pl, pt-BR, it, nl, nb, ja, cs, bg and sk are supported)
   config.default_locale = :en
 
   # available locales suggested to "localize" a site. You will have to pick up at least one among that list.
-  # config.site_locales = %w{en de fr pl pt-BR it nl nb es ru ja cs bg}
+  # config.site_locales = %w{en de fr pl pt-BR it nl nb es ru ja cs bg sk}
 
   # tell if logs are enabled. Useful for debug purpose.
   config.enable_logs = true
@@ -70,6 +69,11 @@ Locomotive.configure do |config|
   # Note: we strongly recommend to enable it. See the documentation about the "csrf_param" liquid tag.
   #
   # config.csrf_protection = true
+
+  # Add the checksum of a theme asset at the end of its path to allow public caching.
+  # By default, it's disabled.
+  #
+  # config.theme_assets_checksum = true
 
   # Rack-cache settings, mainly used for the inline resizing image module. Default options:
   # config.rack_cache = {

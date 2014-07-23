@@ -25,6 +25,8 @@ nb:
       zh-CN: Kinesisk
       cs: Tsjekkisk
       bg: Bulgarian
+      sk: Slovakisk
+      sr: Serbian
 
     messages:
       confirm: Er du sikker?

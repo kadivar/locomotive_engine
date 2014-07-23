@@ -23,11 +23,11 @@ Locomotive.configure do |config|
   #   per_page:           10
   # }
 
-  # default locale (for now, only en, de, fr, pl, pt-BR, it, nb, ja, zh-CN, cs and bg are supported)
+  # default locale (for now, only en, de, fr, pl, pt-BR, it, nb, ja, zh-CN, cs, bg and sk are supported)
   config.default_locale = :en
 
   # available locales suggested to "localize" a site. You will have to pick up at least one among that list.
-  # config.site_locales = %w{en de fr pl pt-BR it nl nb es ru ja zh-CN cs bg}
+  # config.site_locales = %w{en de fr pl pt-BR it nl nb es ru ja zh-CN cs bg sk sr}
 
   # tell if logs are enabled. Useful for debug purpose.
   config.enable_logs = true
@@ -59,6 +59,11 @@ Locomotive.configure do |config|
   # Note: we strongly recommend to enable it. See the documentation about the "csrf_param" liquid tag.
   #
   # config.csrf_protection = true
+
+  # Add the checksum of a theme asset at the end of its path to allow public caching.
+  # By default, it's disabled.
+  #
+  # config.theme_assets_checksum = true
 
   # Rack-cache settings, mainly used for the inline resizing image module. Default options:
   # config.rack_cache = {
