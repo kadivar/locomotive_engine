@@ -7,9 +7,6 @@ class Locomotive.Models.Site extends Backbone.Model
   initialize: ->
     @_fix_attributes()
 
-    plugins = new Locomotive.Models.PluginsCollection(@get('plugins'))
-
-    @set domains: domains, memberships: memberships, plugins: plugins
     # After save, need to fix the attributes again
     this.on 'sync', ->
       @_fix_attributes()
@@ -28,9 +25,6 @@ class Locomotive.Models.Site extends Backbone.Model
       hash.memberships_attributes = @get('memberships').toJSONForSave() if @get('memberships')? && @get('memberships').length > 0
       delete hash.domains
       hash.domains = _.map(@get('domains'), (domain) -> domain.get('name'))
-      delete hash.plugins
-      plugins_json = @get('plugins').toJSON()
-      hash.plugins = plugins_json unless plugins_json.length == 0
       hash.locales = _.flatten([@get('locales')])
 
   _fix_attributes: ->
@@ -39,8 +33,10 @@ class Locomotive.Models.Site extends Backbone.Model
       new Locomotive.Models.Domain(name: name)
 
     memberships = new Locomotive.Models.MembershipsCollection(@get('memberships'))
+    plugins = new Locomotive.Models.PluginsCollection(@get('plugins'))
 
-    @set domains: domains, memberships: memberships
+    @set domains: domains, memberships: memberships, plugins: plugins
+
 
 class Locomotive.Models.CurrentSite extends Locomotive.Models.Site
 
