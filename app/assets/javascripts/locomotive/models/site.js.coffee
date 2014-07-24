@@ -23,6 +23,8 @@ class Locomotive.Models.Site extends Backbone.Model
       _.each ['locales_text', 'timezone_name_text'], (key) => delete hash[key]
       delete hash.memberships
       hash.memberships_attributes = @get('memberships').toJSONForSave() if @get('memberships')? && @get('memberships').length > 0
+      delete hash.plugins
+      hash.plugins = @get('plugins').toJSONForSave() if @get('plugins')? && @get('plugins').length > 0
       delete hash.domains
       hash.domains = _.map(@get('domains'), (domain) -> domain.get('name'))
       hash.locales = _.flatten([@get('locales')])

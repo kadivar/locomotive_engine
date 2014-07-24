@@ -30,7 +30,7 @@ Background:
     And I should not see the element "#site_plugins_first_cucumber_plugin_enabled"
     And I should not see "Second cucumber plugin"
     And I should not see the element "#site_plugins_second_cucumber_plugin_enabled"
-    And I should see "Cucumber Plugin Config"
+    And I should see "Cucumber Plugin Config Two"
 
   @javascript
   Scenario: Accessing plugin settings as an Author

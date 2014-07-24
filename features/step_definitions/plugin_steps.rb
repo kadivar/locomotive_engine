@@ -31,7 +31,7 @@ Given /^the plugin data for "(.*?)" has ID "(.*?)"$/ do |plugin_id, id|
 
   if plugin_data
     new_plugin_data = @site.plugin_data.new
-    new_plugin_data.id = BSON::ObjectId(id)
+    new_plugin_data.id = Moped::BSON::ObjectId(id)
 
     %w{plugin_id config enabled}.each do |meth|
       new_plugin_data.send("#{meth}=", plugin_data.send(meth))

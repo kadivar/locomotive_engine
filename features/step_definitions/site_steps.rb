@@ -45,11 +45,6 @@ Given /^multi_sites is disabled$/ do
   Locomotive.after_configure
 end
 
-Given /^multi_sites is disabled$/ do
-  Locomotive.config.multi_sites = false
-  Locomotive.after_configure
-end
-
 Then /^I should be a administrator of the "([^"]*)" site$/ do |name|
   site = Locomotive::Site.where(name: name).first
   m = site.memberships.detect { |m| m.account_id == @admin._id && m.admin? }

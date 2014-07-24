@@ -82,7 +82,7 @@ class FirstCucumberPlugin
   def config_template_file
     # Rails root is at spec/dummy
     engine_root = Rails.root.join('..', '..')
-    engine_root.join('spec', 'fixtures', 'assets', 'plugin_config_template.html.haml')
+    engine_root.join('spec', 'fixtures', 'assets', 'plugin_config_template_2.html.haml')
   end
 end
 
@@ -92,6 +92,6 @@ class SecondCucumberPlugin
   def config_template_file
     # Rails root is at spec/dummy
     engine_root = Rails.root.join('..', '..')
-    engine_root.join('spec', 'fixtures', 'assets', 'plugin_config_template.html.haml')
+    engine_root.join('spec', 'fixtures', 'assets', 'plugin_config_template_2.html.haml')
   end
 end
