@@ -63,7 +63,7 @@ describe 'Plugin Database Isolation' do
       include Locomotive::Plugin
 
       class Model
-        include Mongoid::Document
+        include Locomotive::Plugins::Document
         field :name
       end
 

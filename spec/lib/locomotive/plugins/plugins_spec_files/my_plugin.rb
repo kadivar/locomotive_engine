@@ -4,5 +4,5 @@ class MyPlugin
 end
 
 class PluginModel
-  include Mongoid::Document
+  include Locomotive::Plugins::Document
 end
