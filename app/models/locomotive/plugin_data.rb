@@ -56,6 +56,5 @@ module Locomotive
     def mountpoint
       Plugins::Mounter.mountpoint_for_plugin_id(plugin_id)
     end
-
   end
 end
