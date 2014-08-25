@@ -7,6 +7,7 @@ module Locomotive
   module Plugins
 
     extend Registration
+    extend JS3
 
     def self.init_plugins
       raise 'Cannot nest init_plugins block' if in_init_block?
@@ -55,6 +56,7 @@ module Locomotive
     def self.handle_added_plugin_class(plugin_class)
       plugin_id = register_plugin!(plugin_class)
       load_tags!(plugin_id, plugin_class)
+      add_javascript_context(plugin_id, plugin_class)
     end
 
     def self._added_plugin_class(plugin_class)

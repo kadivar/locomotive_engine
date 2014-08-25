@@ -54,10 +54,13 @@ module Locomotive
 
       def set_current_site
         old_site = self.current_site
+        thread_old = Thread.current[:site]
         self.current_site = fetch_site
+        Thread.current[:site] = self.current_site
         yield
       ensure
         self.current_site = old_site
+        Thread.current[:site] = thread_old
       end
 
       def set_plugin_id

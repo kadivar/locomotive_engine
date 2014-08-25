@@ -59,6 +59,18 @@ module Locomotive
       end
     end
 
+    it 'should be able to add js3 context' do
+      MyPlugin.expects(:javascript_context)
+      Plugins.send(:add_javascript_context, 'my_plugin', MyPlugin)
+    end
+
+    it 'should add to the js3 context for loaded plugins' do
+      Plugins.expects(:add_javascript_context).with('my_plugin', MyPlugin)
+      Plugins.init_plugins do
+        load_plugin 'my_plugin.rb', true
+      end
+    end
+
     it 'should ensure that only Mongoid models in the init_plugins block use the collection prefix' do
       PluginModel.use_collection_name_prefix?.should be_true
       OtherModel.use_collection_name_prefix?.should be_false
