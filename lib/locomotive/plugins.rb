@@ -8,6 +8,7 @@ module Locomotive
 
     extend Registration
     extend JS3
+    extend Helper
 
     def self.init_plugins
       raise 'Cannot nest init_plugins block' if in_init_block?
