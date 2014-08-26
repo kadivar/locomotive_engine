@@ -42,8 +42,10 @@ module Locomotive
     def construct_plugin_object
       if plugin_class
         plugin_class.new.tap do |plugin_object|
-          %w{config mountpoint}.each do |meth|
-            plugin_object.public_send(:"#{meth}=", self.send(meth))
+          plugin_object.run_callbacks(:plugin_setup) do
+            %w{config mountpoint}.each do |meth|
+              plugin_object.public_send(:"#{meth}=", self.send(meth))
+            end
           end
         end
       else
