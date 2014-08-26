@@ -12,6 +12,8 @@ module Locomotive
             end
           end
         end
+        cxt['mongoid_where'] = lambda{|this,criteria,key,value| criteria.where(key.to_sym => value) }
+        cxt['mongoid_in'] = lambda{|this,criteria,key,value| criteria.in(key.to_sym => value) }
         cxt
       end
 
