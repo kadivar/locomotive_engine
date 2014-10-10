@@ -14,6 +14,7 @@ module Locomotive
         end
         cxt['mongoid_where'] = lambda{|this,criteria,key,value| criteria.where(key.to_sym => value) }
         cxt['mongoid_in'] = lambda{|this,criteria,key,value| criteria.in(key.to_sym => value) }
+        cxt['mongoid_create'] = lambda{|this,criteria,object| hash = {}; object.each{|k,v| hash[k] = v}; criteria.create(hash)}
         Thread.current[:site].content_types.each do |type|
           cxt['content_'+type.slug] = type.entries
           cxt['type_'+type.slug] = eval(type.klass_name)
