@@ -17,7 +17,7 @@ module Locomotive
         cxt['mongoid_create'] = lambda{|this,criteria,object| hash = {}; object.each{|k,v| hash[k] = v}; criteria.create(hash)}
         Thread.current[:site].content_types.each do |type|
           cxt['content_'+type.slug] = type.entries
-          cxt['type_'+type.slug] = eval(type.klass_name)
+          cxt['type_'+type.slug] = eval(type.entries_class_name)
         end
         cxt
       end
