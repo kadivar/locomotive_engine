@@ -37,7 +37,7 @@ group :development do
   gem 'github_api'
 
   gem 'unicorn-rails' # Using unicorn_rails instead of webrick (default server)
-
+  gem 'debugger'
 end
 
 group :test do
@@ -62,5 +62,4 @@ group :test do
 
   gem 'mocha', '~> 0.13.0', require: false
 
-  gem 'debugger'
 end
